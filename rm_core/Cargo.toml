@@ -1,0 +1,7 @@
+[package]
+name = "rm_core"
+version = "0.0.1"
+authors = ["cjschneider2 <cjschneider2@gmail.com>"]
+
+[dependencies]
+byteorder = "*"

@@ -10,4 +10,4 @@ Cargo.lock
 **/*.rs.bk
 
 # The data directory
-/Data/
+/data/

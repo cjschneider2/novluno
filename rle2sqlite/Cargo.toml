@@ -1,0 +1,9 @@
+[package]
+name = "rle2sqlite"
+version = "0.1.0"
+authors = ["cjschneider2 <schneider@br-tech.de>"]
+
+[dependencies.rm_core]
+path = "../rm_core"
+
+[dependencies]

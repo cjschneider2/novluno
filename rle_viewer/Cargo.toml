@@ -1,0 +1,16 @@
+[package]
+name = "rle_viewer"
+version = "0.0.1"
+authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
+
+[dependencies.rm_core]
+path = "../rm_core"
+
+[dependencies.gtk]
+version = "0.1.3"
+features = ["v3_10"]
+
+[dependencies]
+gdk-pixbuf = "*"
+gdk = "*"
+glib = "*"
