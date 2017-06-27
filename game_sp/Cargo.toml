@@ -1,16 +1,10 @@
 [package]
-name = "rle_viewer"
-version = "0.0.1"
+name = "game_sp"
+version = "0.1.0"
 authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
 
 [dependencies.core_compat]
 path = "../core_compat"
 
-[dependencies.gtk]
-version = "0.1.3"
-features = ["v3_10"]
-
 [dependencies]
-gdk-pixbuf = "*"
-gdk = "*"
-glib = "*"
+sdl2 = "*"

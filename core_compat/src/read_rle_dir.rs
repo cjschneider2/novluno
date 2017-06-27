@@ -15,7 +15,7 @@ pub fn read_rle_dir(rle_list: &Path, rle_folder: &Path) -> Result<Vec<rle::Resou
     let mut rle_list_file = File::open(rle_list)?;
     let mut list_bytes = Vec::<u8>::new();
     rle_list_file.read_to_end(&mut list_bytes)?;
-    let list = lst::List::load(&list_bytes,false)?;
+    let list = lst::List::load(&list_bytes, false)?;
 
     // load and parse the rle files
     let rle_file_paths = read_dir(rle_folder)?;

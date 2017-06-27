@@ -81,7 +81,7 @@ impl ResourceFile {
         let (file_type, _rest) = if data.len() >= 14 {
             data.split_at(14)
         } else {
-            return Err(Error::MissingRleIdentifier)
+            return Err(Error::MissingRleIdentifier);
         };
         let file_type: &str = from_utf8(file_type)?;
 

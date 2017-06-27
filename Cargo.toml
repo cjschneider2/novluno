@@ -1,3 +1,3 @@
 [workspace]
 
-members = ["rm_core", "rle_viewer", "rle2sqlite"]
+members = ["core_compat", "game_sp", "rle_viewer", "rle2sqlite"]

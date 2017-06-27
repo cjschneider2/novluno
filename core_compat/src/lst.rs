@@ -37,11 +37,11 @@ impl List {
         }
         {
             let file_type: &str = from_utf8(&string)?;
-            println!("{:?}", &file_type);
+            // println!("{:?}", &file_type);
         }
         // file version length prefixed string
         let version: &str;
-        { 
+        {
             let version_length = cursor.read_u8()?;
             string.clear();
             for _ in 0..version_length {
@@ -49,7 +49,7 @@ impl List {
                 string.push(chr);
             }
             version = from_utf8(&string)?;
-            println!("{:?}", &version);
+            // println!("{:?}", &version);
         }
 
         if use_v2 {
@@ -58,17 +58,15 @@ impl List {
             match version {
                 "1.0" => load_1_0(&mut cursor),
                 "1.2" => load_1_2(&mut cursor),
-                _ => { panic!("Unknown version type: {:?}", version) },
+                _ => panic!("Unknown version type: {:?}", version),
             }
         }
 
     }
-
-
 }
 
 /// The 1.0 format is used in most of the list files
-fn load_1_0 (cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
+fn load_1_0(cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
     let mut list = List::new();
     let mut string = Vec::<u8>::new();
 
@@ -91,14 +89,15 @@ fn load_1_0 (cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
             name: name,
             id: cursor.read_u32::<LE>()?,
             file_number: cursor.read_u32::<LE>()?,
-            index: cursor.read_u32::<LE>()?, };
+            index: cursor.read_u32::<LE>()?,
+        };
         list.items.push(item);
     }
     Ok(list)
 }
 
 /// The 1.2 format seems to only be used in the `Obj` rle list file
-fn load_1_2 (cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
+fn load_1_2(cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
     let mut list = List::new();
     let mut string = Vec::<u8>::new();
 
@@ -165,8 +164,8 @@ mod tests {
         println!("data.len() = 0x{:X} bytes", data.len());
         let list = List::load(data, false);
         let list = match list {
-            Ok(_)  => { list },
-            Err(_) => { 
+            Ok(_) => list,
+            Err(_) => {
                 // maybe it really is in version 1.2 format?
                 List::load(data, true)
             }
