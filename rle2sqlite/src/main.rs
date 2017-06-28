@@ -98,25 +98,13 @@ fn main() {
         let rle_paths = read_dir(folder).unwrap();
         let mut resources = Vec::<Resource>::new();
 
-        for path in rle_paths {
+        for entry in rle_paths {
 
-            // open and read the file
-            let path = path.unwrap();
-            let mut file = File::open(path.path()).unwrap();
-            let mut bytes = Vec::<u8>::new();
-            file.read_to_end(&mut bytes).unwrap();
+            let entry = entry.unwrap();
+            let path = entry.path();
 
-            // parse the file number
-            let mut file_num = 0xFFFF;
-            if let Some(stem) = path.path().file_stem() {
-                if let Some(stem) = stem.to_str() {
-                    let num: String = stem.matches(char::is_numeric).collect();
-                    file_num = num.parse().unwrap_or(0xFFFF);
-                }
-            }
+            let res_file: ResourceFile = load_rle_data(&path).unwrap();
 
-            // parse && append results
-            let res_file = ResourceFile::load(file_num, &mut bytes).unwrap();
             for resource in res_file.resources {
                 resources.push(resource);
             }
@@ -168,9 +156,29 @@ fn main() {
     println!("lst_vec.len(): {:?}", lst_vec.len());
 }
 
-fn load_list_data(list_path: &Path) -> Result<List, Error> {
-    let mut list_file = File::open(list_path)?;
-    let mut list_bytes = Vec::<u8>::new();
-    list_file.read_to_end(&mut list_bytes)?;
-    List::load(&list_bytes, false)
+fn load_list_data(path: &Path) -> Result<List, Error> {
+    let mut file = File::open(path)?;
+    let mut bytes = Vec::<u8>::new();
+    file.read_to_end(&mut bytes)?;
+    List::load(&bytes, false)
+}
+
+fn load_rle_data(path: &Path) -> Result<ResourceFile, Error> {
+
+    // open and read the file
+    let mut file = File::open(path)?;
+    let mut bytes = Vec::<u8>::new();
+    file.read_to_end(&mut bytes)?;
+
+    // parse the file number
+    let mut file_num = 0xFFFF;
+    if let Some(stem) = path.file_stem() {
+        if let Some(stem) = stem.to_str() {
+            let num: String = stem.matches(char::is_numeric).collect();
+            file_num = num.parse().unwrap_or(0xFFFF);
+        }
+    }
+
+    // parse && append results
+    ResourceFile::load(file_num, &mut bytes)
 }
