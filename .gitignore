@@ -17,3 +17,6 @@ rle2sqlite/rm.sqlite
 
 # Files generated from `cargo fmt`
 /*/*/src/*.fmt
+
+# editor configs
+.idea

@@ -8,6 +8,7 @@ use byteorder::LittleEndian as LE;
 
 use error::*;
 
+#[derive(Debug)]
 struct Map {
     size_x: u32,
     size_y: u32,
@@ -20,6 +21,7 @@ struct Map {
     tiles: Vec<MapTile>,
 }
 
+#[derive(Debug)]
 struct MapTile {
     unknown_1: u16,
     unknown_2: u16,
@@ -110,6 +112,11 @@ mod tests {
     fn test_map00005_rmm() {
         let data = include_bytes!("../../data/DATAs/Map/Map00005.rmm");
         let map = Map::load(data).unwrap();
+        println!( "{:?}",
+            (map.size_x, map.size_y, map.id_count,
+             map.id_list, map.number,
+             map.unknown_1, map.unknown_2, map.unknown_3 ));
+        assert!(false);
         assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
     }
 }

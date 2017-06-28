@@ -118,7 +118,7 @@ impl ApplicationData {
 }
 
 pub fn read_rle_from_bytes(data: &[u8]) -> Result<rle::ResourceFile, AppError> {
-    let rle = rle::ResourceFile::load(data)?;
+    let rle = rle::ResourceFile::load(0, data)?;
     Ok(rle)
 }
 
@@ -126,6 +126,6 @@ pub fn read_rle_from_file(file: &PathBuf) -> Result<rle::ResourceFile, AppError>
     let mut file = File::open(file)?;
     let mut data: Vec<u8> = Vec::new();
     file.read_to_end(&mut data)?;
-    let rle = rle::ResourceFile::load(&data)?;
+    let rle = rle::ResourceFile::load(0, &data)?;
     Ok(rle)
 }
