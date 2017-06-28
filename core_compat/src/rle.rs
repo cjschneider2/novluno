@@ -14,6 +14,7 @@ use error::*;
 
 #[derive(Debug)]
 pub struct Resource {
+    pub file_num: Option<u32>,
     pub index: u32,
     pub offset: u32,
     pub len: u32,
@@ -26,16 +27,12 @@ pub struct Resource {
     pub unknown_3: u32,
     pub unknown_4: u32,
     pub image: Vec<Pixel>,
-    // data from `lst` file
-    pub name: Option<String>,
-    pub id: Option<u32>,
-    pub file_number: Option<u32>,
-    pub lst_rle_index: Option<u32>,
 }
 
 impl Resource {
     pub fn new() -> Resource {
         Resource {
+            file_num: None,
             index: 0,
             offset: 0,
             len: 0,
@@ -48,11 +45,6 @@ impl Resource {
             unknown_3: 0,
             unknown_4: 0,
             image: Vec::new(),
-            // we don't have the data from `lst` file yet
-            name: None,
-            id: None,
-            file_number: None,
-            lst_rle_index: None,
         }
     }
 }
@@ -72,7 +64,7 @@ impl ResourceFile {
         }
     }
 
-    pub fn load(data: &[u8]) -> Result<ResourceFile, Error> {
+    pub fn load(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
 
         let mut cursor = Cursor::new(data);
         let mut resource_file = ResourceFile::new();
@@ -111,6 +103,7 @@ impl ResourceFile {
             cursor.seek(SeekFrom::Start(*offset as u64))?;
 
             // resource id's
+            resource.file_num = Some(file_number);
             resource.index = idx as u32;
             resource.offset = *offset;
 
@@ -198,11 +191,11 @@ mod tests {
     #[test]
     fn test_c0000000_rle() {
         let data = include_bytes!("../../data/RLEs/Chr/C00/c0000000.rle");
-        let rle = ResourceFile::load(data).unwrap();
+        let rle = ResourceFile::load(0, data).unwrap();
     }
     #[test]
     fn test_c0000042_rle() {
         let data = include_bytes!("../../data/RLEs/Chr/C00/c0000042.rle");
-        let rle = ResourceFile::load(data).unwrap();
+        let rle = ResourceFile::load(42, data).unwrap();
     }
 }
