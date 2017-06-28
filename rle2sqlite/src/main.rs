@@ -174,33 +174,3 @@ fn load_list_data(list_path: &Path) -> Result<List, Error> {
     list_file.read_to_end(&mut list_bytes)?;
     List::load(&list_bytes, false)
 }
-
-// #[allow(dead_code)]
-// fn parse_entries() {
-//     // parse entries
-//     for &(_type, folder, list) in FOLDER_ENTRIES.iter() {
-//         println!("Parsing: {:?}", _type);
-//         let mut map = HashSet::<u32>::new();
-// 
-//         let data_folder = Path::new(folder);
-//         let data_list = Path::new(list);
-// 
-//         let entries = read_rle_dir(&data_list, &data_folder).unwrap();
-//         let mut missing_ids = 0;
-// 
-//         for entry in entries {
-//             if let Some(id) = entry.id {
-//                 let success = map.insert(id);
-//                 if !success {
-//                     // testing for ID doubles
-//                     println!("double id: {:?}", &id);
-//                 }
-//             } else {
-//                 // testing missing ID
-//                 missing_ids += 1;
-//             }
-//         }
-//         println!("\tentries      : {:?}", map.len());
-//         println!("\tmissing id's : {:?}", missing_ids);
-//     }
-// }
