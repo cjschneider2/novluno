@@ -11,3 +11,9 @@ Cargo.lock
 
 # The data directory
 /data/
+
+# Generated files from our programs
+rle2sqlite/rm.sqlite
+
+# Files generated from `cargo fmt`
+/*/*/src/*.fmt

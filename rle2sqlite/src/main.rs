@@ -86,9 +86,11 @@ fn main() {
             for item in list.items {
                 // insert the data into the database
                 tx.execute(
-                    "INSERT INTO list (type, name, list_id, file_num, file_idx)
+                    "INSERT INTO list (
+                        type, name, list_id, file_num, file_idx)
                     VALUES (?1, ?2, ?3, ?4, ?5)",
-                    &[&_type, &item.name, &item.id, &item.file_number, &item.index]
+                    &[&_type, &item.name, &item.id,
+                      &item.file_number, &item.index]
                 ).unwrap();
             }
             tx.commit().unwrap();
