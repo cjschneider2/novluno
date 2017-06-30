@@ -116,15 +116,9 @@ impl Map {
         // read in the tile values...
         let count = map.size_x * map.size_y;
         for tile in 0..count {
-            b_0 = cursor.read_u8()?;
-            b_1 = cursor.read_u8()?;
-            b_2 = cursor.read_u8()?;
-            b_3 = cursor.read_u8()?;
-            b_4 = cursor.read_u8()?;
-            b_5 = cursor.read_u8()?;
-            b_6 = cursor.read_u8()?;
-            b_7 = cursor.read_u8()?;
+                b_0 = cursor.read_u8()?;
             let tile = MapTile {
+               
                 unknown_1: cursor.read_u16::<LE>()?,
                 unknown_2: cursor.read_u16::<LE>()?,
                 unknown_3: cursor.read_u16::<LE>()?,
