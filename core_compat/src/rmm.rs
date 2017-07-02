@@ -36,26 +36,34 @@ use byteorder::LittleEndian as LE;
 use error::*;
 
 #[derive(Debug)]
+struct Event {
+    number: u16,
+    c1_x: u32,
+    c1_y: u32,
+    c2_x: u32,
+    c2_y: u32,
+}
+
+#[derive(Debug)]
 struct Map {
     size_x: u32,
     size_y: u32,
     id_count: u8,
     id_list: Vec<u8>,
-    number: u16,
-    unknown_1: u16,
-    unknown_2: u16,
-    unknown_3: u16,
+    number: u32,
+    event_count: u32,
+    events: Vec<Event>,
     tiles: Vec<MapTile>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 struct MapTile {
-    object_file_num: u16,
-    object_file_idx: u8,
-    tile_file_num: u16,
-    tile_file_idx: u8,
-    warp: bool,
-    collision: bool,
+    object_file_num: u32,
+    object_file_idx: u32,
+    tile_file_num: u32,
+    tile_file_idx: u32,
+    warp: u32,
+    collision: u32,
 }
 
 impl Map {
@@ -66,9 +74,8 @@ impl Map {
             id_count: 0,
             id_list: Vec::new(),
             number: 0,
-            unknown_1: 0,
-            unknown_2: 0,
-            unknown_3: 0,
+            event_count: 0,
+            events: Vec::new(),
             tiles: Vec::new(),
         }
     }
@@ -104,37 +111,102 @@ impl Map {
         }
 
         // the map number described by this file...
-        map.number = cursor.read_u16::<LE>()?;
+        map.number = cursor.read_u32::<LE>()?;
+        map.event_count = cursor.read_u32::<LE>()?;
 
         // NOTE: This is an array of event rectangles for interactions with
         //       things like mailboxes and the like
-        map.event_cnt = 
-        map.unknown_1 = cursor.read_u16::<LE>()?;
-        map.unknown_2 = cursor.read_u16::<LE>()?;
-        map.unknown_3 = cursor.read_u16::<LE>()?;
+        for _ in 0..map.event_count {
+            let event = Event {
+                number: cursor.read_u16::<LE>()?,
+                c1_x: cursor.read_u32::<LE>()?,
+                c1_y: cursor.read_u32::<LE>()?,
+                c2_x: cursor.read_u32::<LE>()?,
+                c2_y: cursor.read_u32::<LE>()?,
+            };
+            map.events.push(event);
+        }
 
         // read in the tile values...
         let count = map.size_x * map.size_y;
         for tile in 0..count {
-            b_0 = cursor.read_u8()?;
-            b_1 = cursor.read_u8()?;
-            b_2 = cursor.read_u8()?;
-            b_3 = cursor.read_u8()?;
-            b_4 = cursor.read_u8()?;
-            b_5 = cursor.read_u8()?;
-            b_6 = cursor.read_u8()?;
-            b_7 = cursor.read_u8()?;
-            let tile = MapTile {
-                unknown_1: cursor.read_u16::<LE>()?,
-                unknown_2: cursor.read_u16::<LE>()?,
-                unknown_3: cursor.read_u16::<LE>()?,
-                unknown_4: cursor.read_u16::<LE>()?,
-            };
+            let tile = parse_v1(&mut cursor)?;
             map.tiles.push(tile);
         }
 
         Ok(map)
     }
+}
+
+fn parse_v1 (cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
+    let b_0: u32 = cursor.read_u8()? as u32;
+    let b_1: u32 = cursor.read_u8()? as u32;
+    let b_2: u32 = cursor.read_u8()? as u32;
+    let b_3: u32 = cursor.read_u8()? as u32;
+    let b_4: u32 = cursor.read_u8()? as u32;
+    let b_5: u32 = cursor.read_u8()? as u32;
+    let b_6: u32 = cursor.read_u8()? as u32;
+    let b_7: u32 = cursor.read_u8()? as u32;
+
+    assert!(b_0 & 0x2 == 0);
+
+    let obj_file_num = (b_0 / 4) + (b_1 % 32) * 64;
+    let tle_file_idx = ((b_2 % 128) * 8) + (b_1 / 32);
+    let tle_file_num = (b_3 * 2) + (b_2 / 128);
+    let warp         = b_4;
+    let collision    = b_6;
+    let obj_file_idx = if collision % 24 == 0 {
+            (b_7 << 1)
+        } else {
+            (b_7 << 1) + 1
+        };
+
+    let tile = MapTile {
+        object_file_num: obj_file_num,
+        object_file_idx: obj_file_idx,
+        tile_file_num: tle_file_num,
+        tile_file_idx: tle_file_idx,
+        warp: warp,
+        collision: collision,
+    };
+
+    Ok(tile)
+}
+
+fn parse_v2 (cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
+    let b_0: u32 = cursor.read_u8()? as u32;
+    let b_1: u32 = cursor.read_u8()? as u32;
+    let b_2: u32 = cursor.read_u8()? as u32;
+    let b_3: u32 = cursor.read_u8()? as u32;
+    let b_4: u32 = cursor.read_u8()? as u32;
+    let b_5: u32 = cursor.read_u8()? as u32;
+    let b_6: u32 = cursor.read_u8()? as u32;
+    let b_7: u32 = cursor.read_u8()? as u32;
+
+    assert!(b_0 & 0x2 == 0);
+
+    let obj_file_num = (b_0 >> 2) + (( b_1 & 0x1F) << 6);
+    let tle_file_idx = (b_1 >> 5) + ((b_2 & 0x7F) << 3);
+    let tle_file_num = (b_2 >> 7) + (b_3 << 1);
+    let warp         = b_4;
+    // let collision    = (b_6 & 0xF0) >> 4;
+    let collision    = b_6; 
+    let obj_file_idx = if b_6 % 24 == 0 {
+        (b_7 << 1)
+    } else {
+        (b_7 << 1) + 1
+    };
+
+    let tile = MapTile {
+        object_file_num: obj_file_num,
+        object_file_idx: obj_file_idx,
+        tile_file_num: tle_file_num,
+        tile_file_idx: tle_file_idx,
+        warp: warp,
+        collision: collision,
+    };
+
+    Ok(tile)
 }
 
 #[cfg(test)]
@@ -150,11 +222,12 @@ mod tests {
     fn test_map00005_rmm() {
         let data = include_bytes!("../../data/DATAs/Map/Map00005.rmm");
         let map = Map::load(data).unwrap();
-        println!( "{:?}",
-            (map.size_x, map.size_y, map.id_count,
-             map.id_list, map.number,
-             map.unknown_1, map.unknown_2, map.unknown_3 ));
-        assert!(false);
+        assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
+    }
+    #[test]
+    fn test_map00003_rmm() {
+        let data = include_bytes!("../../data/DATAs/Map/Map00003.rmm");
+        let map = Map::load(data).unwrap();
         assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
     }
 }
