@@ -2,7 +2,6 @@ use std::time::{Instant, Duration};
 use std::thread;
 
 pub struct FpsTimer {
-   fps: f32,
    epoch: Instant,
    tick: Instant,
    frames: u64,
@@ -14,7 +13,6 @@ pub struct FpsTimer {
 impl FpsTimer {
    pub fn new (fps: f32) -> FpsTimer {
       FpsTimer {
-         fps: fps,
          epoch: Instant::now(),
          tick: Instant::now(),
          frames: 0,
@@ -36,14 +34,6 @@ impl FpsTimer {
       } else {
          self.frames += 1;
       }
-   }
-
-   pub fn get_sec(&self) -> u64 {
-      self.last_sec
-   }
-
-   pub fn get_frames(&self) -> u64 {
-      self.frames
    }
 
    pub fn get_epoch(&self) -> Instant {

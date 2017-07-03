@@ -1,5 +1,5 @@
 [package]
-name = "rle_viewer"
+name = "rm_viewer"
 version = "0.0.1"
 authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
 

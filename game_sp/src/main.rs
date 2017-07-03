@@ -1,6 +1,15 @@
-extern crate sdl2;
+#![allow(dead_code)]
 
+extern crate sdl2;
+extern crate core_compat;
+
+mod error;
 mod fps;
+mod sprite;
+mod sprite_type;
+mod sprite_manager;
+mod entry;
+mod vec;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
