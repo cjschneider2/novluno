@@ -7,14 +7,14 @@
 //! String (first byte indicates how long the string is)
 //! int map number
 //! int number of events
-//! 
+//!
 //! [Event list (Number of events)] = Event clickable like mailbox
 //! short eventnumber
 //! int corner X1
 //! int corner Y1
 //! int corner X2
 //! int corner Y2
-//! 
+//!
 //! [XY List]
 //! Here a few numbers are defined: Object = a tree, a house. Tle = floor tiles
 //! Object number (RMD pointer)
@@ -22,7 +22,9 @@
 //! Tle number (RMD pointer)
 //! Tle part (RMD part pointer in the RMD file)
 //! Mouse indicator (Only used for mouseover on warp events 0 = nothing, 16 = warp event)
-//! Collision (1XY has 2 spots to stand on and 4 different collision settings. No collision, full collision, left top collision, right bottom collision)
+//! Collision (1XY has 2 spots to stand on and 4 different collision settings.
+//!            No collision, full collision,
+//!            left top collision, right bottom collision)
 
 
 use std::str::from_utf8;
@@ -85,7 +87,7 @@ impl Map {
         let mut cursor = Cursor::new(data);
         let mut map = Map::new();
 
-        // filetype string: needs to equal "Resource File\n"
+        // filetype string: needs to equal "Redmoon MapData 1.0"
         let string_length = cursor.read_u8()?;
         let mut string = Vec::<u8>::new();
         for _ in 0..string_length {
@@ -103,7 +105,7 @@ impl Map {
         map.size_x = cursor.read_u32::<LE>()?;
         map.size_y = cursor.read_u32::<LE>()?;
 
-        // read in array count and the array values
+        // Map String (name?)
         map.id_count = cursor.read_u8()?;
         for idx in 0..(map.id_count) {
             let val = cursor.read_u8()?;
@@ -156,10 +158,10 @@ fn parse_v1 (cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     let warp         = b_4;
     let collision    = b_6;
     let obj_file_idx = if collision % 24 == 0 {
-            (b_7 << 1)
-        } else {
-            (b_7 << 1) + 1
-        };
+                           (b_7 << 1)
+                       } else {
+                           (b_7 << 1) + 1
+                       };
 
     let tile = MapTile {
         object_file_num: obj_file_num,
@@ -190,12 +192,12 @@ fn parse_v2 (cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     let tle_file_num = (b_2 >> 7) + (b_3 << 1);
     let warp         = b_4;
     // let collision    = (b_6 & 0xF0) >> 4;
-    let collision    = b_6; 
+    let collision    = b_6;
     let obj_file_idx = if b_6 % 24 == 0 {
-        (b_7 << 1)
-    } else {
-        (b_7 << 1) + 1
-    };
+                           (b_7 << 1)
+                       } else {
+                           (b_7 << 1) + 1
+                       };
 
     let tile = MapTile {
         object_file_num: obj_file_num,

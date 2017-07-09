@@ -18,7 +18,7 @@ impl SpriteManager {
         }
     }
 
-    pub fn get_sprite(&mut self, entry: Entry) -> Result<&Sprite, Error>{
+    pub fn get_sprite(&mut self, entry: Entry) -> Result<&Sprite, Error> {
         // First check to see if we've already loaded the sprite file
         if let Some(item) = self.map.get(&entry) {
             Ok(item)
