@@ -88,7 +88,7 @@ impl RmdImage {
 #[derive(Debug)]
 pub struct RmdAnimation {
     frame_count: i32,
-    frames: Vec<i32> // Rmd row pointer
+    frames: Vec<i16> // Rmd row pointer
 }
 
 #[derive(Debug)]
@@ -167,14 +167,10 @@ impl Rmd {
 
         rmd.row_count = cursor.read_i32::<LE>()?;
 
-        println!("read header: {:?}", rmd);
-
         // read the Rmd rows
         for _ in 0..rmd.row_count {
-        // for _ in 0..2 {
             let mut row = RmdRow::new();    
             row.image_count = cursor.read_i32::<LE>()?;
-
             for _ in 0..row.image_count {
                 let mut img = RmdImage::new();
                 img.source_x = cursor.read_i32::<LE>()?;
@@ -192,21 +188,19 @@ impl Rmd {
                     let id = cursor.read_i32::<LE>()?;
                     img.image_id.push(id);
                 }
-                println!("{:?}", &img);
-
             }
-
             rmd.rows.push(row);
         }
 
         rmd.animation_count = cursor.read_i32::<LE>()?;
+
         for _ in 0..rmd.animation_count {
             let mut ani = RmdAnimation {
                 frame_count: cursor.read_i32::<LE>()?,
                 frames: Vec::new(),
             };
             for _ in 0..ani.frame_count {
-                let ptr = cursor.read_i32::<LE>()?;
+                let ptr = cursor.read_i16::<LE>()?;
                 ani.frames.push(ptr);
             }
             rmd.animations.push(ani);
@@ -246,20 +240,31 @@ mod tests {
     fn test_tle_00001() {
         let data = include_bytes!("../../data/DATAs/Tle/tle00001.rmd");
         let rmd = Rmd::load(data).unwrap();
-        assert!(false);
+        assert!(rmd.row_count as usize == rmd.rows.len());
+        assert!(rmd.animation_count as usize == rmd.animations.len());
     }
 
     #[test]
     fn test_obj_00001() {
         let data = include_bytes!("../../data/DATAs/Obj/obj00001.rmd");
         let rmd = Rmd::load(data).unwrap();
-        assert!(false);
+        assert!(rmd.row_count as usize == rmd.rows.len());
+        assert!(rmd.animation_count as usize == rmd.animations.len());
     }
 
     #[test]
     fn test_chr_00001() {
         let data = include_bytes!("../../data/DATAs/Chr/chr00001.rmd");
         let rmd = Rmd::load(data).unwrap();
-        assert!(false);
+        assert!(rmd.row_count as usize == rmd.rows.len());
+        assert!(rmd.animation_count as usize == rmd.animations.len());
+    }
+
+    #[test]
+    fn test_chr_00042() {
+        let data = include_bytes!("../../data/DATAs/Chr/chr00042.rmd");
+        let rmd = Rmd::load(data).unwrap();
+        assert!(rmd.row_count as usize == rmd.rows.len());
+        assert!(rmd.animation_count as usize == rmd.animations.len());
     }
 }
