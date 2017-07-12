@@ -56,7 +56,8 @@ pub struct RmdImage {
     source_y: i32,
     source_width: i32,
     source_height: i32,
-    empty: u32,
+    empty_1: u32,
+    empty_2: u32,
     render_z: i32,
     dest_x: i32,
     dest_y: i32,
@@ -72,7 +73,8 @@ impl RmdImage {
             source_y: 0,
             source_width: 0,
             source_height: 0,
-            empty: 0,
+            empty_1: 0,
+            empty_2: 0,
             render_z: 0,
             dest_x: 0,
             dest_y: 0,
@@ -168,8 +170,8 @@ impl Rmd {
         println!("read header: {:?}", rmd);
 
         // read the Rmd rows
-        // for _ in 0..rmd.row_count {
-        for _ in 0..2 {
+        for _ in 0..rmd.row_count {
+        // for _ in 0..2 {
             let mut row = RmdRow::new();    
             row.image_count = cursor.read_i32::<LE>()?;
 
@@ -179,10 +181,11 @@ impl Rmd {
                 img.source_y = cursor.read_i32::<LE>()?;
                 img.source_width = cursor.read_i32::<LE>()?;
                 img.source_height = cursor.read_i32::<LE>()?;
-                img.empty = cursor.read_u32::<LE>()?;
-                img.render_z = cursor.read_i32::<LE>()?;
+                img.empty_1 = cursor.read_u32::<LE>()?;
                 img.dest_x = cursor.read_i32::<LE>()?;
                 img.dest_y = cursor.read_i32::<LE>()?;
+                img.empty_2 = cursor.read_u32::<LE>()?;
+                img.render_z = cursor.read_i32::<LE>()?;
                 img.draw_type = cursor.read_i32::<LE>()?;
                 img.image_id_count = cursor.read_i32::<LE>()?;
                 for _ in 0..img.image_id_count {
