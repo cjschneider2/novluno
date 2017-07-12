@@ -35,7 +35,7 @@ use std::io::SeekFrom;
 use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
-use error::*;
+use error::Error;
 
 #[derive(Debug)]
 struct Event {

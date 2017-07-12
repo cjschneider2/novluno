@@ -8,3 +8,4 @@ pub mod rle;
 pub mod rmm;
 pub mod error;
 pub mod lst;
+pub mod rmd;
