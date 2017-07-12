@@ -115,6 +115,8 @@ pub struct Rmd {
     animation_rows: i32,
     row_count: i32,
     rows: Vec<RmdRow>,
+    animation_count: i32,
+    animations: Vec<RmdAnimation>,
 }
 
 impl Rmd {
@@ -125,6 +127,8 @@ impl Rmd {
             animation_rows: 0,
             row_count: 0,
             rows: Vec::new(),
+            animation_count: 0,
+            animations: Vec::new(),
         }
     }
 
@@ -140,18 +144,32 @@ impl Rmd {
         let string_1 = parse_string(&mut cursor)?;
         println!("{:?}", string_1);
         
-        // 12 empty bytes
-        let padding = cursor.read_u32::<LE>()?; // 4
+        let file_number = cursor.read_u32::<LE>()?; // 4
+        println!("file_number: {}", file_number);
+
+        // 8 empty bytes
         let padding = cursor.read_u32::<LE>()?; // 8
+        if padding != 0 { println!("p2: {}", padding); }
         let padding = cursor.read_u32::<LE>()?; // 12
+        if padding != 0 { println!("p3: {}", padding); }
+
+        // let string = parse_string(&mut cursor)?;
+        let string = parse_u8_vec(&mut cursor)?;
+        println!("str 1: `{:?}`", string);
 
         rmd.animation_parts = cursor.read_i32::<LE>()?;
         rmd.animation_rows = cursor.read_i32::<LE>()?;
-        rmd.string = parse_string(&mut cursor)?;
+
+        let string = parse_string(&mut cursor)?;
+        println!("str 2: `{}`", string);
+
         rmd.row_count = cursor.read_i32::<LE>()?;
 
+        println!("read header: {:?}", rmd);
+
         // read the Rmd rows
-        for _ in 0..rmd.row_count {
+        // for _ in 0..rmd.row_count {
+        for _ in 0..2 {
             let mut row = RmdRow::new();    
             row.image_count = cursor.read_i32::<LE>()?;
 
@@ -166,7 +184,7 @@ impl Rmd {
                 img.dest_x = cursor.read_i32::<LE>()?;
                 img.dest_y = cursor.read_i32::<LE>()?;
                 img.draw_type = cursor.read_i32::<LE>()?;
-                img.image_id_count = cursor.read_u8()?;
+                img.image_id_count = cursor.read_i32::<LE>()?;
                 for _ in 0..img.image_id_count {
                     let id = cursor.read_i32::<LE>()?;
                     img.image_id.push(id);
@@ -180,9 +198,9 @@ impl Rmd {
 
         rmd.animation_count = cursor.read_i32::<LE>()?;
         for _ in 0..rmd.animation_count {
-            let ani = Animation {
-                frame_count = cursor.read_i32::<LE>()?;
-                frames = Vec::new();
+            let mut ani = RmdAnimation {
+                frame_count: cursor.read_i32::<LE>()?,
+                frames: Vec::new(),
             };
             for _ in 0..ani.frame_count {
                 let ptr = cursor.read_i32::<LE>()?;
@@ -191,7 +209,7 @@ impl Rmd {
             rmd.animations.push(ani);
         }
 
-        println!("{:?}", rmd);
+        // println!("{:?}", rmd);
         Ok(rmd)
     }
 }
@@ -207,12 +225,37 @@ fn parse_string(cursor: &mut Cursor<&[u8]>) -> Result<String, Error> {
     Ok(string)
 }
 
+fn parse_u8_vec(cursor: &mut Cursor<&[u8]>) -> Result<Vec<u8>, Error> {
+    let string_length = cursor.read_u8()?;
+    let mut vec = Vec::<u8>::new();
+    for _ in 0..string_length {
+        let chr = cursor.read_u8()?;
+        vec.push(chr);
+    }
+    Ok(vec)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_tle_00001() {
         let data = include_bytes!("../../data/DATAs/Tle/tle00001.rmd");
+        let rmd = Rmd::load(data).unwrap();
+        assert!(false);
+    }
+
+    #[test]
+    fn test_obj_00001() {
+        let data = include_bytes!("../../data/DATAs/Obj/obj00001.rmd");
+        let rmd = Rmd::load(data).unwrap();
+        assert!(false);
+    }
+
+    #[test]
+    fn test_chr_00001() {
+        let data = include_bytes!("../../data/DATAs/Chr/chr00001.rmd");
         let rmd = Rmd::load(data).unwrap();
         assert!(false);
     }
