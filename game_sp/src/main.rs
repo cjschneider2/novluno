@@ -2,7 +2,7 @@
 
 extern crate sdl2;
 extern crate core_compat;
-extern crate rusqlite;
+//extern crate rusqlite;
 
 mod error;
 mod fps;
@@ -13,30 +13,20 @@ mod entry;
 mod vec;
 mod game;
 mod map_manager;
+mod sdl_state;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
 use fps::FpsTimer;
 use game::Game;
+use sdl_state::SdlState;
 
 fn main() {
 
     // Setup game state
-    let game = Game::new();
-
-    // Setup SDL
-    let sdl_context = sdl2::init().unwrap();
-    let video_subsystem = sdl_context.video().unwrap();
-    let window = video_subsystem
-        .window("rs_hero", 400, 400)
-        .position_centered()
-        .opengl()
-        .build()
-        .unwrap();
-
-    let mut _canvas = window.into_canvas().present_vsync().build().unwrap();
-    let mut event_pump = sdl_context.event_pump().unwrap();
+    let mut game = Game::new();
+    let mut sdl = SdlState::new().unwrap();
 
     // inital loop state
     let mut fps_timer = FpsTimer::new(60.0);
@@ -53,7 +43,7 @@ fn main() {
         }
 
         // start event handler
-        let new_event = event_pump.poll_event();
+        let new_event = sdl.event.poll_event();
         if new_event != last_event {
             if let Some(ref event) = new_event {
                 match event {

@@ -82,7 +82,7 @@ impl RmdImage {
             image_id_count: 0,
             image_id: Vec::new(),
         }
-    }    
+    }
 }
 
 #[derive(Debug)]
@@ -145,7 +145,7 @@ impl Rmd {
         // filetype string: Equal to ""
         let string_1 = parse_string(&mut cursor)?;
         println!("{:?}", string_1);
-        
+
         let file_number = cursor.read_u32::<LE>()?; // 4
         println!("file_number: {}", file_number);
 
@@ -169,7 +169,7 @@ impl Rmd {
 
         // read the Rmd rows
         for _ in 0..rmd.row_count {
-            let mut row = RmdRow::new();    
+            let mut row = RmdRow::new();
             row.image_count = cursor.read_i32::<LE>()?;
             for _ in 0..row.image_count {
                 let mut img = RmdImage::new();
