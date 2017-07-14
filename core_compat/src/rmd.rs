@@ -50,7 +50,7 @@ use byteorder::LittleEndian as LE;
 
 use error::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub enum RmdType {
     Tile,
     Object,

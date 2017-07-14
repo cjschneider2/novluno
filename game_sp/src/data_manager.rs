@@ -1,26 +1,55 @@
+//! Handles the loading and 
+
+use std::collections::HashMap;
+use std::path::PathBuf;
+use std::path::Path;
+use std::fs::File;
+use std::io::Read;
+
+use core_compat::rmd::RmdType;
+use core_compat::rmd::Rmd;
+
+use error::Error;
 
 pub struct DataManager {
+    data_path: PathBuf,
+    data: HashMap<(RmdType, usize), Rmd>,
 }
 
 impl DataManager {
-    pub fn new() -> DataManager {
-        DataManager {}
+    pub fn new(path: &Path) -> DataManager {
+        DataManager {
+            data_path: path.into(),
+            data: HashMap::new(),
+        }
     }
 
-    pub fn load(&mut self, type: RmdType, number: usize) -> Result<(), Error> {
+    pub fn load(&mut self, kind: RmdType, number: usize) -> Result<(), Error> {
         // generate correct path for the map
-        let map_str = match RmdType {
-            format!("{:05}.rmd", number);
-        }
         let mut path: PathBuf = self.data_path.clone();
+        let dir_str = match kind {
+            RmdType::Tile => { "Tle" },
+            RmdType::Object => { "Obj" },
+            RmdType::Icon => { "Ico" },
+            RmdType::Character => { "Chr" },
+            RmdType::Bullet => { "Bul" },
+        };
+        let map_str = match kind {
+            RmdType::Tile => { format!("tle{:05}.rmd", number) },
+            RmdType::Object => { format!("obj{:05}.rmd", number) },
+            RmdType::Icon => { format!("ico{:05}.rmd", number) },
+            RmdType::Character => { format!("chr{:05}.rmd", number) },
+            RmdType::Bullet => { format!("bul{:05}.rmd", number) },
+        };
+        path.push(dir_str);
         path.push(map_str);
         // load data from file
-        let mut map_file = File::open(&path)?;
-        let mut map_data = Vec::<u8>::new();
-        map_file.read_to_end(&mut map_data)?;
+        let mut file = File::open(&path)?;
+        let mut data = Vec::<u8>::new();
+        file.read_to_end(&mut data)?;
         // parse map and insert into manager
-        let map = Map::load(&map_data)?;
-        self.maps.insert(number, map);
+        let rmd = Rmd::load(kind, &data)?;
+        self.data.insert((kind,number), rmd);
         Ok(())
     }
 }
@@ -30,13 +59,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_load_Tle_tle_00001() {
-        let data_path = Path::new("../data/DATAs/Tle/");
+    fn test_load_tle_rmd_00001() {
+        let data_path = Path::new("../data/DATAs/");
         let mut rmd = DataManager::new(&data_path);
         let rmd_no = 1usize;
-        rmd.load_map(rmd_no).unwrap();
-        let map = mapper.maps.get(&1).unwrap();
-        assert_eq!(map.number, 1);
-        assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
+        rmd.load(RmdType::Tile, rmd_no).unwrap();
+        let data = rmd.data.get(&(RmdType::Tile, 1)).unwrap();
     }
 }
