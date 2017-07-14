@@ -1,19 +1,20 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_mut, unused_variables)]
 
 extern crate sdl2;
 extern crate core_compat;
 //extern crate rusqlite;
 
+mod data_manager;
+mod entry;
 mod error;
 mod fps;
-mod sprite;
-mod sprite_type;
-mod sprite_manager;
-mod entry;
-mod vec;
 mod game;
 mod map_manager;
 mod sdl_state;
+mod sprite_manager;
+mod sprite_type;
+mod sprite;
+mod vec;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;

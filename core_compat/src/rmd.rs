@@ -51,6 +51,15 @@ use byteorder::LittleEndian as LE;
 use error::Error;
 
 #[derive(Debug)]
+pub enum RmdType {
+    Tile,
+    Object,
+    Icon,
+    Character,
+    Bullet,
+}
+
+#[derive(Debug)]
 pub struct RmdImage {
     source_x: i32,
     source_y: i32,
@@ -112,6 +121,7 @@ impl RmdRow {
 
 #[derive(Debug)]
 pub struct Rmd {
+    kind: RmdType,
     string: String,
     animation_parts: i32, // for object animaitons
     animation_rows: i32,
@@ -122,8 +132,9 @@ pub struct Rmd {
 }
 
 impl Rmd {
-    pub fn new() -> Rmd {
+    pub fn new(kind: RmdType) -> Rmd {
         Rmd {
+            kind: kind,
             string: String::new(),
             animation_parts: 0,
             animation_rows: 0,
@@ -134,13 +145,13 @@ impl Rmd {
         }
     }
 
-    pub fn load(data: &[u8]) -> Result<Rmd, Error> {
+    pub fn load(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
 
         // This is just because tests always have a tab on the first line :-/
         println!("");
 
         let mut cursor = Cursor::new(data);
-        let mut rmd = Rmd::new();
+        let mut rmd = Rmd::new(kind);
 
         // filetype string: Equal to ""
         let string_1 = parse_string(&mut cursor)?;

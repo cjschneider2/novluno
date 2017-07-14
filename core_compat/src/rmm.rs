@@ -38,34 +38,34 @@ use byteorder::LittleEndian as LE;
 use error::Error;
 
 #[derive(Debug)]
-struct Event {
-    number: u16,
-    c1_x: u32,
-    c1_y: u32,
-    c2_x: u32,
-    c2_y: u32,
+pub struct Event {
+    pub number: u16,
+    pub c1_x: u32,
+    pub c1_y: u32,
+    pub c2_x: u32,
+    pub c2_y: u32,
 }
 
 #[derive(Debug)]
-struct Map {
-    size_x: u32,
-    size_y: u32,
-    id_count: u8,
-    id_list: Vec<u8>,
-    number: u32,
-    event_count: u32,
-    events: Vec<Event>,
-    tiles: Vec<MapTile>,
+pub struct Map {
+    pub size_x: u32,
+    pub size_y: u32,
+    pub id_count: u8,
+    pub id_list: Vec<u8>,
+    pub number: u32,
+    pub event_count: u32,
+    pub events: Vec<Event>,
+    pub tiles: Vec<MapTile>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
-struct MapTile {
-    object_file_num: u32,
-    object_file_idx: u32,
-    tile_file_num: u32,
-    tile_file_idx: u32,
-    warp: u32,
-    collision: u32,
+pub struct MapTile {
+    pub object_file_num: u32, // points to a `/DATAs/Obj/*.rmd
+    pub object_file_idx: u32, // this is an index into this file
+    pub tile_file_num: u32,   // points to a `/DATAs/Tle/*.rmd
+    pub tile_file_idx: u32,   // this is an index into this file
+    pub warp: u32,
+    pub collision: u32,
 }
 
 impl Map {

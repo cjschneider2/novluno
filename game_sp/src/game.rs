@@ -9,9 +9,10 @@ pub struct Game {
 impl Game {
     pub fn new() -> Game {
         let sqlite_path = ::std::path::Path::new("./rm.sqlite");
+        let data_path = ::std::path::Path::new("./data/DATAs/Map/");
         Game {
             sprites: SpriteManager::new(sqlite_path),
-            maps: MapManager::new(),
+            maps: MapManager::new(data_path),
         }
     }
 }
