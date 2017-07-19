@@ -1,17 +1,17 @@
 use std::io;
 use std::str::Utf8Error;
-use std::string::FromUtf8Error;
 use std::string::FromUtf16Error;
+use std::string::FromUtf8Error;
 
 #[derive(Debug)]
 pub enum Error {
-    MissingRleIdentifier,
-    MissingMapIdentifier,
-    UnknownOffsetTypeAt(u64),
-    Io(io::Error),
-    Utf8(Utf8Error),
-    FromUtf8(FromUtf8Error),
     FromUtf16(FromUtf16Error),
+    FromUtf8(FromUtf8Error),
+    Io(io::Error),
+    MissingMapIdentifier,
+    MissingRleIdentifier,
+    UnknownOffsetTypeAt(u64),
+    Utf8(Utf8Error),
 }
 
 impl From<io::Error> for Error {
