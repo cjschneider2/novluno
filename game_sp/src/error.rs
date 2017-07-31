@@ -9,6 +9,7 @@ use core_compat;
 #[derive(Debug)]
 pub enum Error {
     SpriteLoad,
+    MapLoad,
     Rm(core_compat::error::Error),
     Io(io::Error),
     Utf8(Utf8Error),

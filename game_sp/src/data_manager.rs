@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::path::Path;
 use std::fs::File;
 use std::io::Read;
+use std::rc::Rc;
 
 use core_compat::rmd::RmdType;
 use core_compat::rmd::Rmd;
@@ -13,7 +14,7 @@ use error::Error;
 
 pub struct DataManager {
     data_path: PathBuf,
-    data: HashMap<(RmdType, usize), Rmd>,
+    data: HashMap<(RmdType, usize), Rc<Rmd>>,
 }
 
 impl DataManager {
@@ -49,7 +50,7 @@ impl DataManager {
         file.read_to_end(&mut data)?;
         // parse map and insert into manager
         let rmd = Rmd::load(kind, &data)?;
-        self.data.insert((kind,number), rmd);
+        self.data.insert((kind,number), Rc::new(rmd));
         Ok(())
     }
 }

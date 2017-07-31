@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::Read;
+use std::rc::Rc;
 
 use core_compat::rmm::Map;
 
@@ -9,7 +10,7 @@ use error::Error;
 
 pub struct MapManager {
     data_path: PathBuf,
-    maps: HashMap<usize, Map>,
+    maps: HashMap<usize, Rc<Map>>,
 }
 
 impl MapManager {
@@ -21,8 +22,12 @@ impl MapManager {
         }
     }
 
-    pub fn get_map() -> Result<Map, Error> {
-        unimplemented!();
+    pub fn get_map(&self, number: usize) -> Result<Rc<Map>, Error> {
+        let map = match self.maps.get(&1) {
+            Some(map) => map.clone(),
+            None => return Err(Error::MapLoad),
+        };
+        Ok(map)
     }
 
     pub fn load_map(&mut self, number: usize) -> Result<(), Error> {
@@ -36,7 +41,7 @@ impl MapManager {
         map_file.read_to_end(&mut map_data)?;
         // parse map and insert into manager
         let map = Map::load(&map_data)?;
-        self.maps.insert(number, map);
+        self.maps.insert(number, Rc::new(map));
         Ok(())
     }
 }
@@ -47,11 +52,11 @@ mod tests {
 
     #[test]
     fn test_load_map00001() {
-        let data_path = Path::new("../data/DATAs/Map/");
-        let mut mapper = MapManager::new(&data_path);
+        let map_data_path = Path::new("../data/DATAs/Map/");
+        let mut map_man = MapManager::new(&map_data_path);
         let map_no = 1usize;
-        mapper.load_map(map_no).unwrap();
-        let map = mapper.maps.get(&1).unwrap();
+        map_man.load_map(map_no).unwrap();
+        let map = map_man.maps.get(&1).unwrap();
         assert_eq!(map.number, 1);
         assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
     }

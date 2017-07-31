@@ -10,77 +10,68 @@ mod error;
 mod fps;
 mod game;
 mod map_manager;
-mod sdl_state;
 mod sprite_manager;
 mod sprite_type;
 mod sprite;
 mod vec;
+mod sdl;
+#[cfg(test)]
+mod test;
 
 use std::path::Path;
 
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-
 use fps::FpsTimer;
 use game::Game;
-use sdl_state::SdlState;
+use sdl::Sdl;
 use map_manager::MapManager;
 use sprite_manager::SpriteManager;
 use data_manager::DataManager;
 
 fn main() {
 
+    // TODO: constants...
+    let width = 640;
+    let height = 480;
+
+    // Setup SDL2
+    let mut sdl = Sdl::new(width, height).unwrap();
+    sdl.init_game_controllers().unwrap();
+
     // Setup game state
-    let mut game = Game::new();
+    let mut game = Game::new(width, height);
     let mut maps = MapManager::new(&Path::new("../data/DATAs/Map/"));
     let mut sprites = SpriteManager::new(&Path::new("../data/RLEs/"));
     let mut datas = DataManager::new(&Path::new("../data/DATAs/"));
-    let mut sdl = SdlState::new().unwrap();
 
     // inital loop state
     let mut fps_timer = FpsTimer::new(60.0);
     let mut last_sec = 0;
-    let mut last_event = None;
-
-    // load map
-    {
-
-    }
-
-    // draw map
-    {
-
-    }
 
     'main: loop {
         // loop start time
         fps_timer.tick();
+        /*
         let tick = fps_timer.get_epoch().elapsed().as_secs();
         if tick > last_sec {
-            println!("fps: {:?}", fps_timer.get_last_fps());
-            last_sec = tick;
+        let dur = fps_timer.get_frame_time();
+        let (sec, ns) = (dur.as_secs(), dur.subsec_nanos() as f32);
+        println!("Frame time: {}(s):{}ms", sec, ns / 1_000_000.0);
+        last_sec = tick;
         }
+         */
 
         // start event handler
-        let new_event = sdl.event.poll_event();
-        if new_event != last_event {
-            if let Some(ref event) = new_event {
-                match event {
-                    &Event::Quit { .. } |
-                    &Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                        break 'main;
-                    }
-                    _ => {
-                        println!("recieved: {:?}", event);
-                    }
-                }
-            }
+        let (exit, dim) = sdl.handle_events(&mut game);
+        if exit { break 'main; }
+        if let Some((x, y)) = dim {
+            game.resize_buffer(x as u32, y as u32);
         }
 
-        if new_event.is_some() {
-            last_event = new_event;
-        }
-        // end of event handler
+        // Update game
+        game.update_and_render();
+
+        // render our window
+        sdl.draw_buffer_surface(&game.render_buffer.memory).unwrap();
 
         // start frame timing calculations
         fps_timer.sleep_til_next_tick();
