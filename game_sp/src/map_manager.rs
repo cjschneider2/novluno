@@ -36,11 +36,11 @@ impl MapManager {
         let mut path: PathBuf = self.data_path.clone();
         path.push(map_str);
         // load data from file
-        let mut map_file = File::open(&path)?;
-        let mut map_data = Vec::<u8>::new();
-        map_file.read_to_end(&mut map_data)?;
+        let mut file = File::open(&path)?;
+        let mut data = Vec::<u8>::new();
+        file.read_to_end(&mut data)?;
         // parse map and insert into manager
-        let map = Map::load(&map_data)?;
+        let map = Map::load(&data)?;
         self.maps.insert(number, Rc::new(map));
         Ok(())
     }

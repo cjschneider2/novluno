@@ -30,8 +30,8 @@ use data_manager::DataManager;
 fn main() {
 
     // TODO: constants...
-    let width = 640;
-    let height = 480;
+    let width = 800;
+    let height = 600;
 
     // Setup SDL2
     let mut sdl = Sdl::new(width, height).unwrap();

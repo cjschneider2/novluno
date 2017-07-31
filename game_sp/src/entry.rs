@@ -1,6 +1,6 @@
 
-#[derive(Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
 pub struct Entry {
-    file: u32,
-    index: u32,
+    pub file: u32,
+    pub index: u32,
 }

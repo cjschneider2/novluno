@@ -8,6 +8,8 @@ mod integration {
     use ::map_manager::MapManager;
     use ::data_manager::DataManager;
     use ::sprite_manager::SpriteManager;
+    use ::sprite_type::SpriteType;
+    use ::entry::Entry;
 
     #[test]
     fn map_load() {
@@ -29,5 +31,17 @@ mod integration {
         let object_idx = tile.object_file_idx; // and it's index into this file
         data_manager.load(RmdType::Object, object_num as usize).unwrap();
         // load the tile rle
+    }
+
+    #[test]
+    fn load_main_screen () {
+        // create the managers
+        let sprite_path = Path::new("../data/RLEs/");
+        let mut sprite_manager = SpriteManager::new(&sprite_path);
+        // load the correct sprite
+        let entry = Entry { file: 0, index: 4 };
+        let interface_t = SpriteType::Interface;
+        let sprite = sprite_manager.get_sprite(entry, interface_t).unwrap();
+        assert!(sprite.entry == entry);
     }
 }

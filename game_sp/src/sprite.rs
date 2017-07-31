@@ -1,11 +1,15 @@
+use core_compat::util::pixel::Pixel;
+
 use entry::Entry;
-use vec::Vec3;
 use sprite_type::SpriteType;
 
+#[derive(Debug)]
 pub struct Sprite {
-    class: SpriteType,
-    entry: Entry,
-    x_dim: usize,
-    y_dim: usize,
-    image: Vec<Vec3<u8>>,
+    pub class: SpriteType,
+    pub entry: Entry,
+    pub x_dim: usize,
+    pub y_dim: usize,
+    pub x_off: usize,
+    pub y_off: usize,
+    pub image: Vec<Pixel>,
 }
