@@ -1,6 +1,35 @@
+use std::rc::Rc;
 
 use ::error::Error;
+use ::sprite::Sprite;
 use super::buffer;
+
+pub fn render_sprite (
+    buffer: &mut buffer::Image,
+    sprite: Rc<Sprite>,
+    at_x: usize,
+    at_y: usize
+) -> Result<(), Error> {
+
+    let max_x = buffer.width;
+    let max_y = buffer.height;
+    let bpp   = buffer.bytes_per_pixel as usize;
+    let pitch = buffer.pitch as usize;
+
+    let mut idx = 0;
+
+    for pixel in &sprite.image {
+
+        if let Some(p) = buffer.memory.get_mut(idx + 0) { *p = pixel.b; }
+        if let Some(p) = buffer.memory.get_mut(idx + 1) { *p = pixel.g; }
+        if let Some(p) = buffer.memory.get_mut(idx + 2) { *p = pixel.r; }
+        if let Some(p) = buffer.memory.get_mut(idx + 3) { *p = pixel.a; }
+
+        idx += bpp;
+    }
+
+    Ok(())
+}
 
 pub fn weird_gradient (
     buffer: &mut buffer::Image,

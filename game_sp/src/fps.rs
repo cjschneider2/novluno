@@ -1,21 +1,26 @@
+
 use std::time::{Instant, Duration};
 use std::thread;
 
 pub struct FpsTimer {
+    // fps: f32,
     epoch: Instant,
     tick: Instant,
     frames: u64,
     fps_as_ns: f64,
     last_sec: u64,
     last_fps: u32,
+    frame_time: Duration,
 }
 
 impl FpsTimer {
     pub fn new(fps: f32) -> FpsTimer {
         FpsTimer {
+            // fps: fps,
             epoch: Instant::now(),
             tick: Instant::now(),
             frames: 0,
+            frame_time: Duration::new(0,0),
             fps_as_ns: (1.0 / fps as f64) * 1_000_000_000.0,
             last_sec: 0,
             last_fps: 0,
@@ -24,7 +29,9 @@ impl FpsTimer {
 
     pub fn tick(&mut self) {
         // update current time
-        self.tick = Instant::now();
+        let now = Instant::now();
+        self.frame_time = now - self.tick;
+        self.tick = now;
         // update FPS
         let sec = self.epoch.elapsed().as_secs();
         if sec > self.last_sec {
@@ -34,6 +41,10 @@ impl FpsTimer {
         } else {
             self.frames += 1;
         }
+    }
+
+    pub fn get_frame_time(&self) -> Duration {
+        self.frame_time
     }
 
     pub fn get_epoch(&self) -> Instant {
