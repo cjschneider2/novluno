@@ -117,9 +117,7 @@ THE SOFTWARE.
                     <property name="can_focus">False</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
-                    <property name="resize_mode">queue</property>
                     <property name="hscroll_policy">natural</property>
-                    <property name="vscroll_policy">natural</property>
                     <property name="shadow_type">none</property>
                     <child>
                       <object class="GtkImage" id="Image">
@@ -128,7 +126,6 @@ THE SOFTWARE.
                         <property name="is_focus">True</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
-                        <property name="icon_size">0</property>
                       </object>
                     </child>
                   </object>

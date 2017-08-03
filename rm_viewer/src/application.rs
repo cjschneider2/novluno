@@ -39,7 +39,10 @@ impl ApplicationGui {
                             ));
     }
 
-    pub fn load_new_folder(&self, app_data: &ApplicationData) -> Result<(), AppError> {
+    pub fn load_new_folder(
+        &self,
+        app_data: &ApplicationData
+    ) -> Result<(), AppError> {
         let mut file_list: Vec<PathBuf> = Vec::new();
         if app_data.current_path.is_dir() {
         let dir = read_dir(&app_data.current_path)?;
@@ -113,16 +116,18 @@ impl ApplicationData {
             self.resource_idx = idx as isize;
         }
     }
+} // end impl ApplicationData
 
-
-}
-
-pub fn read_rle_from_bytes(data: &[u8]) -> Result<rle::ResourceFile, AppError> {
+pub fn read_rle_from_bytes(
+    data: &[u8]
+) -> Result<rle::ResourceFile, AppError> {
     let rle = rle::ResourceFile::load(0, data)?;
     Ok(rle)
 }
 
-pub fn read_rle_from_file(file: &PathBuf) -> Result<rle::ResourceFile, AppError> {
+pub fn read_rle_from_file(
+    file: &PathBuf
+) -> Result<rle::ResourceFile, AppError> {
     let mut file = File::open(file)?;
     let mut data: Vec<u8> = Vec::new();
     file.read_to_end(&mut data)?;

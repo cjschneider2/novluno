@@ -28,10 +28,10 @@ use sql::Connection;
 
 // This is the list of data folder's and list files for them
 static FOLDER_ENTRIES: [(&'static str, &'static str, &'static str); 5] = [
-    ("Bullets", "../data/RLEs/Bul", "../data/RLEs/bul.lst"),
-    ("Icons", "../data/RLEs/Ico", "../data/RLEs/ico.lst"),
-    ("Objects", "../data/RLEs/Obj", "../data/RLEs/obj.lst"),
-    ("Tiles", "../data/RLEs/Tle", "../data/RLEs/tle.lst"),
+    // ("Bullets", "../data/RLEs/Bul", "../data/RLEs/bul.lst"),
+    // ("Icons", "../data/RLEs/Ico", "../data/RLEs/ico.lst"),
+    // ("Objects", "../data/RLEs/Obj", "../data/RLEs/obj.lst"),
+    // ("Tiles", "../data/RLEs/Tle", "../data/RLEs/tle.lst"),
     ("Interface", "../data/RLEs/Int", "../data/RLEs/int.lst"),
     // The sounds one is the only one which is a little different...
     // ("Sounds", "../data/RLEs/Snd", "../data/RLEs/snd.lst"),
