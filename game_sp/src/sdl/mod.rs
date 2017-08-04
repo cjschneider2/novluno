@@ -30,9 +30,11 @@ impl Sdl {
     pub fn new(width: u32, height: u32) -> Result<Sdl, Error> {
         let context = sdl2::init()?;
         let video = context.video()?;
+        // TODO: The window should eventually be able to be resized, but this requires
+        //       changing the backing renderer to use Textures and not 
         let window = video.window("Novluno", width, height)
                           .position_centered()
-                          .resizable()
+                          // .resizable() 
                           .opengl()
                           .build()?;
         let controller = context.game_controller()?;

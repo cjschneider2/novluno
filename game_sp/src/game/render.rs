@@ -2,6 +2,28 @@
 use ::error::Error;
 use super::buffer;
 
+pub fn clear_with_blue (
+    buffer: &mut buffer::Image,
+) -> Result<(), Error> {
+    let r = 16u8;
+    let g = 64u8;
+    let b = 240u8;
+    assert!( p_size <= m_size);
+    for p_y in 0..buffer.height {
+        let row = 4 * p_y * buffer.width;
+        for p_x in 0..buffer.width {
+            let loc = (row + (4 * p_x)) as usize;
+            unsafe {
+                *buffer.memory.get_unchecked_mut(loc + 0) = b;
+                *buffer.memory.get_unchecked_mut(loc + 1) = g;
+                *buffer.memory.get_unchecked_mut(loc + 2) = r;
+                *buffer.memory.get_unchecked_mut(loc + 3) = 0xFF;
+            }
+        }
+    }
+    Ok(())
+}
+
 pub fn weird_gradient (
     buffer: &mut buffer::Image,
     x_offset: u32,
