@@ -1,26 +1,33 @@
+use std::rc::Rc;
 
 use ::error::Error;
+use ::sprite::Sprite;
 use super::buffer;
 
-pub fn clear_with_blue (
+pub fn render_sprite (
     buffer: &mut buffer::Image,
+    sprite: Rc<Sprite>,
+    at_x: usize,
+    at_y: usize
 ) -> Result<(), Error> {
-    let r = 16u8;
-    let g = 64u8;
-    let b = 240u8;
-    assert!( p_size <= m_size);
-    for p_y in 0..buffer.height {
-        let row = 4 * p_y * buffer.width;
-        for p_x in 0..buffer.width {
-            let loc = (row + (4 * p_x)) as usize;
-            unsafe {
-                *buffer.memory.get_unchecked_mut(loc + 0) = b;
-                *buffer.memory.get_unchecked_mut(loc + 1) = g;
-                *buffer.memory.get_unchecked_mut(loc + 2) = r;
-                *buffer.memory.get_unchecked_mut(loc + 3) = 0xFF;
-            }
-        }
+
+    let max_x = buffer.width;
+    let max_y = buffer.height;
+    let bpp   = buffer.bytes_per_pixel as usize;
+    let pitch = buffer.pitch as usize;
+
+    let mut idx = 0;
+
+    for pixel in &sprite.image {
+
+        if let Some(p) = buffer.memory.get_mut(idx + 0) { *p = pixel.b; }
+        if let Some(p) = buffer.memory.get_mut(idx + 1) { *p = pixel.g; }
+        if let Some(p) = buffer.memory.get_mut(idx + 2) { *p = pixel.r; }
+        if let Some(p) = buffer.memory.get_mut(idx + 3) { *p = pixel.a; }
+
+        idx += bpp;
     }
+
     Ok(())
 }
 

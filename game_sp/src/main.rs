@@ -25,12 +25,12 @@ use game::Game;
 use sdl::Sdl;
 use map_manager::MapManager;
 use sprite_manager::SpriteManager;
+use sprite_type::SpriteType;
 use data_manager::DataManager;
+use entry::Entry;
 
-// Constants...
-
-static WINDOW_WIDTH:u32 = 800;
-static WINDOW_HEIGHT:u32 = 600;
+const WINDOW_WIDTH:u32 = 800;
+const WINDOW_HEIGHT:u32 = 600;
 
 fn main() {
 
@@ -48,7 +48,14 @@ fn main() {
     let mut fps_timer = FpsTimer::new(60.0);
     let mut last_sec = 0;
 
+    // experiment
+    let entry = Entry { file: 0, index: 3 };
+    let interface_t = SpriteType::Interface;
+    let sprite = sprites.get_sprite(entry, interface_t).unwrap();
+    game.state.sprite = Some(sprite);
+
     'main: loop {
+
         // loop start time
         fps_timer.tick();
         let tick = fps_timer.get_epoch().elapsed().as_secs();

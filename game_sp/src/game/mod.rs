@@ -3,19 +3,24 @@ pub mod input;
 pub mod buffer;
 pub mod render;
 
+use std::rc::Rc;
+
+use sprite::Sprite;
 use sprite_manager::SpriteManager;
 use map_manager::MapManager;
+use entry::Entry;
 
 pub struct State {
-    // Experiments
-    pub tone_hz: usize,
-    pub x_offset: usize,
-    pub y_offset: usize,
-
     // _actual_ game state
     pub player_x: usize,
     pub player_y: usize,
     pub map: usize,
+
+    // Experiments
+    pub tone_hz: usize,
+    pub x_offset: usize,
+    pub y_offset: usize,
+    pub sprite: Option<Rc<Sprite>>,
 }
 
 pub struct Game {
@@ -41,14 +46,16 @@ impl Game {
             sprites: SpriteManager::new(sqlite_path),
             maps: MapManager::new(data_path),
             state: State {
-                // experiments
-                tone_hz: 440,
-                x_offset: 0,
-                y_offset: 0,
                 // game
                 player_x: 50,
                 player_y: 50,
                 map: 0,
+
+                // experiments
+                tone_hz: 440,
+                x_offset: 0,
+                y_offset: 0,
+                sprite: None,
             },
             render_buffer: buffer::Image {
                 memory: memory,
@@ -88,10 +95,17 @@ impl Game {
         }
 
         // Render
+        /*
         let _ = render::weird_gradient(&mut self.render_buffer,
                                        self.state.x_offset as u32,
                                        self.state.y_offset as u32);
         let _ = render::player(&mut self.render_buffer, 50, 50);
+        */
+
+        let sprite = self.state.sprite.clone().unwrap();
+        let _ = render::render_sprite(
+            &mut self.render_buffer,
+            sprite, 100, 100);
     }
 
     /*

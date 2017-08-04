@@ -22,7 +22,6 @@ use application as app;
 // include the UI file
 const RLE_VIEWER_UI: &'static str = include_str!("rle_viewer.ui");
 
-
 fn main() {
 
     // init gtk
@@ -41,9 +40,10 @@ fn main() {
         file_tree_selection: builder.get_object("FileTreeSelection").unwrap(),
         open_folder_button: builder.get_object("OpenFolderButton").unwrap(),
         file_chooser_dialog: {
-            let dialog = FileChooserDialog::new(Some("Choose a folder:"),
-                                                Some(&Window::new(WindowType::Popup)),
-                                                FileChooserAction::SelectFolder);
+            let dialog = FileChooserDialog::new(
+                Some("Choose a folder:"),
+                Some(&Window::new(WindowType::Popup)),
+                FileChooserAction::SelectFolder);
             dialog.add_button("Cancel", ResponseType::Cancel.into());
             dialog.add_button("Select", ResponseType::Ok.into());
             dialog
@@ -97,9 +97,13 @@ fn main() {
             let next = idx + 1;
             let prev = idx - 1;
             match key.get_keyval() {
-                key::Right => if next < total { _app_data.borrow_mut().load_rle_at_idx(next as usize); },
-                key::Left  => if prev >= 0    { _app_data.borrow_mut().load_rle_at_idx(prev as usize); },
-                            _ => {}
+                key::Right => if next < total {
+                    _app_data.borrow_mut().load_rle_at_idx(next as usize);
+                },
+                key::Left  => if prev >= 0    {
+                    _app_data.borrow_mut().load_rle_at_idx(prev as usize);
+                },
+                _ => {}
             };
             _app_gui.borrow().update_status(&_app_data.borrow());
             Inhibit(false)
@@ -127,14 +131,14 @@ fn main() {
         let _app_data = app_data.clone();
         move |_widget| {
             let __app_gui = _app_gui.borrow();
-            println!("connect_clicked widget:{:?}", _widget);
             __app_gui.file_tree_selection.unselect_all();
             __app_gui.file_list_store.clear();
             let mut path: Option<PathBuf> = None;
             if __app_gui.file_chooser_dialog.run() == ResponseType::Ok.into() {
-                if let Some(folder) = __app_gui.file_chooser_dialog.get_current_folder() {
-                    path = Some(folder);
-                }
+                if let Some(folder) = __app_gui.file_chooser_dialog
+                    .get_current_folder() {
+                        path = Some(folder);
+                    }
             }
             if let Some(p) = path {
                 _app_data.borrow_mut().current_path = p;

@@ -117,13 +117,17 @@ fn load_1_2(cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
         let name = from_utf8(&string).unwrap_or("wrong encoding?!").into();
         // I'm sort of assuming that we're trying to link to the "next id?"
         // here in the newer format?
+        let id = cursor.read_u32::<LE>()?;
+        let file_number = cursor.read_u32::<LE>()?;
+        let index = cursor.read_u32::<LE>()?;
         let unknown_2 = cursor.read_u32::<LE>()?;
+
         // rest of entry info
         let item = ListItem {
             name: name,
-            file_number: cursor.read_u32::<LE>()?,
-            index: cursor.read_u32::<LE>()?,
-            id: cursor.read_u32::<LE>()?,
+            file_number: file_number,
+            index: index,
+            id: id,
         };
         list.items.push(item);
     }

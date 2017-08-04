@@ -1,0 +1,11 @@
+[package]
+name = "data_converter"
+version = "0.1.0"
+authors = ["cjschneider2 <cjschneider2@gmail.com>"]
+
+[dependencies.core_compat]
+path = "../core_compat"
+
+[dependencies]
+png = "0.9.0"
+xml_writer = "0.2"
