@@ -1,4 +1,4 @@
-//! RMD files are sort of data pointers for the Objects and 
+//! RMD files are sort of data pointers for the Objects and
 //! Tiles and include things like which file they are in and
 //! if they are a part of an animation or so.
 //!
@@ -10,12 +10,12 @@
 //! int animation rows
 //! String
 //! int rmd rows
-//! 
+//!
 //! [RMD Row]
 //! int ImageCount (How many images this row contains,
 //!                 like an image from sadad for example can
 //!                 contain: Body, color hair, color body, weapon)
-//! 
+//!
 //! [RMD Row - Images]
 //! int SourceX
 //! int SourceY
@@ -27,16 +27,16 @@
 //! int DestY
 //! int Draw Type (Shadow, skill, normal)
 //! int ImageIDCount
-//! 
+//!
 //! [RMD Row - Images - Image ID]
 //! int ImageID (Lst row pointer,
 //!              this is a array so different weapons can be used)
-//! 
+//!
 //! int AnimationsCount
-//! 
+//!
 //! [RMD Animation]
 //! int AnimationFrames
-//! 
+//!
 //! [RMD Animation - Frame]
 //! int RMDRowPointer (points to a row of the RMD)
 

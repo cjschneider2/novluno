@@ -16,26 +16,60 @@ use png::HasParameters;
 
 use core_compat::rle::{ResourceFile, Resource};
 use core_compat::lst::List;
+use core_compat::rmd::{Rmd, RmdType};
+use core_compat::rmm::Map;
 use core_compat::error::Error;
 
-static OUTPUT_PATH: &'static str = "/home/schneider/temp/rm/";
+static OUTPUT_PATH: &'static str = "/home/schneider/temp/";
 
 // This is the list of data folder's and list files for them
-static FOLDER_ENTRIES: [(&'static str, &'static str,
-                         &'static str, &'static str, bool); 5] = [
+static RLE_ENTRIES: [(&'static str, &'static str, &'static str,
+                      &'static str, bool); 16] = [
     ("bullets",   "bul", "../data/RLEs/Bul", "../data/RLEs/bul.lst", false),
     ("icons",     "ico", "../data/RLEs/Ico", "../data/RLEs/ico.lst", false),
     ("objects",   "obj", "../data/RLEs/Obj", "../data/RLEs/obj.lst", true ),
     ("tiles",     "tle", "../data/RLEs/Tle", "../data/RLEs/tle.lst", false),
     ("interface", "int", "../data/RLEs/Int", "../data/RLEs/int.lst", false),
+    ("philar",    "ch0", "../data/RLEs/Chr/C00", "../data/RLEs/Chr/c00.lst", false),
+    ("azlar",     "ch1", "../data/RLEs/Chr/C01", "../data/RLEs/Chr/c01.lst", false),
+    ("sadad",     "ch2", "../data/RLEs/Chr/C02", "../data/RLEs/Chr/c02.lst", false),
+    ("destino",   "ch3", "../data/RLEs/Chr/C03", "../data/RLEs/Chr/c03.lst", false),
+    ("jarexx",    "ch4", "../data/RLEs/Chr/C04", "../data/RLEs/Chr/c04.lst", false),
+    ("canon",     "ch5", "../data/RLEs/Chr/C05", "../data/RLEs/Chr/c05.lst", false),
+    ("kitara",    "ch6", "../data/RLEs/Chr/C06", "../data/RLEs/Chr/c06.lst", false),
+    ("lunarena",  "ch7", "../data/RLEs/Chr/C07", "../data/RLEs/Chr/c07.lst", false),
+    ("lavita",    "ch8", "../data/RLEs/Chr/C08", "../data/RLEs/Chr/c08.lst", false),
+    ("ch_9_gm",   "ch9", "../data/RLEs/Chr/C09", "../data/RLEs/Chr/c09.lst", false),
+    ("extra_chr", "etc", "../data/RLEs/Chr/Etc", "../data/RLEs/Chr/etc.lst", false),
     // The sounds one is the only one which is a little different...
     // ("Sounds", "snd", "../data/RLEs/Snd", "../data/RLEs/snd.lst"),
+];
+
+static RMM_ENTRY: (&'static str, &'static str) =
+    ("maps", "../data/DATAs/Map");
+
+static RMD_ENTRIES: [(&'static str, &'static str, &'static str); 4] = [
+    ("bullets", "bul", "../data/DATAs/Bul"),
+    ("character", "bul", "../data/DATAs/Bul"),
+    ("", "bul", "../data/DATAs/Bul"),
+    ("", "bul", "../data/DATAs/Bul"),
 ];
 
 fn main() {
 
     // parse the list file and insert them into the database
-    for &(kind, short_kind, folder, list, use_v2) in FOLDER_ENTRIES.iter() {
+    convert_rle_data();
+
+    // convert the maps ...
+    // convert_rmm_data();
+
+    // ... and rmd files
+    // convert_rmd_data();
+
+}
+
+fn convert_rle_data() {
+    for &(kind, short_kind, folder, list, use_v2) in RLE_ENTRIES.iter() {
 
         println!("file: {:?}", &kind);
 
@@ -85,7 +119,6 @@ fn main() {
                         let ent = RleCombiEntry {
                             id: item.id,
                             name: item.name.clone(),
-                            len: rle.len,
                             x_offset: rle.offset_x,
                             y_offset: rle.offset_y,
                             width: rle.width,
@@ -113,10 +146,12 @@ fn main() {
 
                             writer.write_image_data(&img).unwrap();
                         }
-                    }
+                    } 
                 }
             }
         } // end resource iter
+
+
 
         // write out descriptor file
         {
@@ -136,7 +171,6 @@ fn main() {
                     xml.begin_elem("entry").unwrap();
                     xml.attr("id", &format!("{}", entry.id)).unwrap();
                     xml.attr("name", &entry.name).unwrap();
-                    xml.attr("len", &format!("{}", entry.len)).unwrap();
                     xml.attr("x_offset", &format!("{}", entry.x_offset)).unwrap();
                     xml.attr("y_offset", &format!("{}", entry.y_offset)).unwrap();
                     xml.attr("width", &format!("{}", entry.width)).unwrap();
@@ -154,7 +188,20 @@ fn main() {
         println!("matches          == {:?}", matches);
 
     } // end kind entry loop
+}
 
+fn load_rmd_data(path: &Path, kind: RmdType) -> Result<Rmd, Error> {
+    let mut file = File::open(path)?;
+    let mut bytes = Vec::<u8>::new();
+    file.read_to_end(&mut bytes)?;
+    Rmd::load(kind, &bytes)
+}
+
+fn load_rmm_data(path: &Path) -> Result<Map, Error> {
+    let mut file = File::open(path)?;
+    let mut bytes = Vec::<u8>::new();
+    file.read_to_end(&mut bytes)?;
+    Map::load(&bytes)
 }
 
 fn load_list_data(path: &Path, use_v2: bool) -> Result<List, Error> {
@@ -177,6 +224,8 @@ fn load_rle_data(path: &Path) -> Result<ResourceFile, Error> {
         if let Some(stem) = stem.to_str() {
             let num: String = stem.matches(char::is_numeric).collect();
             file_num = num.parse().unwrap_or(0xFFFF);
+            // we really only need a maximum of 5 digits...
+            file_num = file_num % 99_999;
         }
     }
 
@@ -187,7 +236,6 @@ fn load_rle_data(path: &Path) -> Result<ResourceFile, Error> {
 struct RleCombiEntry {
     id: u32,
     name: String,
-    len: u32,
     x_offset: u32,
     y_offset: u32,
     width: u32,
