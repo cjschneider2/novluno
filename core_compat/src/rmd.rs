@@ -52,11 +52,11 @@ use error::Error;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub enum RmdType {
-    Tile,
-    Object,
-    Icon,
-    Character,
     Bullet,
+    Character,
+    Icon,
+    Object,
+    Tile,
 }
 
 #[derive(Debug)]
@@ -155,10 +155,10 @@ impl Rmd {
 
         // filetype string: Equal to ""
         let string_1 = parse_string(&mut cursor)?;
-        println!("{:?}", string_1);
+        // println!("{:?}", string_1);
 
         let file_number = cursor.read_u32::<LE>()?; // 4
-        println!("file_number: {}", file_number);
+        // println!("file_number: {}", file_number);
 
         // 8 empty bytes
         let padding = cursor.read_u32::<LE>()?; // 8
@@ -168,15 +168,17 @@ impl Rmd {
 
         // let string = parse_string(&mut cursor)?;
         let string = parse_u8_vec(&mut cursor)?;
-        println!("str 1: `{:?}`", string);
+        // println!("str 1: `{:?}`", string);
 
         rmd.animation_parts = cursor.read_i32::<LE>()?;
         rmd.animation_rows = cursor.read_i32::<LE>()?;
 
         let string = parse_string(&mut cursor)?;
-        println!("str 2: `{}`", string);
+        // println!("str 2: `{}`", string);
 
         rmd.row_count = cursor.read_i32::<LE>()?;
+
+        println!("end header offset: `{}`", cursor.position());
 
         // read the Rmd rows
         for _ in 0..rmd.row_count {
@@ -250,7 +252,7 @@ mod tests {
     #[test]
     fn test_tle_00001() {
         let data = include_bytes!("../../data/DATAs/Tle/tle00001.rmd");
-        let rmd = Rmd::load(data).unwrap();
+        let rmd = Rmd::load(RmdType::Tile, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());
     }
@@ -258,7 +260,7 @@ mod tests {
     #[test]
     fn test_obj_00001() {
         let data = include_bytes!("../../data/DATAs/Obj/obj00001.rmd");
-        let rmd = Rmd::load(data).unwrap();
+        let rmd = Rmd::load(RmdType::Object, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());
     }
@@ -266,7 +268,7 @@ mod tests {
     #[test]
     fn test_chr_00001() {
         let data = include_bytes!("../../data/DATAs/Chr/chr00001.rmd");
-        let rmd = Rmd::load(data).unwrap();
+        let rmd = Rmd::load(RmdType::Character, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());
     }
@@ -274,7 +276,7 @@ mod tests {
     #[test]
     fn test_chr_00042() {
         let data = include_bytes!("../../data/DATAs/Chr/chr00042.rmd");
-        let rmd = Rmd::load(data).unwrap();
+        let rmd = Rmd::load(RmdType::Character, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());
     }

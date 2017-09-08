@@ -40,10 +40,10 @@ use error::Error;
 #[derive(Debug)]
 pub struct Event {
     pub number: u16,
-    pub c1_x: u32,
-    pub c1_y: u32,
-    pub c2_x: u32,
-    pub c2_y: u32,
+    pub left: u32,   // c1_x
+    pub top: u32,    // c1_x
+    pub right: u32,  // c2_x
+    pub bottom: u32, // c2_y
 }
 
 #[derive(Debug)]
@@ -97,7 +97,7 @@ impl Map {
         let file_type: &str = from_utf8(&string)?;
 
         if file_type != "RedMoon MapData 1.0" {
-            println!("{:?}", file_type);
+            // println!("{:?}", file_type);
             return Err(Error::MissingMapIdentifier);
         }
 
@@ -121,12 +121,14 @@ impl Map {
         for _ in 0..map.event_count {
             let event = Event {
                 number: cursor.read_u16::<LE>()?,
-                c1_x: cursor.read_u32::<LE>()?,
-                c1_y: cursor.read_u32::<LE>()?,
-                c2_x: cursor.read_u32::<LE>()?,
-                c2_y: cursor.read_u32::<LE>()?,
+                left: cursor.read_u32::<LE>()?,
+                top: cursor.read_u32::<LE>()?,
+                right: cursor.read_u32::<LE>()?,
+                bottom: cursor.read_u32::<LE>()?,
             };
-            map.events.push(event);
+            if event.number != 0 {
+                map.events.push(event);
+            }
         }
 
         // read in the tile values...

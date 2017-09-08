@@ -97,6 +97,10 @@ impl ResourceFile {
             resource_offsets.push(val);
         }
 
+        println!("Loading {} resources at offsets:{:#?}",
+                 total_resources,
+                 resource_offsets);
+
         for (idx, offset) in resource_offsets.iter().enumerate() {
             let mut resource = Resource::new();
 
@@ -126,8 +130,8 @@ impl ResourceFile {
                 }
             } else {
                 // println!("oversized resource: W: {}, H: {}",
-                //          resource.width,
-                //          resource.height);
+                //         resource.width,
+                //         resource.height);
                 resource.image.push(Pixel::new_empty());
                 continue;
             }
@@ -137,6 +141,9 @@ impl ResourceFile {
             let mut y = 0i32;
             'image: loop {
                 let entry_type = cursor.read_u8().unwrap();
+                // println!("RLE Entry Type:{} @ offset: `{}`",
+                //          entry_type, 
+                //          cursor.position());
                 match entry_type {
                     0x00 => {
                         /* End resource marker */
@@ -197,5 +204,10 @@ mod tests {
     fn test_c0000042_rle() {
         let data = include_bytes!("../../data/RLEs/Chr/C00/c0000042.rle");
         let rle = ResourceFile::load(42, data).unwrap();
+    }
+    #[test]
+    fn test_ico_00000_rle() {
+        let data = include_bytes!("../../data/RLEs/Ico/ico00000.rle");
+        let rle = ResourceFile::load(0, data).unwrap();
     }
 }
