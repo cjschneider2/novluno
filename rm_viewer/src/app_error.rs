@@ -6,6 +6,7 @@ use redmoon;
 
 #[derive(Debug)]
 pub enum AppError {
+    Str(&'static str),
     StringConversion,
     Rm(redmoon::error::Error),
     Io(io::Error),

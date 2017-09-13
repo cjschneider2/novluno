@@ -7,7 +7,7 @@ authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
 path = "../core_compat"
 
 [dependencies.gtk]
-version = "0.1.3"
+version = "*"
 features = ["v3_10"]
 
 [dependencies]

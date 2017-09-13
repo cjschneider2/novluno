@@ -6,18 +6,23 @@ extern crate gdk;
 extern crate gdk_pixbuf;
 
 mod constants;
-mod application;
+mod app_data;
+mod app_gui;
 mod app_error;
+mod read_rle;
 
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::path::PathBuf;
 
 use gtk::*;
+use gtk::Builder;
 use gdk::prelude::*;
 use gdk::enums::key;
 
-use application as app;
+use app_data::AppData;
+use app_gui::AppGui;
+use read_rle::read_rle_from_file;
 
 // include the UI file
 const RLE_VIEWER_UI: &'static str = include_str!("rle_viewer.ui");
@@ -31,44 +36,10 @@ fn main() {
     let builder = Builder::new_from_string(RLE_VIEWER_UI);
 
     // setup application gui
-    let app_gui = app::ApplicationGui {
-        main_window: builder.get_object("MainWindow").unwrap(),
-        image: builder.get_object("Image").unwrap(),
-        status_bar: builder.get_object("StatusBar").unwrap(),
-        file_list_store: builder.get_object("FileListStore").unwrap(),
-        file_tree_view: builder.get_object("FileTreeView").unwrap(),
-        file_tree_selection: builder.get_object("FileTreeSelection").unwrap(),
-        open_folder_button: builder.get_object("OpenFolderButton").unwrap(),
-        file_chooser_dialog: {
-            let dialog = FileChooserDialog::new(
-                Some("Choose a folder:"),
-                Some(&Window::new(WindowType::Popup)),
-                FileChooserAction::SelectFolder);
-            dialog.add_button("Cancel", ResponseType::Cancel.into());
-            dialog.add_button("Select", ResponseType::Ok.into());
-            dialog
-        },
-    };
-    app_gui.file_tree_view.set_headers_visible(false);
-    let column = TreeViewColumn::new();
-    let cell = CellRendererText::new();
-    column.pack_start(&cell, true);
-    column.add_attribute(&cell, "text", 0);
-    app_gui.file_tree_view.append_column(&column);
+    let app_gui = AppGui::new(&builder);
 
     // Setup application data
-    let mut app_data = app::ApplicationData {
-        current_path: PathBuf::new(),
-        current_file: PathBuf::new(),
-        resource_file: None,
-        resource_idx: 0,
-        resource_total: 0,
-        height: 0,
-        width: 0,
-        offset_x: 0,
-        offset_y: 0,
-        pixbuf: None,
-    };
+    let mut app_data = AppData::new();
     app_data.current_path.push("~/redmoon_data/RLEs/Obj");
     let _ = app_gui.load_new_folder(&app_data);
 
@@ -157,7 +128,7 @@ fn main() {
             if let Some((model, iter)) = selection.get_selected() {
                 file.push(model.get_value(&iter, 0).get::<&str>().unwrap());
             }
-            match app::read_rle_from_file(&file) {
+            match read_rle_from_file(&file) {
                 Ok(rle) => {
                     _app_data.borrow_mut().resource_total = rle.resources.len();
                     _app_data.borrow_mut().resource_idx = 0;
