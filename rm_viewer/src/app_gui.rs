@@ -8,34 +8,38 @@ use app_data::AppData;
 
 pub struct AppGui {
     pub main_window: Window,
-    pub image: Image,
     pub status_bar: Statusbar,
-    pub file_list_store: ListStore,
-    pub file_tree_view: TreeView,
-    pub file_tree_selection: TreeSelection,
+    pub list_store: ListStore,
+    pub tree_view: TreeView,
+    pub tree_selection: TreeSelection,
+    pub notebook: Notebook,
     pub open_folder_button: Button,
+    pub settings_button: Button,
     pub file_chooser_dialog: FileChooserDialog,
 }
 
 impl AppGui {
     pub fn new(builder: &Builder) -> Result<AppGui, AppError> {
-        let err = || { return Err(AppError::Str("Builder error"));};
-
+        // get builder objects
         let main_window = builder.get_object("MainWindow").unwrap();
-        let image = builder.get_object("Image").unwrap();
-        let file_list_store = builder.get_object("FileListStore").unwrap();
-        let file_tree_view = builder.get_object("FileTreeView").unwrap();
-        let file_tree_selection = builder.get_object("FileTreeSelection").unwrap();
-        let open_folder_button = builder.get_object("OpenFolderButton").unwrap();
-
+        let status_bar = builder.get_object("StatusBar").unwrap();
+        let notebook = builder.get_object("Notebook").unwrap();
+        let list_store = builder.get_object("TreeListStore").unwrap();
+        let tree_view = builder.get_object("TreeView").unwrap();
+        let tree_selection = builder.get_object("TreeSelection").unwrap();
+        let open_folder_button = builder.get_object("LoadDataDirButton").unwrap();
+        let settings_button = builder.get_object("SettingsButton").unwrap();
+        let welcome_text: TextView = builder.get_object("WelcomeText").unwrap();
+        // create gui object
         let app_gui: AppGui = AppGui {
             main_window,
-            image,
+            notebook,
             status_bar,
-            file_list_store,
-            file_tree_view,
-            file_tree_selection,
+            list_store,
+            tree_view,
+            tree_selection,
             open_folder_button,
+            settings_button,
             file_chooser_dialog: {
                 let dialog = FileChooserDialog::new(
                     Some("Choose a folder:"),
@@ -46,14 +50,18 @@ impl AppGui {
                 dialog
             },
         };
-
-        app_gui.file_tree_view.set_headers_visible(false);
+        // GUI configuration
+        // -- Config tree-view
+        app_gui.tree_view.set_headers_visible(false);
         let column = TreeViewColumn::new();
         let cell = CellRendererText::new();
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", 0);
-        app_gui.file_tree_view.append_column(&column);
-
+        app_gui.tree_view.append_column(&column);
+        // -- Config Notebook
+        let label = Label::new(Some("Welcome!"));
+        app_gui.notebook.append_page(&welcome_text, Some(&label));
+        // return
         Ok(app_gui)
     }
 
@@ -84,20 +92,17 @@ impl AppGui {
                 }
             }
         }
-
         file_list.sort();
-
         for file in file_list {
-            let next = self.file_list_store.append();
+            let next = self.list_store.append();
             if let Some(name) = file.file_name() {
                 let name: &str = match name.to_str() {
                     Some(name) => name,
                     None => return Err(AppError::StringConversion),
                 };
-                self.file_list_store.set_value(&next, 0, &name.to_value());
+                self.list_store.set_value(&next, 0, &name.to_value());
             }
         }
-
         Ok(())
     }
 }
