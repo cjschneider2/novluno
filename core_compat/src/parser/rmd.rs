@@ -251,7 +251,7 @@ mod tests {
 
     #[test]
     fn test_tle_00001() {
-        let data = include_bytes!("../../data/DATAs/Tle/tle00001.rmd");
+        let data = include_bytes!("../../../data/DATAs/Tle/tle00001.rmd");
         let rmd = Rmd::load(RmdType::Tile, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());
@@ -259,7 +259,7 @@ mod tests {
 
     #[test]
     fn test_obj_00001() {
-        let data = include_bytes!("../../data/DATAs/Obj/obj00001.rmd");
+        let data = include_bytes!("../../../data/DATAs/Obj/obj00001.rmd");
         let rmd = Rmd::load(RmdType::Object, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());
@@ -267,7 +267,7 @@ mod tests {
 
     #[test]
     fn test_chr_00001() {
-        let data = include_bytes!("../../data/DATAs/Chr/chr00001.rmd");
+        let data = include_bytes!("../../../data/DATAs/Chr/chr00001.rmd");
         let rmd = Rmd::load(RmdType::Character, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());
@@ -275,7 +275,7 @@ mod tests {
 
     #[test]
     fn test_chr_00042() {
-        let data = include_bytes!("../../data/DATAs/Chr/chr00042.rmd");
+        let data = include_bytes!("../../../data/DATAs/Chr/chr00042.rmd");
         let rmd = Rmd::load(RmdType::Character, data).unwrap();
         assert!(rmd.row_count as usize == rmd.rows.len());
         assert!(rmd.animation_count as usize == rmd.animations.len());

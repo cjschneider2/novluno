@@ -4,9 +4,10 @@ use std::fs::File;
 use std::io::Read;
 use std::rc::Rc;
 
-use core_compat::rmm::Map;
-
+use entity::map::Map;
+use entity::map_tile::MapTile;
 use error::Error;
+use parser::rmm::parse_rmm;
 
 pub struct MapManager {
     data_path: PathBuf,
@@ -40,7 +41,7 @@ impl MapManager {
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
         // parse map and insert into manager
-        let map = Map::load(&data)?;
+        let map = parse_rmm(&data)?;
         self.maps.insert(number, Rc::new(map));
         Ok(())
     }
@@ -52,6 +53,7 @@ mod tests {
 
     #[test]
     fn test_load_map00001() {
+        // load the map files
         let map_data_path = Path::new("../data/DATAs/Map/");
         let mut map_man = MapManager::new(&map_data_path);
         let map_no = 1usize;

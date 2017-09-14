@@ -7,61 +7,44 @@ use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
 use error::Error;
+use entity::list::List;
+use entity::list_item::ListItem;
 
-#[derive(Debug, Clone)]
-pub struct ListItem {
-    pub name: String,
-    pub id: u32,
-    pub file_number: u32,
-    pub index: u32,
-}
-
-pub struct List {
-    pub items: Vec<ListItem>,
-}
-
-impl List {
-    pub fn new() -> List {
-        List { items: Vec::new() }
+pub fn load_list(data: &[u8], use_v2: bool) -> Result<List, Error> {
+    let mut cursor = Cursor::new(data);
+    // filetype len prefixed string:
+    //  - needs to equal "RedMoon Lst File"
+    let string_length = cursor.read_u8()?;
+    let mut string = Vec::<u8>::new();
+    for _ in 0..string_length {
+        let chr = cursor.read_u8()?;
+        string.push(chr);
     }
-
-    pub fn load(data: &[u8], use_v2: bool) -> Result<List, Error> {
-        let mut cursor = Cursor::new(data);
-        // filetype len prefixed string:
-        //  - needs to equal "RedMoon Lst File"
-        let string_length = cursor.read_u8()?;
-        let mut string = Vec::<u8>::new();
-        for _ in 0..string_length {
+    {
+        let file_type: &str = from_utf8(&string)?;
+        // println!("{:?}", &file_type);
+    }
+    // file version length prefixed string
+    let version: &str;
+    {
+        let version_length = cursor.read_u8()?;
+        string.clear();
+        for _ in 0..version_length {
             let chr = cursor.read_u8()?;
             string.push(chr);
         }
-        {
-            let file_type: &str = from_utf8(&string)?;
-            // println!("{:?}", &file_type);
-        }
-        // file version length prefixed string
-        let version: &str;
-        {
-            let version_length = cursor.read_u8()?;
-            string.clear();
-            for _ in 0..version_length {
-                let chr = cursor.read_u8()?;
-                string.push(chr);
-            }
-            version = from_utf8(&string)?;
-            // println!("{:?}", &version);
-        }
+        version = from_utf8(&string)?;
+        // println!("{:?}", &version);
+    }
 
-        if use_v2 {
-            load_1_2(&mut cursor)
-        } else {
-            match version {
-                "1.0" => load_1_0(&mut cursor),
-                "1.2" => load_1_2(&mut cursor),
-                _ => panic!("Unknown version type: {:?}", version),
-            }
+    if use_v2 {
+        load_1_2(&mut cursor)
+    } else {
+        match version {
+            "1.0" => load_1_0(&mut cursor),
+            "1.2" => load_1_2(&mut cursor),
+            _ => panic!("Unknown version type: {:?}", version),
         }
-
     }
 }
 
@@ -137,27 +120,28 @@ fn load_1_2(cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_lst_bul() {
-        let data = include_bytes!("../../data/RLEs/bul.lst");
+        let data = include_bytes!("../../../data/RLEs/bul.lst");
         let list = List::load(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_ico() {
-        let data = include_bytes!("../../data/RLEs/ico.lst");
+        let data = include_bytes!("../../../data/RLEs/ico.lst");
         let list = List::load(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_int() {
-        let data = include_bytes!("../../data/RLEs/int.lst");
+        let data = include_bytes!("../../../data/RLEs/int.lst");
         let list = List::load(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_tle() {
-        let data = include_bytes!("../../data/RLEs/tle.lst");
+        let data = include_bytes!("../../../data/RLEs/tle.lst");
         let list = List::load(data, false).unwrap();
     }
 
@@ -180,7 +164,7 @@ mod tests {
     #[test]
     // NOTE: This uses the version 1.2 of the lst file
     fn test_lst_obj() {
-        let data = include_bytes!("../../data/RLEs/obj.lst");
+        let data = include_bytes!("../../../data/RLEs/obj.lst");
         let list = List::load(data, false).unwrap();
     }
 }

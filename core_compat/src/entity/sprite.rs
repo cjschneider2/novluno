@@ -1,7 +1,6 @@
-use core_compat::util::pixel::Pixel;
-
-use entry::Entry;
-use sprite_type::SpriteType;
+use utility::pixel::Pixel;
+use entity::entry::Entry;
+use entity::sprite_type::SpriteType;
 
 #[derive(Debug)]
 pub struct Sprite {

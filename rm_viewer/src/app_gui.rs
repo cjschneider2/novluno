@@ -16,6 +16,7 @@ pub struct AppGui {
     pub open_folder_button: Button,
     pub settings_button: Button,
     pub file_chooser_dialog: FileChooserDialog,
+    pub info_text: TextView,
 }
 
 impl AppGui {
@@ -23,13 +24,14 @@ impl AppGui {
         // get builder objects
         let main_window = builder.get_object("MainWindow").unwrap();
         let status_bar = builder.get_object("StatusBar").unwrap();
-        let notebook = builder.get_object("Notebook").unwrap();
         let list_store = builder.get_object("TreeListStore").unwrap();
         let tree_view = builder.get_object("TreeView").unwrap();
         let tree_selection = builder.get_object("TreeSelection").unwrap();
         let open_folder_button = builder.get_object("LoadDataDirButton").unwrap();
         let settings_button = builder.get_object("SettingsButton").unwrap();
+        let notebook = builder.get_object("Notebook").unwrap();
         let welcome_text: TextView = builder.get_object("WelcomeText").unwrap();
+        let info_text: TextView = builder.get_object("InfoTextView").unwrap();
         // create gui object
         let app_gui: AppGui = AppGui {
             main_window,
@@ -40,6 +42,7 @@ impl AppGui {
             tree_selection,
             open_folder_button,
             settings_button,
+            info_text,
             file_chooser_dialog: {
                 let dialog = FileChooserDialog::new(
                     Some("Choose a folder:"),
@@ -58,9 +61,11 @@ impl AppGui {
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", 0);
         app_gui.tree_view.append_column(&column);
+        // -- Set the "Welcome Message"
+        let buffer = welcome_text.get_buffer().unwrap();
+        buffer.set_text("Welcome!");
         // -- Config Notebook
-        let label = Label::new(Some("Welcome!"));
-        app_gui.notebook.append_page(&welcome_text, Some(&label));
+
         // return
         Ok(app_gui)
     }

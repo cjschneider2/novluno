@@ -3,8 +3,12 @@
 extern crate byteorder;
 
 pub mod error;
-pub mod lst;
-pub mod rle;
-pub mod rmd;
-pub mod rmm;
-pub mod util;
+pub mod utility;
+pub mod parser;
+pub mod manager;
+pub mod entity;
+
+// top level re-exports
+pub use manager::map_manager::MapManager;
+pub use manager::data_manager::DataManager;
+pub use manager::sprite_manager::SpriteManager;

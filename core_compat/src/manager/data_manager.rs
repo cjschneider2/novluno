@@ -1,4 +1,3 @@
-//! Handles the loading and 
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -7,9 +6,8 @@ use std::fs::File;
 use std::io::Read;
 use std::rc::Rc;
 
-use core_compat::rmd::RmdType;
-use core_compat::rmd::Rmd;
-
+use parser::rmd::RmdType;
+use parser::rmd::Rmd;
 use error::Error;
 
 pub struct DataManager {

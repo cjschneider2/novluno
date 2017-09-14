@@ -4,35 +4,33 @@ use std::rc::Rc;
 use std::fs::File;
 use std::io::Read;
 
-use core_compat::rle::ResourceFile;
-
+use entity::resource_file::ResourceFile;
 use error::Error;
-use entry::Entry;
-use sprite::Sprite;
-use sprite_type::SpriteType::{
-    self, Bullet, Character, Interface, Icon, Tile, Object};
+use entity::entry::Entry;
+use entity::sprite::Sprite;
+use entity::sprite_type::SpriteType::{self, Bullet, Character, Interface, Icon, Tile, Object};
+use parser::rle::parse_rle;
 
 pub struct SpriteManager {
     db_path: PathBuf,
-    // FIXME: doing seperate maps really stinks...
-    map_bul: HashMap<Entry, Rc<Sprite>>,
-    map_ico: HashMap<Entry, Rc<Sprite>>,
-    map_chr: HashMap<Entry, Rc<Sprite>>,
-    map_obj: HashMap<Entry, Rc<Sprite>>,
-    map_tle: HashMap<Entry, Rc<Sprite>>,
-    map_int: HashMap<Entry, Rc<Sprite>>,
+    bul_map: HashMap<Entry, Rc<Sprite>>,
+    ico_map: HashMap<Entry, Rc<Sprite>>,
+    chr_map: HashMap<Entry, Rc<Sprite>>,
+    obj_map: HashMap<Entry, Rc<Sprite>>,
+    tle_map: HashMap<Entry, Rc<Sprite>>,
+    int_map: HashMap<Entry, Rc<Sprite>>,
 }
 
 impl SpriteManager {
     pub fn new(db_path: &Path) -> SpriteManager {
         SpriteManager {
             db_path: db_path.into(),
-            map_bul: HashMap::new(),
-            map_ico: HashMap::new(),
-            map_chr: HashMap::new(),
-            map_obj: HashMap::new(),
-            map_tle: HashMap::new(),
-            map_int: HashMap::new(),
+            bul_map: HashMap::new(),
+            ico_map: HashMap::new(),
+            chr_map: HashMap::new(),
+            obj_map: HashMap::new(),
+            tle_map: HashMap::new(),
+            int_map: HashMap::new(),
         }
     }
 
@@ -59,12 +57,12 @@ impl SpriteManager {
         sprite_type: SpriteType
     ) -> Option<Rc<Sprite>> {
         if let Some(entry) = match sprite_type {
-            Bullet    => { self.map_bul.get(entry) },
-            Icon      => { self.map_ico.get(entry) },
-            Character => { self.map_chr.get(entry) },
-            Object    => { self.map_obj.get(entry) },
-            Tile      => { self.map_tle.get(entry) },
-            Interface => { self.map_int.get(entry) },
+            Bullet    => { self.bul_map.get(entry) },
+            Icon      => { self.ico_map.get(entry) },
+            Character => { self.chr_map.get(entry) },
+            Object    => { self.obj_map.get(entry) },
+            Tile      => { self.tle_map.get(entry) },
+            Interface => { self.int_map.get(entry) },
         } {
             Some(entry.clone())
         } else {
@@ -95,7 +93,7 @@ impl SpriteManager {
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
         // parse rle file and insert into manager
-        let resource_file = ResourceFile::load(number, &data)?;
+        let resource_file = parse_rle(number, &data)?;
         for resource in resource_file.resources {
             let entry = Entry { file: number, index: resource.index };
             let sprite = Sprite {
@@ -108,12 +106,12 @@ impl SpriteManager {
                 image: resource.image,
             };
             match sprite_type {
-                Bullet    => { self.map_bul.insert(entry, Rc::new(sprite)); },
-                Icon      => { self.map_ico.insert(entry, Rc::new(sprite)); },
-                Character => { self.map_chr.insert(entry, Rc::new(sprite)); },
-                Object    => { self.map_obj.insert(entry, Rc::new(sprite)); },
-                Tile      => { self.map_tle.insert(entry, Rc::new(sprite)); },
-                Interface => { self.map_int.insert(entry, Rc::new(sprite)); },
+                Bullet    => { self.bul_map.insert(entry, Rc::new(sprite)); },
+                Icon      => { self.ico_map.insert(entry, Rc::new(sprite)); },
+                Character => { self.chr_map.insert(entry, Rc::new(sprite)); },
+                Object    => { self.obj_map.insert(entry, Rc::new(sprite)); },
+                Tile      => { self.tle_map.insert(entry, Rc::new(sprite)); },
+                Interface => { self.int_map.insert(entry, Rc::new(sprite)); },
             }
         }
         Ok(())
