@@ -6,6 +6,7 @@ use std::path::Path;
 use core_compat::DataManager;
 use core_compat::MapManager;
 use core_compat::SpriteManager;
+use core_compat::entity::rmd_type::RmdType;
 
 #[test]
 fn test_map_sprite_load_map00001() {
@@ -21,8 +22,18 @@ fn test_map_sprite_load_map00001() {
     map_manager.load_map(1).unwrap();
     let map = map_manager.get_map(1).unwrap();
     // check map data
-    assert_eq!(map.number, 1);
-    assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
+    assert_eq!(map.number(), 1);
+    assert_eq!((map.size_x() * map.size_y()) as usize, map.tiles().len());
     // load the data files for each tile
-    // for tile in map.
+    for map_tile in map.tiles().iter() {
+        // load references to the data files
+        let obj_num = map_tile.object_file_num as usize;
+        if obj_num != 0 {
+            data_manager.get_data(RmdType::Object, obj_num).unwrap();
+        }
+        let tile_num = map_tile.tile_file_num as usize;
+        if tile_num != 0 {
+            data_manager.get_data(RmdType::Tile, tile_num).unwrap();
+        }
+    }
 }

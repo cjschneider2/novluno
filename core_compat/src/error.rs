@@ -7,6 +7,7 @@ use std::string::FromUtf8Error;
 pub enum Error {
     SpriteLoad,
     MapLoad,
+    DataLoad,
     FromUtf16(FromUtf16Error),
     FromUtf8(FromUtf8Error),
     Io(io::Error),

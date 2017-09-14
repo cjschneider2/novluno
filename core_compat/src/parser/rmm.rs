@@ -60,23 +60,22 @@ pub fn parse_rmm(data: &[u8]) -> Result<Map, Error> {
     }
 
     // map size (x, y) in number of tiles
-    map.size_x = cursor.read_u32::<LE>()?;
-    map.size_y = cursor.read_u32::<LE>()?;
+    map.set_size_x(cursor.read_u32::<LE>()?);
+    map.set_size_y(cursor.read_u32::<LE>()?);
 
     // Map String (name?)
-    map.id_count = cursor.read_u8()?;
-    for idx in 0..(map.id_count) {
-        let val = cursor.read_u8()?;
-        map.id_list.push(val);
+    map.set_id_count(cursor.read_u8()?);
+    for idx in 0..(map.id_count()) {
+        map.add_id_list_val(cursor.read_u8()?);
     }
 
     // the map number described by this file...
-    map.number = cursor.read_u32::<LE>()?;
-    map.event_count = cursor.read_u32::<LE>()?;
+    map.set_map_number(cursor.read_u32::<LE>()?);
+    map.set_event_count(cursor.read_u32::<LE>()?);
 
     // NOTE: This is an array of event rectangles for interactions with
     //       things like mailboxes and the like
-    for _ in 0..map.event_count {
+    for _ in 0..map.event_count() {
         let event = Event {
             number: cursor.read_u16::<LE>()?,
             left: cursor.read_u32::<LE>()?,
@@ -85,15 +84,15 @@ pub fn parse_rmm(data: &[u8]) -> Result<Map, Error> {
             bottom: cursor.read_u32::<LE>()?,
         };
         if event.number != 0 {
-            map.events.push(event);
+            map.add_event(event);
         }
     }
 
     // read in the tile values...
-    let count = map.size_x * map.size_y;
+    let count = map.size_x() * map.size_y();
     for tile in 0..count {
         let tile = parse_v1(&mut cursor)?;
-        map.tiles.push(tile);
+        map.add_tile(tile);
     }
 
     Ok(map)
