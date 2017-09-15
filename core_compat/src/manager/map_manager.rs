@@ -59,7 +59,7 @@ mod tests {
         let map_no = 1usize;
         map_man.load_map(map_no).unwrap();
         let map = map_man.maps.get(&1).unwrap();
-        assert_eq!(map.number, 1);
-        assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
+        assert_eq!(map.number(), 1);
+        assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }
 }

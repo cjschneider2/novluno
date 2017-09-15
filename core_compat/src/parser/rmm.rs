@@ -176,21 +176,21 @@ mod tests {
     #[test]
     fn test_map00001_rmm() {
         let data = include_bytes!("../../../data/DATAs/Map/Map00001.rmm");
-        let map = Map::load(data).unwrap();
-        assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
+        let map = parse_rmm(data).unwrap();
+        assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }
 
     #[test]
     fn test_map00005_rmm() {
         let data = include_bytes!("../../../data/DATAs/Map/Map00005.rmm");
-        let map = Map::load(data).unwrap();
-        assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
+        let map = parse_rmm(data).unwrap();
+        assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }
 
     #[test]
     fn test_map00003_rmm() {
         let data = include_bytes!("../../../data/DATAs/Map/Map00003.rmm");
-        let map = Map::load(data).unwrap();
-        assert_eq!((map.size_x * map.size_y) as usize, map.tiles.len());
+        let map = parse_rmm(data).unwrap();
+        assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }
 }

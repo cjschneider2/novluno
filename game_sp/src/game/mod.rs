@@ -5,10 +5,9 @@ pub mod render;
 
 use std::rc::Rc;
 
-use sprite::Sprite;
-use sprite_manager::SpriteManager;
-use map_manager::MapManager;
-use entry::Entry;
+use core_compat::MapManager;
+use core_compat::SpriteManager;
+use core_compat::entity::sprite::Sprite;
 
 pub struct State {
     // _actual_ game state

@@ -80,6 +80,14 @@ impl Map {
         &self.tiles
     }
 
+    pub fn tile_count(&self) -> usize {
+        self.tiles.len()
+    }
+
+    pub fn get_tile(&self, index: usize) -> Option<&MapTile> {
+        self.tiles.get(index)
+    }
+
     pub fn number(&self) -> u32 {
         self.number
     }

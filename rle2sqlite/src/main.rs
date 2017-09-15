@@ -20,8 +20,9 @@ use std::fs::File;
 use std::fs::read_dir;
 use std::io::Read;
 
-use core_compat::rle::{ResourceFile, Resource};
-use core_compat::lst::List;
+use core_compat::entity::resource_file::ResourceFile;
+use core_compat::entity::resource::Resource;
+use core_compat::entity::lst::List;
 use core_compat::error::Error;
 
 use sql::Connection;
@@ -182,5 +183,5 @@ fn load_rle_data(path: &Path) -> Result<ResourceFile, Error> {
     }
 
     // parse && append results
-    ResourceFile::load(file_num, &mut bytes)
+    parse_rle(file_num, &mut bytes)
 }

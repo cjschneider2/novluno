@@ -9,7 +9,7 @@ pub mod resource_file;
 pub mod rmd;
 pub mod rmd_animation;
 pub mod rmd_image;
-pub mod rmd_row;
+pub mod rmd_entry;
 pub mod rmd_type;
 pub mod sprite;
 pub mod sprite_type;

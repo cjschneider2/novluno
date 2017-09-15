@@ -27,13 +27,20 @@ fn test_map_sprite_load_map00001() {
     // load the data files for each tile
     for map_tile in map.tiles().iter() {
         // load references to the data files
+        // -- map tile objects
         let obj_num = map_tile.object_file_num as usize;
+        let obj_idx = map_tile.object_file_idx as usize;
         if obj_num != 0 {
-            data_manager.get_data(RmdType::Object, obj_num).unwrap();
+            let rmd = data_manager.get_data(RmdType::Object, obj_num).unwrap();
+            let entry = rmd.get_entry(obj_idx).unwrap();
         }
+        // -- map tile sprites
         let tile_num = map_tile.tile_file_num as usize;
+        let tile_idx = map_tile.tile_file_idx as usize;
         if tile_num != 0 {
-            data_manager.get_data(RmdType::Tile, tile_num).unwrap();
+            let rmd = data_manager.get_data(RmdType::Tile, tile_num).unwrap();
+            let entry = rmd.get_entry(tile_idx).unwrap();
+            assert!(entry.image_count() > 0);
         }
     }
 }

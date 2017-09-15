@@ -4,15 +4,9 @@ extern crate sdl2;
 extern crate core_compat;
 //extern crate rusqlite;
 
-mod data_manager;
-mod entry;
 mod error;
 mod fps;
 mod game;
-mod map_manager;
-mod sprite_manager;
-mod sprite_type;
-mod sprite;
 mod vec;
 mod sdl;
 #[cfg(test)]
@@ -20,14 +14,15 @@ mod test;
 
 use std::path::Path;
 
+use core_compat::manager::map_manager::MapManager;
+use core_compat::manager::sprite_manager::SpriteManager;
+use core_compat::entity::sprite_type::SpriteType;
+use core_compat::entity::entry::Entry;
+use core_compat::manager::data_manager::DataManager;
+
 use fps::FpsTimer;
 use game::Game;
 use sdl::Sdl;
-use map_manager::MapManager;
-use sprite_manager::SpriteManager;
-use sprite_type::SpriteType;
-use data_manager::DataManager;
-use entry::Entry;
 
 const WINDOW_WIDTH:u32 = 800;
 const WINDOW_HEIGHT:u32 = 600;

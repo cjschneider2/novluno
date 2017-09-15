@@ -10,7 +10,7 @@ use error::Error;
 use entity::list::List;
 use entity::list_item::ListItem;
 
-pub fn load_list(data: &[u8], use_v2: bool) -> Result<List, Error> {
+pub fn parse_lst(data: &[u8], use_v2: bool) -> Result<List, Error> {
     let mut cursor = Cursor::new(data);
     // filetype len prefixed string:
     //  - needs to equal "RedMoon Lst File"
@@ -124,25 +124,25 @@ mod tests {
     #[test]
     fn test_lst_bul() {
         let data = include_bytes!("../../../data/RLEs/bul.lst");
-        let list = List::load(data, false).unwrap();
+        let list = parse_lst(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_ico() {
         let data = include_bytes!("../../../data/RLEs/ico.lst");
-        let list = List::load(data, false).unwrap();
+        let list = parse_lst(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_int() {
         let data = include_bytes!("../../../data/RLEs/int.lst");
-        let list = List::load(data, false).unwrap();
+        let list = parse_lst(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_tle() {
         let data = include_bytes!("../../../data/RLEs/tle.lst");
-        let list = List::load(data, false).unwrap();
+        let list = parse_lst(data, false).unwrap();
     }
 
     // #[test]
@@ -165,6 +165,6 @@ mod tests {
     // NOTE: This uses the version 1.2 of the lst file
     fn test_lst_obj() {
         let data = include_bytes!("../../../data/RLEs/obj.lst");
-        let list = List::load(data, false).unwrap();
+        let list = parse_lst(data, false).unwrap();
     }
 }

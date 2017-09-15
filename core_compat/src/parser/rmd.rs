@@ -50,7 +50,7 @@ use byteorder::LittleEndian as LE;
 
 use entity::rmd::Rmd;
 use entity::rmd_animation::RmdAnimation;
-use entity::rmd_row::RmdRow;
+use entity::rmd_entry::RmdEntry;
 use entity::rmd_type::RmdType;
 use entity::rmd_image::RmdImage;
 use error::Error;
@@ -77,20 +77,20 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     // println!("str 1: `{:?}`", string);
 
     rmd.set_animation_parts(cursor.read_i32::<LE>()?);
-    rmd.set_animation_rows(cursor.read_i32::<LE>()?);
+    rmd.set_animation_entry_count(cursor.read_i32::<LE>()?);
 
     let string = parse_string(&mut cursor)?;
     // println!("str 2: `{}`", string);
 
-    rmd.set_row_count(cursor.read_i32::<LE>()?);
+    rmd.set_entry_count(cursor.read_i32::<LE>()?);
 
     // println!("end header offset: `{}`", cursor.position());
 
     // read the Rmd rows
-    for _ in 0..rmd.row_count() {
-        let mut row = RmdRow::new();
-        row.set_image_count(cursor.read_i32::<LE>()?);
-        for _ in 0..row.image_count() {
+    for _ in 0..rmd.entry_count() {
+        let mut entry = RmdEntry::new();
+        entry.set_image_count(cursor.read_i32::<LE>()?);
+        for _ in 0..entry.image_count() {
             let mut img = RmdImage::new();
             img.set_source_x(cursor.read_i32::<LE>()?);
             img.set_source_y(cursor.read_i32::<LE>()?);
@@ -107,7 +107,7 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
                 img.add_image_id(cursor.read_i32::<LE>()?);
             }
         }
-        rmd.add_row(row);
+        rmd.add_entry(entry);
     }
 
     rmd.set_animation_count(cursor.read_i32::<LE>()?);
@@ -152,32 +152,32 @@ mod tests {
     #[test]
     fn test_tle_00001() {
         let data = include_bytes!("../../../data/DATAs/Tle/tle00001.rmd");
-        let rmd = Rmd::load(RmdType::Tile, data).unwrap();
-        assert!(rmd.row_count as usize == rmd.rows.len());
-        assert!(rmd.animation_count as usize == rmd.animations.len());
+        let rmd = parse_rmd(RmdType::Tile, data).unwrap();
+        // assert!(rmd.row_count() as usize == rmd.rows.len());
+        // assert!(rmd.animation_count() as usize == rmd.animations.len());
     }
 
     #[test]
     fn test_obj_00001() {
         let data = include_bytes!("../../../data/DATAs/Obj/obj00001.rmd");
-        let rmd = Rmd::load(RmdType::Object, data).unwrap();
-        assert!(rmd.row_count as usize == rmd.rows.len());
-        assert!(rmd.animation_count as usize == rmd.animations.len());
+        let rmd = parse_rmd(RmdType::Object, data).unwrap();
+        // assert!(rmd.row_count as usize == rmd.rows.len());
+        // assert!(rmd.animation_count as usize == rmd.animations.len());
     }
 
     #[test]
     fn test_chr_00001() {
         let data = include_bytes!("../../../data/DATAs/Chr/chr00001.rmd");
-        let rmd = Rmd::load(RmdType::Character, data).unwrap();
-        assert!(rmd.row_count as usize == rmd.rows.len());
-        assert!(rmd.animation_count as usize == rmd.animations.len());
+        let rmd = parse_rmd(RmdType::Character, data).unwrap();
+        // assert!(rmd.row_count as usize == rmd.rows.len());
+        // assert!(rmd.animation_count as usize == rmd.animations.len());
     }
 
     #[test]
     fn test_chr_00042() {
         let data = include_bytes!("../../../data/DATAs/Chr/chr00042.rmd");
-        let rmd = Rmd::load(RmdType::Character, data).unwrap();
-        assert!(rmd.row_count as usize == rmd.rows.len());
-        assert!(rmd.animation_count as usize == rmd.animations.len());
+        let rmd = parse_rmd(RmdType::Character, data).unwrap();
+        // assert!(rmd.row_count as usize == rmd.rows.len());
+        // assert!(rmd.animation_count as usize == rmd.animations.len());
     }
 }
