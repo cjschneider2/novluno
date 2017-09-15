@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use ::error::Error;
-use ::sprite::Sprite;
+use core_compat::entity::sprite::Sprite;
 use super::buffer;
 
 pub fn render_sprite (

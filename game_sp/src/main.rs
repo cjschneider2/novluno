@@ -24,11 +24,10 @@ use fps::FpsTimer;
 use game::Game;
 use sdl::Sdl;
 
-const WINDOW_WIDTH:u32 = 800;
-const WINDOW_HEIGHT:u32 = 600;
+const WINDOW_WIDTH: u32 = 800;
+const WINDOW_HEIGHT: u32 = 600;
 
 fn main() {
-
     // Setup SDL2
     let mut sdl = Sdl::new(WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
     sdl.init_game_controllers().unwrap();
@@ -44,13 +43,12 @@ fn main() {
     let mut last_sec = 0;
 
     // experiment
-    let entry = Entry { file: 0, index: 3 };
+    let entry = Entry::new(0, 3);
     let interface_t = SpriteType::Interface;
     let sprite = sprites.get_sprite(entry, interface_t).unwrap();
     game.state.sprite = Some(sprite);
 
     'main: loop {
-
         // loop start time
         fps_timer.tick();
         let tick = fps_timer.get_epoch().elapsed().as_secs();
@@ -76,6 +74,5 @@ fn main() {
 
         // start frame timing calculations
         fps_timer.sleep_til_next_tick();
-
     }
 }

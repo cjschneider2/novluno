@@ -12,3 +12,5 @@ pub mod entity;
 pub use manager::map_manager::MapManager;
 pub use manager::data_manager::DataManager;
 pub use manager::sprite_manager::SpriteManager;
+pub use manager::list_manager::ListManager;
+pub use manager::list_manager::ListType;

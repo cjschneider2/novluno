@@ -2,12 +2,12 @@ use std::path::PathBuf;
 
 use gdk_pixbuf::*;
 
-use redmoon::*;
+use core_compat::entity::resource_file::ResourceFile;
 
 pub struct AppData {
     pub current_path: PathBuf,
     pub current_file: PathBuf,
-    pub resource_file: Option<rle::ResourceFile>,
+    pub resource_file: Option<ResourceFile>,
     pub resource_idx: isize,
     pub resource_total: usize,
     pub height: usize,

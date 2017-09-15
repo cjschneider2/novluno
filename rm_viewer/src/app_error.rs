@@ -2,20 +2,20 @@ use std::io;
 use std::str::Utf8Error;
 
 use gtk;
-use redmoon;
+use core_compat;
 
 #[derive(Debug)]
 pub enum AppError {
     Str(&'static str),
     StringConversion,
-    Rm(redmoon::error::Error),
+    Rm(core_compat::error::Error),
     Io(io::Error),
     Utf8(Utf8Error),
     Gtk(gtk::Error),
 }
 
-impl From<redmoon::error::Error> for AppError {
-    fn from(err: redmoon::error::Error) -> AppError {
+impl From<core_compat::error::Error> for AppError {
+    fn from(err: core_compat::error::Error) -> AppError {
         AppError::Rm(err)
     }
 }

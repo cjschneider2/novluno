@@ -1,13 +1,11 @@
-
 mod integration {
-
     use std::path::Path;
 
-    use core_compat::rmd::RmdType;
 
     use core_compat::manager::map_manager::MapManager;
     use core_compat::manager::data_manager::DataManager;
     use core_compat::manager::sprite_manager::SpriteManager;
+    use core_compat::entity::rmd_type::RmdType;
     use core_compat::entity::sprite_type::SpriteType;
     use core_compat::entity::entry::Entry;
 
@@ -27,21 +25,21 @@ mod integration {
         assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
         // load the tile data
         let tile = map.get_tile(0).unwrap();
-        let object_num = tile.object_file_num; // points to a `/DATAs/Obj/*.rmd
-        let object_idx = tile.object_file_idx; // and it's index into this file
+        let object_num = tile.obj_rmd_entry.file(); // points to a `/DATAs/Obj/*.rmd
+        let object_idx = tile.obj_rmd_entry.index(); // and it's index into this file
         data_manager.get_data(RmdType::Object, object_num as usize).unwrap();
         // load the tile rle
     }
 
     #[test]
-    fn load_main_screen () {
+    fn load_main_screen() {
         // create the managers
         let sprite_path = Path::new("../data/RLEs/");
         let mut sprite_manager = SpriteManager::new(&sprite_path);
         // load the correct sprite
-        let entry = Entry { file: 0, index: 4 };
+        let entry = Entry::new(0, 4);
         let interface_t = SpriteType::Interface;
         let sprite = sprite_manager.get_sprite(entry, interface_t).unwrap();
-        assert!(sprite.entry == entry);
+        assert!(sprite.rle_entry == entry);
     }
 }

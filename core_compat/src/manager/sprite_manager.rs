@@ -42,7 +42,7 @@ impl SpriteManager {
         if let Some(sprite) = self.req_sprite(&req_entry, sprite_type) {
             Ok(sprite)
         } else {
-            self.load_sprite(req_entry.file, sprite_type)?;
+            self.load_sprite(req_entry.file(), sprite_type)?;
             if let Some(sprite) = self.req_sprite(&req_entry, sprite_type) {
                 Ok(sprite)
             } else {
@@ -95,10 +95,10 @@ impl SpriteManager {
         // parse rle file and insert into manager
         let resource_file = parse_rle(number, &data)?;
         for resource in resource_file.resources {
-            let entry = Entry { file: number, index: resource.index };
+            let entry = Entry::new(number, resource.index );
             let sprite = Sprite {
                 class: sprite_type,
-                entry: entry,
+                rle_entry: entry,
                 x_dim: resource.width as usize,
                 y_dim: resource.height as usize,
                 x_off: resource.offset_x as usize,

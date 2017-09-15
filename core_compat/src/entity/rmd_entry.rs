@@ -30,5 +30,9 @@ impl RmdEntry {
     pub fn get_image(&self, index: usize) -> Option<&RmdImage> {
         self.images.get(index)
     }
+
+    pub fn images(&self) -> &[RmdImage] {
+        &self.images
+    }
 }
 

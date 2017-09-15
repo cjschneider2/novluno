@@ -5,6 +5,7 @@ extern crate png;
 extern crate xml_writer;
 
 use std::path::Path;
+use std::path::PathBuf;
 use std::fs::File;
 use std::fs::read_dir;
 use std::io::Read;
@@ -18,8 +19,12 @@ use core_compat::entity::resource::Resource;
 use core_compat::entity::rmd::Rmd;
 use core_compat::entity::rmd_type::RmdType;
 use core_compat::entity::map::Map;
+use core_compat::entity::list::List;
 use core_compat::error::Error;
-use core_compat::parser;
+use core_compat::parser::rle::parse_rle;
+use core_compat::parser::rmd::parse_rmd;
+use core_compat::parser::rmm::parse_rmm;
+use core_compat::parser::lst::parse_lst;
 
 static OUTPUT_PATH: &'static str = "../temp/";
 
@@ -191,13 +196,13 @@ fn convert_rmm_data() {
             xml.end_elem().unwrap();
             // <object_ref> rm data reference
             xml.begin_elem("object_ref").unwrap();
-            xml.attr("file", &format!("{}", tile.object_file_num)).unwrap();
-            xml.attr("index", &format!("{}", tile.object_file_idx)).unwrap();
+            xml.attr("file", &format!("{}", tile.obj_rmd_entry.file())).unwrap();
+            xml.attr("index", &format!("{}", tile.obj_rmd_entry.index())).unwrap();
             xml.end_elem().unwrap();
             // <tile_ref> rm data reference
             xml.begin_elem("tile_ref").unwrap();
-            xml.attr("file", &format!("{}", tile.tile_file_num)).unwrap();
-            xml.attr("index", &format!("{}", tile.tile_file_idx)).unwrap();
+            xml.attr("file", &format!("{}", tile.tle_rmd_entry.file())).unwrap();
+            xml.attr("index", &format!("{}", tile.tle_rmd_entry.index())).unwrap();
             xml.end_elem().unwrap();
             // <warp>
             xml.begin_elem("warp").unwrap();
@@ -347,7 +352,7 @@ fn load_rmd_data(path: &Path, kind: RmdType) -> Result<Rmd, Error> {
     let mut file = File::open(path)?;
     let mut bytes = Vec::<u8>::new();
     file.read_to_end(&mut bytes)?;
-    parser::parse_rmd(kind, &bytes)
+    parse_rmd(kind, &bytes)
 }
 
 fn load_rmm_data(path: &Path) -> Result<Map, Error> {

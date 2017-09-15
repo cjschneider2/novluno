@@ -5,7 +5,7 @@ use entity::sprite_type::SpriteType;
 #[derive(Debug)]
 pub struct Sprite {
     pub class: SpriteType,
-    pub entry: Entry,
+    pub rle_entry: Entry,
     pub x_dim: usize,
     pub y_dim: usize,
     pub x_off: usize,

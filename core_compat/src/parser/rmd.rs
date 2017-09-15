@@ -11,12 +11,12 @@
 //! String
 //! int rmd rows
 //!
-//! [RMD Row]
-//! int ImageCount (How many images this row contains,
+//! [RMD RowEntry]
+//! int ImageCount (How many images this row/entry contains,
 //!                 like an image from sadad for example can
 //!                 contain: Body, color hair, color body, weapon)
 //!
-//! [RMD Row - Images]
+//! [RMD RowEntry - Images]
 //! int SourceX
 //! int SourceY
 //! int SourceWidth

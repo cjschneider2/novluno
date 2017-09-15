@@ -1,6 +1,6 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_extern_crates)]
 
-extern crate core_compat as redmoon;
+extern crate core_compat;
 extern crate gtk;
 extern crate gdk;
 extern crate gdk_pixbuf;

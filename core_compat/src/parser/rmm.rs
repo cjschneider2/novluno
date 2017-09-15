@@ -39,6 +39,7 @@ use error::Error;
 use entity::map::Map;
 use entity::map_tile::MapTile;
 use entity::event::Event;
+use entity::entry::Entry;
 
 
 pub fn parse_rmm(data: &[u8]) -> Result<Map, Error> {
@@ -122,12 +123,10 @@ fn parse_v1(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     };
 
     let tile = MapTile {
-        object_file_num: obj_file_num,
-        object_file_idx: obj_file_idx,
-        tile_file_num: tle_file_num,
-        tile_file_idx: tle_file_idx,
-        warp: warp,
-        collision: collision,
+        obj_rmd_entry: Entry::new(obj_file_num, obj_file_idx),
+        tle_rmd_entry: Entry::new(tle_file_num, tle_file_idx),
+        warp,
+        collision,
     };
 
     Ok(tile)
@@ -158,12 +157,10 @@ fn parse_v2(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     };
 
     let tile = MapTile {
-        object_file_num: obj_file_num,
-        object_file_idx: obj_file_idx,
-        tile_file_num: tle_file_num,
-        tile_file_idx: tle_file_idx,
-        warp: warp,
-        collision: collision,
+        obj_rmd_entry: Entry::new(obj_file_num, obj_file_idx),
+        tle_rmd_entry: Entry::new(tle_file_num, tle_file_idx),
+        warp,
+        collision,
     };
 
     Ok(tile)

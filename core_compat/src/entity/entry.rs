@@ -1,6 +1,19 @@
-
 #[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
 pub struct Entry {
-    pub file: u32,
-    pub index: u32,
+    file: u32,
+    index: u32,
+}
+
+impl Entry {
+    pub fn new(file: u32, index: u32) -> Entry {
+        Entry { file, index }
+    }
+
+    pub fn file(&self) -> u32 {
+        self.file
+    }
+
+    pub fn index(&self) -> u32 {
+        self.index
+    }
 }

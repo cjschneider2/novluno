@@ -7,5 +7,5 @@ authors = ["cjschneider2 <cjschneider2@gmail.com>"]
 path = "../core_compat"
 
 [dependencies]
-png = "0.9.0"
-xml_writer = "0.2"
+png = "*"
+xml_writer = "*"

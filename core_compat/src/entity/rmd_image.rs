@@ -12,7 +12,7 @@ pub struct RmdImage {
     dest_y: i32,
     draw_type: i32, // enum { Shadow, skill, normal }
     image_id_count: i32,
-    image_id: Vec<i32> // Lst row pointer
+    image_id: Vec<i32> // Lst row/entry pointer entries
 }
 
 impl RmdImage {
@@ -43,6 +43,10 @@ impl RmdImage {
 
     pub fn image_id_count(&self) -> i32 {
         self.image_id_count
+    }
+
+    pub fn get_image_id_list(&self) -> &[i32] {
+        &self.image_id
     }
 
     pub fn set_draw_type(&mut self, val: i32) {
@@ -84,5 +88,6 @@ impl RmdImage {
     pub fn set_source_y(&mut self, val: i32) {
         self.source_y = val;
     }
+
 }
 

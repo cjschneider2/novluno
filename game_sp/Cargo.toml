@@ -12,6 +12,6 @@ path = "../core_compat"
 #features = ["bundled", "blob"]
 
 [dependencies.sdl2]
-version = "0.30"
+version = "*"
 default-features = false
 features = ["image"]

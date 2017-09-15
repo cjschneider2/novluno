@@ -22,8 +22,10 @@ use std::io::Read;
 
 use core_compat::entity::resource_file::ResourceFile;
 use core_compat::entity::resource::Resource;
-use core_compat::entity::lst::List;
+use core_compat::entity::list::List;
 use core_compat::error::Error;
+use core_compat::parser::rle::parse_rle;
+use core_compat::parser::lst::parse_lst;
 
 use sql::Connection;
 
@@ -163,7 +165,7 @@ fn load_list_data(path: &Path) -> Result<List, Error> {
     let mut file = File::open(path)?;
     let mut bytes = Vec::<u8>::new();
     file.read_to_end(&mut bytes)?;
-    List::load(&bytes, false)
+    parse_lst(&bytes, false)
 }
 
 fn load_rle_data(path: &Path) -> Result<ResourceFile, Error> {
