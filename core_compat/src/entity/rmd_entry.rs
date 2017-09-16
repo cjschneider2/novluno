@@ -27,6 +27,10 @@ impl RmdEntry {
         self.image_count
     }
 
+    pub fn add_image(&mut self, img: RmdImage) {
+        self.images.push(img);
+    }
+
     pub fn get_image(&self, index: usize) -> Option<&RmdImage> {
         self.images.get(index)
     }

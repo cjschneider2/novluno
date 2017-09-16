@@ -7,6 +7,7 @@ use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
 use error::Error;
+use entity::entry::Entry;
 use entity::list::List;
 use entity::list_item::ListItem;
 
@@ -70,8 +71,9 @@ fn load_1_0(cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
         let id = cursor.read_u32::<LE>()?;
         let file_number = cursor.read_u32::<LE>()?;
         let index = cursor.read_u32::<LE>()?;
+        let entry = Entry::new(file_number, index);
         // rest of entry info
-        let item = ListItem { name, id, file_number, index };
+        let item = ListItem { name, id, entry};
         list.items.push(item);
     }
     Ok(list)
@@ -99,11 +101,12 @@ fn load_1_2(cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
         let id = cursor.read_u32::<LE>()?;
         let file_number = cursor.read_u32::<LE>()?;
         let index = cursor.read_u32::<LE>()?;
+        let entry = Entry::new(file_number, index);
         // I'm sort of assuming that we're trying to link to the "next id?"
         // here in the newer format with `unknown_2`?
         let unknown_2 = cursor.read_u32::<LE>()?;
         // rest of entry info
-        let item = ListItem { name, file_number, index, id };
+        let item = ListItem { name, id, entry };
         list.items.push(item);
     }
     Ok(list)

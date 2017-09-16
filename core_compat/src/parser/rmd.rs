@@ -106,6 +106,7 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
             for _ in 0..img.image_id_count() {
                 img.add_image_id(cursor.read_i32::<LE>()?);
             }
+            entry.add_image(img);
         }
         rmd.add_entry(entry);
     }
