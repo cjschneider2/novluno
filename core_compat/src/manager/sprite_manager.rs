@@ -76,7 +76,6 @@ impl SpriteManager {
         sprite_type: SpriteType
     ) -> Result<(), Error> {
         // generate correct path for the sprite
-        let file_str = format!("int{:05}.rle", number);
         let folder_str = match sprite_type {
             Bullet    => {"Bul"},
             Icon      => {"Ico"},
@@ -85,10 +84,19 @@ impl SpriteManager {
             Tile      => {"Tle"},
             Interface => {"Int"},
         };
+        let file_str = match sprite_type {
+            Bullet    => format!("bul{:05}.rle", number),
+            Icon      => format!("ico{:05}.rle", number),
+            Character => format!("chr{:05}.rle", number),
+            Object    => format!("obj{:05}.rle", number),
+            Tile      => format!("tle{:05}.rle", number),
+            Interface => format!("int{:05}.rle", number),
+        };
         let mut path: PathBuf = self.db_path.clone();
         path.push(folder_str);
         path.push(file_str);
         // load data
+        println!("Trying to load sprite file: {:?}", &path);
         let mut file = File::open(&path)?;
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;

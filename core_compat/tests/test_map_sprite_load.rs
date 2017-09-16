@@ -1,6 +1,5 @@
 extern crate core_compat;
 
-use std::path::PathBuf;
 use std::path::Path;
 
 use core_compat::DataManager;
@@ -8,6 +7,7 @@ use core_compat::MapManager;
 use core_compat::SpriteManager;
 use core_compat::{ListManager, ListType};
 use core_compat::entity::rmd_type::RmdType;
+use core_compat::entity::sprite_type::SpriteType;
 
 #[test]
 fn test_map_sprite_load_map00001() {
@@ -44,7 +44,7 @@ fn test_map_sprite_load_map00001() {
                     println!("\tLooking for obj list item: {}", id);
                     let item = obj_list.get_item(*id as usize).unwrap();
                     // load the RLE's pointed to by the list item
-                    sprite_manager.get_sprite(item.entry, SpriteType::Object);
+                    let sprite = sprite_manager.get_sprite(item.entry, SpriteType::Object).unwrap();
                 }
             }
         }
