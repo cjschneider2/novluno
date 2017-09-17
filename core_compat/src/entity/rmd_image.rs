@@ -89,5 +89,13 @@ impl RmdImage {
         self.source_y = val;
     }
 
+    pub fn dest_x(&self) -> i32 {
+        self.dest_x
+    }
+
+    pub fn dest_y(&self) -> i32 {
+        self.dest_y
+    }
+
 }
 

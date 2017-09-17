@@ -96,7 +96,7 @@ impl SpriteManager {
         path.push(folder_str);
         path.push(file_str);
         // load data
-        println!("Trying to load sprite file: {:?}", &path);
+        // println!("Trying to load sprite file: {:?}", &path);
         let mut file = File::open(&path)?;
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;

@@ -38,14 +38,19 @@ fn test_map_sprite_load_map00001() {
             let index = obj_entry.index() as usize;
             let rmd = data_manager.get_data(RmdType::Object, file).unwrap();
             let entry = rmd.get_entry(index).unwrap();
-            println!("Obj entry file: {}", file);
+            // -- load images
+            // println!("Obj entry file: {}", file);
             for img in entry.images() {
                 for id in img.get_image_id_list().iter() {
-                    println!("\tLooking for obj list item: {}", id);
+                    // println!("\tLooking for obj list item: {}", id);
                     let item = obj_list.get_item(*id as usize).unwrap();
                     // load the RLE's pointed to by the list item
                     let sprite = sprite_manager.get_sprite(item.entry, SpriteType::Object).unwrap();
                 }
+            }
+            // -- load animations
+            for ani in entry.animations() {
+
             }
         }
         // -- map tile sprites
@@ -55,10 +60,10 @@ fn test_map_sprite_load_map00001() {
             let index = tle_entry.index() as usize;
             let rmd = data_manager.get_data(RmdType::Tile, file).unwrap();
             let entry = rmd.get_entry(index).unwrap();
-            println!("Tle entry file: {}", file);
+            // println!("Tle entry file: {}", file);
             for img in entry.images() {
                 for id in img.get_image_id_list().iter() {
-                    println!("\tLooking for tle list item: {}", id);
+                    // println!("\tLooking for tle list item: {}", id);
                     let item = tle_list.get_item(*id as usize).unwrap();
                     // load the RLE's pointed to by the list item
                     let sprite = sprite_manager.get_sprite(item.entry, SpriteType::Tile).unwrap();

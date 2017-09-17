@@ -46,19 +46,26 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
         resource_offsets.push(val);
     }
 
-    println!("Loading {} resources at offsets:{:#?}",
-             total_resources,
-             resource_offsets);
+    // println!("Loading {} resources at offsets:{:?}", total_resources, resource_offsets);
 
     for (idx, offset) in resource_offsets.iter().enumerate() {
-        let mut resource = Resource::new();
 
-        cursor.seek(SeekFrom::Start(*offset as u64))?;
+        let offset = *offset;
+
+        if offset == 0 {
+            // we'll skip 0 (null) offsets as I think they are just placeholders in the file
+            // but we can't ignore them in the resource offset list because the index of the
+            // resource is important
+            continue;
+        }
+
+        let mut resource = Resource::new();
+        cursor.seek(SeekFrom::Start(offset as u64))?;
 
         // resource id's
         resource.file_num = Some(file_number);
         resource.index = idx as u32;
-        resource.offset = *offset;
+        resource.offset = offset;
 
         // read the resource header
         resource.len = cursor.read_u32::<LE>()?;
@@ -106,9 +113,9 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
                         let (r, g, b) = format_r5g6b5_norm(data);
                         let idx: usize = (y as usize * resource.width as usize) + x as usize;
                         let pixel = &mut resource.image[idx];
-                        pixel.r = r as u8;
-                        pixel.g = g as u8;
-                        pixel.b = b as u8;
+                        pixel.r = r;
+                        pixel.g = g;
+                        pixel.b = b;
                         pixel.a = 255u8;
                         x += 1;
                     }
@@ -132,6 +139,11 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
     Ok(resource_file)
 }
 
+/// The pixels in the RLE files are saved as normalized 5,6,5 bit normalized RGB colors.
+/// Magenta is sometimes used in the images as an alpha colour but it is relatively rare; it is
+/// usually just enough to set the default colour to be transparent and "paint" over the pixels
+/// with the actual colour.
+// TODO: There is probably a quicker way to do this conversion without the FP mult & div ...
 fn format_r5g6b5_norm(d: u16) -> (u8, u8, u8) {
     let b = ((d & 0x1F) as f32 / 31.0) * 255.0;
     let g = (((d >> 5) & 0x3F) as f32 / 63.0) * 255.0;

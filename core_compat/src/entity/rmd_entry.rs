@@ -38,5 +38,9 @@ impl RmdEntry {
     pub fn images(&self) -> &[RmdImage] {
         &self.images
     }
+
+    pub fn animations(&self) -> &[RmdAnimation] {
+        &self.animations
+    }
 }
 
