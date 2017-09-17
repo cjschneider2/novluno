@@ -49,8 +49,8 @@ fn test_map_sprite_load_map00001() {
                 }
             }
             // -- load animations
-            for ani in entry.animations() {
-
+            for ani in rmd.animations() {
+                // Note: These indexes point to RmdEntries in _this_ RMD file
             }
         }
         // -- map tile sprites

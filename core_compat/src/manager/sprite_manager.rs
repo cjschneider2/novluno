@@ -103,7 +103,7 @@ impl SpriteManager {
         // parse rle file and insert into manager
         let resource_file = parse_rle(number, &data)?;
         for resource in resource_file.resources {
-            let entry = Entry::new(number, resource.index );
+            let entry = Entry::new(number, resource.index() );
             let sprite = Sprite {
                 class: sprite_type,
                 rle_entry: entry,

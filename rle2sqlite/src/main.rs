@@ -93,7 +93,7 @@ fn main() {
                         type, name, list_id, file_num, file_idx)
                     VALUES (?1, ?2, ?3, ?4, ?5)",
                     &[&_type, &item.name, &item.id,
-                      &item.file_number, &item.index]
+                      &item.entry.file(), &item.entry.index()]
                 ).unwrap();
             }
             tx.commit().unwrap();
@@ -139,7 +139,7 @@ fn main() {
                     VALUES (?1, ?2, ?3,
                             ?4, ?5, ?6,
                             ?7, ?8, ?9)",
-                    &[&_type,   &rle.file_num, &rle.index,
+                    &[&_type,   &rle.file_num, &rle.index(),
                     &rle.len,   &rle.offset_x, &rle.offset_y,
                     &rle.width, &rle.height,   &img]
                 ).unwrap();

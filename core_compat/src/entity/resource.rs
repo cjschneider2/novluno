@@ -3,7 +3,7 @@ use utility::pixel::Pixel;
 #[derive(Debug)]
 pub struct Resource {
     pub file_num: Option<u32>,
-    pub index: u32,
+    index: u32,
     pub offset: u32,
     pub len: u32,
     pub offset_x: u32,
@@ -34,5 +34,13 @@ impl Resource {
             unknown_4: 0,
             image: Vec::new(),
         }
+    }
+
+    pub fn set_index(&mut self, val: u32) {
+        self.index = val;
+    }
+
+    pub fn index(&self) -> u32 {
+        self.index
     }
 }

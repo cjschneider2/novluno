@@ -64,7 +64,7 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
 
         // resource id's
         resource.file_num = Some(file_number);
-        resource.index = idx as u32;
+        resource.set_index(idx as u32);
         resource.offset = offset;
 
         // read the resource header

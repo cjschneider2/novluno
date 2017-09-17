@@ -41,6 +41,10 @@ impl Rmd {
         self.animation_count
     }
 
+    pub fn animations(&self) -> &[RmdAnimation] {
+        &self.animations
+    }
+
     pub fn set_animation_parts(&mut self, parts: i32) {
         self.animation_parts = parts;
     }

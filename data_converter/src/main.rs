@@ -270,8 +270,8 @@ fn convert_rle_data() {
             }
             if let Some(file_num) = rle.file_num {
                 for item in &list.items {
-                    if item.file_number == file_num
-                        && item.index == rle.index
+                    if item.entry.file() == file_num
+                        && item.entry.index() == rle.index()
                         {
                             matches += 1;
                             let file_name = format!("{}_{}.png",

@@ -5,8 +5,8 @@ use entity::rmd_image::RmdImage;
 pub struct RmdEntry {
     image_count: i32,
     images: Vec<RmdImage>,
-    animation_count: i32,
-    animations: Vec<RmdAnimation>,
+    // animation_count: i32,
+    // animations: Vec<RmdAnimation>,
 }
 
 impl RmdEntry {
@@ -14,8 +14,8 @@ impl RmdEntry {
         RmdEntry {
             image_count: 0,
             images: Vec::new(),
-            animation_count: 0,
-            animations: Vec::new(),
+            // animation_count: 0,
+            // animations: Vec::new(),
         }
     }
 
@@ -39,8 +39,8 @@ impl RmdEntry {
         &self.images
     }
 
-    pub fn animations(&self) -> &[RmdAnimation] {
-        &self.animations
-    }
+    // pub fn animations(&self) -> &[RmdAnimation] {
+    //     &self.animations
+    // }
 }
 
