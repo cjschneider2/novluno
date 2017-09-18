@@ -3,17 +3,25 @@ pub const MAX_CONTROLLERS: usize = 4;
 pub const MAX_MOUSE_BUTTONS: usize = 5;
 
 pub struct Input {
+    // control flow inputs
+    pub should_quit: bool,
+    pub should_resize: Option<(i32, i32)>,
+    // mouse inputs
     pub mouse_buttons: [ButtonState; MAX_MOUSE_BUTTONS],
     pub mouse_x: i32,
     pub mouse_y: i32,
     pub mouse_z: i32,
+    // keyboard inputs
     pub keyboard: Controller,
+    // controller inputs
     pub controllers: [Controller; MAX_CONTROLLERS],
 }
 
 impl Input {
     pub fn new() -> Input {
         Input {
+            should_quit: false,
+            should_resize: None,
             mouse_buttons: [ButtonState::new(); MAX_MOUSE_BUTTONS],
             mouse_x: 0,
             mouse_y: 0,

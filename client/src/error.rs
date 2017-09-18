@@ -4,6 +4,8 @@ use std::str::Utf8Error;
 use sdl2::IntegerOrSdlError;
 use sdl2::video::WindowBuildError;
 
+use glium_sdl2;
+
 use core_compat;
 
 #[derive(Debug)]
@@ -14,8 +16,15 @@ pub enum Error {
     Io(io::Error),
     Utf8(Utf8Error),
     Str(String),
+    GliumSDL2(glium_sdl2::GliumSdl2Error),
     WindowBuildError,
     IntegerOrSdlError,
+}
+
+impl From<glium_sdl2::GliumSdl2Error> for Error {
+    fn from(err: glium_sdl2::GliumSdl2Error) -> Error {
+        Error::GliumSDL2(err)
+    }
 }
 
 impl From<core_compat::error::Error> for Error {
