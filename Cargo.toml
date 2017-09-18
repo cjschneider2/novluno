@@ -1,6 +1,6 @@
 [workspace]
 
-members = ["core_compat", "game_sp", "rm_viewer", "rle2sqlite", "data_converter"]
+members = ["core_compat", "client"]
 
 [profile.release]
 debug = true

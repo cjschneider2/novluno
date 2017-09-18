@@ -13,7 +13,7 @@ mod read_rle;
 
 use std::cell::RefCell;
 use std::rc::Rc;
-// use std::path::PathBuf;
+use std::path::PathBuf;
 
 use gtk::*;
 // use gdk::prelude::*;
@@ -94,14 +94,14 @@ fn main() {
     //     }
     // });
 
-    // // load folder button pressed
+    // load folder button pressed
     // app_gui.borrow().open_folder_button.connect_clicked({
     //     let _app_gui = app_gui.clone();
     //     let _app_data = app_data.clone();
     //     move |_widget| {
     //         let __app_gui = _app_gui.borrow();
-    //         __app_gui.file_tree_selection.unselect_all();
-    //         __app_gui.file_list_store.clear();
+    //         __app_gui.tree_selection.unselect_all();
+    //         __app_gui.list_store.clear();
     //         let mut path: Option<PathBuf> = None;
     //         if __app_gui.file_chooser_dialog.run() == ResponseType::Ok.into() {
     //             if let Some(folder) = __app_gui.file_chooser_dialog

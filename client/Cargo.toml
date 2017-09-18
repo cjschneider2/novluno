@@ -1,0 +1,17 @@
+[package]
+name = "client"
+version = "0.1.0"
+authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
+
+[dependencies.core_compat]
+path = "../core_compat"
+
+[dependencies.sdl2]
+version = "*"
+default-features = false
+features = ["image"]
+
+[dependencies]
+gl = "*"
+imgui-rs = "*"
+rusttype = "*"

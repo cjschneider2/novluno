@@ -17,10 +17,10 @@
 //!                 contain: Body, color hair, color body, weapon)
 //!
 //! [RMD RowEntry - Images]
-//! int SourceX
-//! int SourceY
-//! int SourceWidth
-//! int SourceHeight
+//! int SourceX      // upper-left  x coordinate
+//! int SourceY      // upper-right x coordinate
+//! int SourceWidth  // lower-left  y coordinate
+//! int SourceHeight // lower-right y coordinate
 //! int empty
 //! int renderz
 //! int DestX
@@ -92,10 +92,15 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
         entry.set_image_count(cursor.read_i32::<LE>()?);
         for _ in 0..entry.image_count() {
             let mut img = RmdImage::new();
-            img.set_source_x(cursor.read_i32::<LE>()?);
-            img.set_source_y(cursor.read_i32::<LE>()?);
-            img.set_source_width(cursor.read_i32::<LE>()?);
-            img.set_source_height(cursor.read_i32::<LE>()?);
+            // NOTE: the source bounds are defined as the space between two `Point`s
+            let x1 = cursor.read_i32::<LE>()?;
+            let y1 = cursor.read_i32::<LE>()?;
+            let x2 = cursor.read_i32::<LE>()?;
+            let y2 = cursor.read_i32::<LE>()?;
+            img.set_source_x(x1);
+            img.set_source_y(y1);
+            img.set_source_width(x2 - x1);
+            img.set_source_height(y2 - y1);
             img.set_empty_1(cursor.read_u32::<LE>()?);
             img.set_dest_x(cursor.read_i32::<LE>()?);
             img.set_dest_y(cursor.read_i32::<LE>()?);

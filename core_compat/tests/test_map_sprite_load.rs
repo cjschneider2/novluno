@@ -39,13 +39,14 @@ fn test_map_sprite_load_map00001() {
             let rmd = data_manager.get_data(RmdType::Object, file).unwrap();
             let entry = rmd.get_entry(index).unwrap();
             // -- load images
-            // println!("Obj entry file: {}", file);
+            //println!("Obj entry file: {}", file);
             for img in entry.images() {
                 for id in img.get_image_id_list().iter() {
-                    // println!("\tLooking for obj list item: {}", id);
+                    //println!("\tLooking for obj list item: {}", id);
                     let item = obj_list.get_item(*id as usize).unwrap();
                     // load the RLE's pointed to by the list item
                     let sprite = sprite_manager.get_sprite(item.entry, SpriteType::Object).unwrap();
+                    //println!("\tsprite size (x,y) : ({},{})", sprite.x_dim, sprite.y_dim);
                 }
             }
             // -- load animations
@@ -60,13 +61,19 @@ fn test_map_sprite_load_map00001() {
             let index = tle_entry.index() as usize;
             let rmd = data_manager.get_data(RmdType::Tile, file).unwrap();
             let entry = rmd.get_entry(index).unwrap();
-            // println!("Tle entry file: {}", file);
+            println!("Tle entry (file {}, index {})", file, index);
             for img in entry.images() {
+                // NOTE: Each image can be a selection of a sprite. This is defined in the RleImage
+                //       object's `source_*` attributes.
+                // TODO: I'm not sure how this works with multiple image ID's in the list...
+                println!("\timage target rect (x, y, w, h): ({}, {}, {}, {})",
+                         img.source_x(), img.source_y(), img.source_width(), img.source_height());
                 for id in img.get_image_id_list().iter() {
-                    // println!("\tLooking for tle list item: {}", id);
+                    println!("\tLooking for tle list item: {}", id);
                     let item = tle_list.get_item(*id as usize).unwrap();
                     // load the RLE's pointed to by the list item
                     let sprite = sprite_manager.get_sprite(item.entry, SpriteType::Tile).unwrap();
+                    println!("\tsprite size (x, y) : ({}, {})", sprite.x_dim, sprite.y_dim);
                 }
             }
         }

@@ -96,8 +96,13 @@ impl SpriteManager {
         path.push(folder_str);
         path.push(file_str);
         // load data
-        // println!("Trying to load sprite file: {:?}", &path);
-        let mut file = File::open(&path)?;
+        let mut file = match File::open(&path) {
+            Ok(file) => file,
+            Err(e) => {
+                println!("Failed to load sprite file: {:?}", &path);
+                return Err(Error::Io(e))
+            }
+        };
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
         // parse rle file and insert into manager
