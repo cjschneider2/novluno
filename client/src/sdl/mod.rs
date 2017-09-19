@@ -36,7 +36,7 @@ pub struct Sdl {
     pub audio_spec: sdl2::audio::AudioSpecDesired,
     // event handlers
     pub event_pump: RefCell<sdl2::EventPump>,
-    pub last_event: RefCell<Option<sdl2::event::Event>>,
+    // pub last_event: RefCell<Option<sdl2::event::Event>>,
     // controllers
     pub controller: sdl2::GameControllerSubsystem,
     pub controllers: RefCell<[Option<sdl2::controller::GameController>; MAX_CTL]>,
@@ -80,7 +80,6 @@ impl Sdl {
             audio,
             imgui,
             imgui_renderer,
-            last_event: RefCell::new(None),
             audio_spec,
             controller,
             controllers,
@@ -128,35 +127,34 @@ impl Sdl {
     }
 
     pub fn handle_events(
-        &self,
+        &mut self,
         game: &mut Game
     ) {
         let mut event_pump = self.event_pump.borrow_mut();
-        let mut last_event = self.last_event.borrow_mut();
-        let new_event = event_pump.poll_event();
-        if new_event != *last_event {
-            if let Some(ref event) = new_event {
-                match event {
-                    &Event::Quit { .. }
-                    | &Event::KeyDown { keycode: Some(Keycode::Escape), .. }
+        let mut last_event: Option<Event> = None;
+        while let Some(new_event) = event_pump.poll_event() {
+            if last_event.is_none() || new_event != last_event.unwrap() {
+                match new_event {
+                    Event::Quit { .. }
+                    | Event::KeyDown { keycode: Some(Keycode::Escape), .. }
                     => {
                         game.input.should_quit = true;
                     }
-                    &Event::KeyDown { keycode: Some(key), repeat, .. }
+                    Event::KeyDown { keycode: Some(key), repeat, .. }
                     => {
                         let is_down = true;
                         if !repeat {
                             process_keycode(key, is_down, game.get_mut_keyboard());
                         }
                     }
-                    &Event::KeyUp { keycode: Some(key), repeat, .. }
+                    Event::KeyUp { keycode: Some(key), repeat, .. }
                     => {
                         let is_down = false;
                         if !repeat {
                             process_keycode(key, is_down, game.get_mut_keyboard());
                         }
                     }
-                    &Event::Window { win_event: w_event, .. } => {
+                    Event::Window { win_event: w_event, .. } => {
                         match w_event {
                             WindowEvent::Enter => (),
                             WindowEvent::Leave => (),
@@ -167,25 +165,36 @@ impl Sdl {
                             _ => (),
                         }
                     }
-                    &Event::MouseMotion { .. } => (),
-                    &Event::ControllerDeviceAdded { which: index, .. } => {
-                        println!("{:?}: {:?}", event, index);
+                    Event::MouseMotion { .. } => (),
+                    Event::ControllerDeviceAdded { which: index, .. } => {
+                        println!("{:?}: {:?}", new_event, index);
                         self.add_game_controller(index).unwrap();
                     }
-                    &Event::ControllerDeviceRemoved { which: index, .. } => {
-                        println!("{:?}: {:?}", event, index);
+                    Event::ControllerDeviceRemoved { which: index, .. } => {
+                        println!("{:?}: {:?}", new_event, index);
                         self.remove_game_controller(index).unwrap();
                     }
-                    &Event::JoyDeviceAdded { .. } => (),
+                    Event::JoyDeviceAdded { .. } => (),
                     _ => {
-                        println!("{:?}", event);
+                        println!("{:?}", new_event);
                     }
                 }
             }
-        }
-        if new_event.is_some() {
-            *last_event = new_event;
-        }
+            last_event = Some(new_event);
+        } // end while new SDL event
+
+        // update imgui vars
+        // -- mouse
+        let sdl_mouse = sdl2::mouse::MouseState::new(&event_pump);
+        let mouse_x: f32 = sdl_mouse.x() as f32;
+        let mouse_y: f32 = sdl_mouse.y() as f32;
+        self.imgui.set_mouse_pos(mouse_x, mouse_y);
+        self.imgui.set_mouse_down(&[
+            sdl_mouse.left(),
+            sdl_mouse.middle(),
+            sdl_mouse.right(),
+            sdl_mouse.x1(),
+            sdl_mouse.x2()]);
     }
 
     pub fn render(&mut self, game: &Game, dt: f32) {
