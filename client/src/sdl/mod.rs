@@ -7,7 +7,9 @@ use imgui;
 
 use imgui_glium_renderer;
 
+use glium;
 use glium::Surface;
+use glium::index::PrimitiveType;
 
 use glium_sdl2;
 use glium_sdl2::DisplayBuild;
@@ -201,8 +203,116 @@ impl Sdl {
         // start frame
         let mut target = self.window.draw();
 
-        // draw frame
+        // draw background color
         target.clear_color(0.4, 0.7, 1.0, 1.0);
+
+        // drawing a triangle
+        {
+            let vertex_buffer = {
+                #[derive(Copy, Clone)]
+                struct Vertex {
+                    pos: [f32; 2],
+                    color: [f32; 3],
+                }
+                implement_vertex!(Vertex, pos, color);
+                glium::VertexBuffer::new(&self.window, &[
+                    Vertex { pos: [-0.5, -0.5], color: [0.0, 1.0, 0.0] },
+                    Vertex { pos: [0.0, 0.5], color: [0.0, 0.0, 1.0] },
+                    Vertex { pos: [0.5, -0.5], color: [1.0, 1.0, 0.0] },
+                ]).unwrap()
+            };
+
+            let index_buffer = glium::IndexBuffer::new(
+                &self.window,
+                PrimitiveType::TrianglesList,
+                &[0u16, 1, 2]
+            ).unwrap();
+
+            let program = program!(&self.window,
+                140 => {
+                    vertex: "
+                        #version 140
+                        uniform mat4 matrix;
+                        in vec2 pos;
+                        in vec3 color;
+                        out vec4 vColor;
+                        void main() {
+                            gl_position = vec4(pos, 0.0, 1.0) * matrix;
+                            vColor = color;
+                        }
+                    ",
+                    fragment: "
+                        #version 140
+                        in vec3 vColor;
+                        out vec4 f_color;
+                        void main() {
+                            f_color = vec4(vColor, 1.0);
+                        }
+                    "
+                },
+
+                110 => {
+                    vertex: "
+                        #version 110
+                        uniform mat4 matrix;
+                        attribute vec2 pos;
+                        attribute vec3 color;
+                        varying vec3 vColor;
+                        void main() {
+                            gl_Position = vec4(pos, 0.0, 1.0) * matrix;
+                            vColor = color;
+                        }
+                    ",
+
+                    fragment: "
+                        #version 110
+                        varying vec3 vColor;
+                        void main() {
+                            gl_FragColor = vec4(vColor, 1.0);
+                        }
+                    ",
+                },
+
+                100 => {
+                    vertex: "
+                        #version 100
+                        uniform lowp mat4 matrix;
+                        attribute lowp vec2 pos;
+                        attribute lowp vec3 color;
+                        varying lowp vec3 vColor;
+                        void main() {
+                            gl_Position = vec4(pos, 0.0, 1.0) * matrix;
+                            vColor = color;
+                        }
+                    ",
+
+                    fragment: "
+                        #version 100
+                        varying lowp vec3 vColor;
+                        void main() {
+                            gl_FragColor = vec4(vColor, 1.0);
+                        }
+                    ",
+                },
+            ).unwrap();
+
+            let uniforms = uniform! {
+                matrix: [
+                    [1.0, 0.0, 0.0, 0.0],
+                    [0.0, 1.0, 0.0, 0.0],
+                    [0.0, 0.0, 1.0, 0.0],
+                    [0.0, 0.0, 0.0, 1.0f32],
+                ]
+            };
+
+            target.draw(
+                &vertex_buffer,
+                &index_buffer,
+                &program,
+                &uniforms,
+                &Default::default()
+            ).unwrap();
+        }
 
         // draw gui
         let dim = target.get_dimensions();

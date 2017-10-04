@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 extern crate rusttype;
 extern crate sdl2;
+#[macro_use]
 extern crate glium;
 extern crate imgui;
 extern crate glium_sdl2;
