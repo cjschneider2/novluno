@@ -11,3 +11,23 @@ pub fn show_gui_test(ui: &imgui::Ui) {
             ui.text(im_str!("Mouse Position: ({:.2}, {:.2})", mouse_pos.0, mouse_pos.1));
         });
 }
+
+pub fn show_file_list(ui: &imgui::Ui) {
+    ui.window(im_str!("RLE Files"))
+        .size((300.0, 300.0), ImGuiSetCond_FirstUseEver)
+        .build(|| {
+            if ui.collapsing_header(im_str!("RLE")).build() {
+                ui.tree_node(im_str!("Tree"))
+                    .build(|| for i in 0..5 {
+                        ui.tree_node(im_str!("Child {}", i))
+                            .build(|| {
+                                ui.text(im_str!("blah blah"));
+                                ui.same_line(0.0);
+                                if ui.small_button(im_str!("print")) {
+                                    println!("Child {} pressed", i);
+                                }
+                            });
+                    });
+            };
+        });
+}

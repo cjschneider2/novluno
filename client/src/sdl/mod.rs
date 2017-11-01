@@ -199,36 +199,72 @@ impl Sdl {
             sdl_mouse.x2()]);
     }
 
-    pub fn render(&mut self, game: &Game, dt: f32) {
+    pub fn render(&mut self, _game: &Game, dt: f32) {
         // start frame
         let mut target = self.window.draw();
 
         // draw background color
         target.clear_color(0.4, 0.7, 1.0, 1.0);
 
-        // drawing a triangle
-        {
-            let vertex_buffer = {
-                #[derive(Copy, Clone)]
-                struct Vertex {
-                    pos: [f32; 2],
-                    color: [f32; 3],
-                }
-                implement_vertex!(Vertex, pos, color);
-                glium::VertexBuffer::new(&self.window, &[
-                    Vertex { pos: [-0.5, -0.5], color: [0.0, 1.0, 0.0] },
-                    Vertex { pos: [0.0, 0.5], color: [0.0, 0.0, 1.0] },
-                    Vertex { pos: [0.5, -0.5], color: [1.0, 1.0, 0.0] },
-                ]).unwrap()
-            };
+        // draw_triangle(self, &mut target);
 
-            let index_buffer = glium::IndexBuffer::new(
-                &self.window,
-                PrimitiveType::TrianglesList,
-                &[0u16, 1, 2]
-            ).unwrap();
 
-            let program = program!(&self.window,
+        // draw imgui
+        let dim = target.get_dimensions();
+        let ui = self.imgui.frame(dim, dim, dt);
+        gui::show_file_list(&ui);
+        self.imgui_renderer.render(&mut target, ui).unwrap();
+
+        // finish frame
+        target.finish().unwrap();
+    }
+}
+
+fn process_keycode(
+    key: sdl2::keyboard::Keycode,
+    is_down: bool,
+    input: &mut Controller
+) {
+    match key {
+        Keycode::W => input.move_up.key_press(is_down),
+        Keycode::A => input.move_left.key_press(is_down),
+        Keycode::S => input.move_down.key_press(is_down),
+        Keycode::D => input.move_right.key_press(is_down),
+        Keycode::Q => input.left_shoulder.key_press(is_down),
+        Keycode::E => input.right_shoulder.key_press(is_down),
+        Keycode::Up => input.action_up.key_press(is_down),
+        Keycode::Down => input.action_down.key_press(is_down),
+        Keycode::Right => input.action_right.key_press(is_down),
+        Keycode::Left => input.action_left.key_press(is_down),
+        Keycode::F => (),
+        Keycode::Space => (),
+        _ => (),
+    }
+}
+
+fn draw_triangle(sdl: &mut Sdl, target: &mut glium::Frame) {
+
+    let vertex_buffer = {
+        #[derive(Copy, Clone)]
+        struct Vertex {
+            pos: [f32; 2],
+            color: [f32; 3],
+        }
+        implement_vertex!(Vertex, pos, color);
+        glium::VertexBuffer::new(&sdl.window, &[
+            Vertex { pos: [-0.5, -0.5], color: [0.0, 1.0, 0.0] },
+            Vertex { pos: [0.0, 0.5], color: [0.0, 0.0, 1.0] },
+            Vertex { pos: [0.5, -0.5], color: [1.0, 1.0, 0.0] },
+        ]).unwrap()
+    };
+
+    let index_buffer = glium::IndexBuffer::new(
+        &sdl.window,
+        PrimitiveType::TrianglesList,
+        &[0u16, 1, 2]
+    ).unwrap();
+
+    let program = program!(&sdl.window,
                 140 => {
                     vertex: "
                         #version 140
@@ -296,7 +332,7 @@ impl Sdl {
                 },
             ).unwrap();
 
-            let uniforms = uniform! {
+    let uniforms = uniform! {
                 matrix: [
                     [1.0, 0.0, 0.0, 0.0],
                     [0.0, 1.0, 0.0, 0.0],
@@ -305,44 +341,11 @@ impl Sdl {
                 ]
             };
 
-            target.draw(
-                &vertex_buffer,
-                &index_buffer,
-                &program,
-                &uniforms,
-                &Default::default()
-            ).unwrap();
-        }
-
-        // draw gui
-        let dim = target.get_dimensions();
-        let ui = self.imgui.frame(dim, dim, dt);
-        gui::show_gui_test(&ui);
-        self.imgui_renderer.render(&mut target, ui).unwrap();
-
-        // finish frame
-        target.finish().unwrap();
-    }
-}
-
-fn process_keycode(
-    key: sdl2::keyboard::Keycode,
-    is_down: bool,
-    input: &mut Controller
-) {
-    match key {
-        Keycode::W => input.move_up.key_press(is_down),
-        Keycode::A => input.move_left.key_press(is_down),
-        Keycode::S => input.move_down.key_press(is_down),
-        Keycode::D => input.move_right.key_press(is_down),
-        Keycode::Q => input.left_shoulder.key_press(is_down),
-        Keycode::E => input.right_shoulder.key_press(is_down),
-        Keycode::Up => input.action_up.key_press(is_down),
-        Keycode::Down => input.action_down.key_press(is_down),
-        Keycode::Right => input.action_right.key_press(is_down),
-        Keycode::Left => input.action_left.key_press(is_down),
-        Keycode::F => (),
-        Keycode::Space => (),
-        _ => (),
-    }
+    target.draw(
+        &vertex_buffer,
+        &index_buffer,
+        &program,
+        &uniforms,
+        &Default::default()
+    ).unwrap();
 }
