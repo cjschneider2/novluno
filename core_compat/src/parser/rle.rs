@@ -144,6 +144,7 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
 /// usually just enough to set the default colour to be transparent and "paint" over the pixels
 /// with the actual colour.
 // TODO: There is probably a quicker way to do this conversion without the FP mult & div ...
+// TODO: Create type for r5g6b5 normalized colors and don't convert (OpenGL & DX can do this)
 fn format_r5g6b5_norm(d: u16) -> (u8, u8, u8) {
     let b = ((d & 0x1F) as f32 / 31.0) * 255.0;
     let g = (((d >> 5) & 0x3F) as f32 / 63.0) * 255.0;

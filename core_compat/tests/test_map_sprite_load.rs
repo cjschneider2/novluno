@@ -19,7 +19,7 @@ fn test_map_sprite_load_map00001() {
     let mut map_manager = MapManager::new(&map_path);
     let mut data_manager = DataManager::new(&data_path);
     let mut sprite_manager = SpriteManager::new(&sprite_path);
-    let list_manager = ListManager::new(sprite_path).unwrap();
+    let list_manager = ListManager::new(&sprite_path).unwrap();
     // load the map files
     map_manager.load_map(1).unwrap();
     let map = map_manager.get_map(1).unwrap();
