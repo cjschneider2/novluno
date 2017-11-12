@@ -199,7 +199,7 @@ impl Sdl {
             sdl_mouse.x2()]);
     }
 
-    pub fn render(&mut self, _game: &Game, dt: f32) {
+    pub fn render(&mut self, game: &Game, dt: f32) {
         // start frame
         let mut target = self.window.draw();
 
@@ -212,7 +212,8 @@ impl Sdl {
         // draw imgui
         let dim = target.get_dimensions();
         let ui = self.imgui.frame(dim, dim, dt);
-        gui::show_file_list(&ui);
+        // gui::show_file_list(&ui);
+        gui::show_game_manager_states(&ui, &game);
         self.imgui_renderer.render(&mut target, ui).unwrap();
 
         // finish frame

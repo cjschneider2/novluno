@@ -1,5 +1,10 @@
-use std::path::{ Path, PathBuf };
+use std::path::{ PathBuf };
 use core_compat::{ MapManager, DataManager, SpriteManager, ListManager };
+use core_compat::entity::sprite_type::SpriteType;
+use core_compat::entity::rmd_type::RmdType;
+use core_compat::ListType;
+
+use error::Error;
 
 pub mod input;
 
@@ -14,9 +19,9 @@ pub struct Game {
     pub state: State,
     pub input: input::Input,
     // file paths
-    pub path_data: PathBuf,
-    pub path_map: PathBuf,
-    pub path_sprite: PathBuf,
+    // pub path_data: PathBuf,
+    // pub path_map: PathBuf,
+    // pub path_sprite: PathBuf,
     // data managers
     pub map_manager: MapManager,
     pub data_manager: DataManager,
@@ -32,9 +37,9 @@ impl Game {
         let mut path_map = PathBuf::new();
         let mut path_sprite = PathBuf::new();
 
-        path_data.push("DATAs/");
-        path_map.push(("data/DATAs/Map/");
-        path_sprite.push("data/RLEs/");
+        path_data.push("data/DATAs");
+        path_map.push("data/DATAs/Map");
+        path_sprite.push("data/RLEs");
 
         let map_manager = MapManager::new(&path_map);
         let data_manager = DataManager::new(&path_data);
@@ -51,9 +56,9 @@ impl Game {
             input: input::Input::new(),
 
             // file paths
-            path_data,
-            path_map,
-            path_sprite,
+            // path_data,
+            // path_map,
+            // path_sprite,
 
             // data managers
             map_manager,
@@ -77,6 +82,54 @@ impl Game {
         if self.input.keyboard.action_left.pressed {
             self.state.player_x += 1;
         }
+    }
+
+    pub fn load_map(&mut self, map_number: usize) -> Result<(), Error> {
+        // load the map data
+        self.map_manager.load_map(map_number)?;
+        let map = self.map_manager.get_map(map_number)?;
+        // load the tile data
+        let obj_list = self.list_manager.get_list(ListType::Object).unwrap();
+        let tle_list = self.list_manager.get_list(ListType::Tile).unwrap();
+        for map_tile in map.tiles().iter() {
+            // load references to the data files
+            // -- map tile objects
+            let obj_entry = map_tile.obj_rmd_entry;
+            if obj_entry.file() != 0 {
+                // -- load entry data
+                let file = obj_entry.file() as usize;
+                let index = obj_entry.index() as usize;
+                let rmd = self.data_manager.get_data(RmdType::Object,file)?;
+                let entry = rmd.get_entry(index).unwrap();
+                // -- load images
+                for img in entry.images() {
+                    for id in img.get_image_id_list().iter() {
+                        let item = obj_list.get_item(*id as usize).unwrap();
+                        let _sprite = self.sprite_manager.get_sprite(item.entry, SpriteType::Object)?;
+                    }
+                }
+                // -- load animations
+                for _ani in rmd.animations() {
+                    // todo
+                }
+            }
+            // -- map tile sprites
+            let tle_entry = map_tile.tle_rmd_entry;
+            if tle_entry.file() != 0 {
+                let file = tle_entry.file() as usize;
+                let index = tle_entry.index() as usize;
+                let rmd = self.data_manager.get_data(RmdType::Tile, file)?;
+                let entry = rmd.get_entry(index).unwrap();
+                for img in entry.images() {
+                    for id in img.get_image_id_list().iter() {
+                        let item = tle_list.get_item(*id as usize).unwrap();
+                        let _sprite = self.sprite_manager.get_sprite(item.entry, SpriteType::Tile)?;
+                    }
+                }
+            }
+        }
+
+        Ok(())
     }
 
     pub fn get_mut_keyboard(&mut self) -> &mut input::Controller {

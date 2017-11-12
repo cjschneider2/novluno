@@ -32,6 +32,10 @@ fn main() {
     // Setup initial game state
     let mut game = game::Game::new();
 
+    let map_number = 1;
+    game.load_map(map_number).unwrap();
+    println!("loaded map: {}", map_number);
+
     'main: loop {
         // start frame
         let start_time = Instant::now();

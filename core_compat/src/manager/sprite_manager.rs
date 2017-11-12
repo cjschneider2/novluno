@@ -130,4 +130,12 @@ impl SpriteManager {
         Ok(())
     }
 
+    pub fn get_count(&self) -> usize {
+          self.bul_map.len()
+        + self.ico_map.len()
+        + self.chr_map.len()
+        + self.obj_map.len()
+        + self.tle_map.len()
+        + self.int_map.len()
+    }
 }

@@ -77,10 +77,16 @@ impl DataManager {
             RmdType::Bullet => { format!("bul{:05}.rmd", number) },
         };
         path.push(dir_str);
-        path.push(map_str);
+        path.push(&map_str);
         // load data from file
         // println!("trying to open: {:?}", &path);
-        let mut file = File::open(&path)?;
+        let mut file = match File::open(&path) {
+            Ok(f) => f,
+            Err(e) => {
+                println!("failed to open RMD file: {:?}", &path);
+                return Err(Error::Io(e));
+            }
+        };
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
         // parse map and insert into manager
@@ -93,6 +99,14 @@ impl DataManager {
             RmdType::Bullet =>    { self.bul_map.insert(number, Rc::new(rmd)); },
         }
         Ok(())
+    }
+
+    pub fn get_count(&self) -> usize {
+        self.bul_map.len() +
+        self.ico_map.len() +
+        self.chr_map.len() +
+        self.obj_map.len() +
+        self.tle_map.len()
     }
 }
 

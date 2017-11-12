@@ -24,7 +24,7 @@ impl MapManager {
     }
 
     pub fn get_map(&self, number: usize) -> Result<Rc<Map>, Error> {
-        let map = match self.maps.get(&1) {
+        let map = match self.maps.get(&number) {
             Some(map) => map.clone(),
             None => return Err(Error::MapLoad),
         };
@@ -35,15 +35,26 @@ impl MapManager {
         // generate correct path for the map
         let map_str = format!("Map{:05}.rmm", number);
         let mut path: PathBuf = self.data_path.clone();
-        path.push(map_str);
+        path.push(&map_str);
         // load data from file
-        let mut file = File::open(&path)?;
+        let mut file = match File::open(&path) {
+            Ok(f) => f,
+            Err(e) => {
+                println!("Failed to open map file: {:?}", &path);
+                return Err(Error::Io(e));
+            }
+        };
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
         // parse map and insert into manager
         let map = parse_rmm(&data)?;
         self.maps.insert(number, Rc::new(map));
+        println!("Loaded map: {}", &map_str);
         Ok(())
+    }
+
+    pub fn get_count(&self) -> usize {
+        self.maps.len()
     }
 }
 

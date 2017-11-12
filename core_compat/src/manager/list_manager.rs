@@ -74,4 +74,8 @@ impl ListManager {
             None
         }
     }
+
+    pub fn get_count(&self) -> usize {
+        self.list_map.len()
+    }
 }
