@@ -88,6 +88,14 @@ impl Map {
         self.tiles.get(index)
     }
 
+    pub fn get_size_x(&self) -> u32 {
+        self.size_x
+    }
+
+    pub fn get_size_y(&self) -> u32 {
+        self.size_y
+    }
+
     pub fn number(&self) -> u32 {
         self.number
     }

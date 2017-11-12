@@ -18,10 +18,6 @@ pub struct Game {
     // game and input state
     pub state: State,
     pub input: input::Input,
-    // file paths
-    // pub path_data: PathBuf,
-    // pub path_map: PathBuf,
-    // pub path_sprite: PathBuf,
     // data managers
     pub map_manager: MapManager,
     pub data_manager: DataManager,
@@ -54,11 +50,6 @@ impl Game {
                 map: 0,
             },
             input: input::Input::new(),
-
-            // file paths
-            // path_data,
-            // path_map,
-            // path_sprite,
 
             // data managers
             map_manager,

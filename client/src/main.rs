@@ -34,6 +34,8 @@ fn main() {
 
     let map_number = 1;
     game.load_map(map_number).unwrap();
+    game.state.map = 1;
+    sdl.pre_render_map(&mut game);
     println!("loaded map: {}", map_number);
 
     'main: loop {
@@ -51,7 +53,7 @@ fn main() {
 
         // render our window
         let ft = frame_time(&start_time);
-        sdl.render(&game, ft);
+        sdl.render(&mut game, ft);
     }
 }
 

@@ -19,6 +19,10 @@ use sdl2::event::Event;
 use sdl2::event::WindowEvent;
 use sdl2::keyboard::Keycode;
 
+use core_compat::entity::sprite_type::SpriteType;
+use core_compat::entity::rmd_type::RmdType;
+use core_compat::ListType;
+
 use error::Error;
 use game::Game;
 use game::input::Controller;
@@ -43,7 +47,8 @@ pub struct Sdl {
     pub controller: sdl2::GameControllerSubsystem,
     pub controllers: RefCell<[Option<sdl2::controller::GameController>; MAX_CTL]>,
     pub controller_count: u32,
-    // testing
+    // map_texture
+    pub map_texture: Option<glium::texture::Texture2d>,
 }
 
 impl Sdl {
@@ -86,6 +91,7 @@ impl Sdl {
             controller,
             controllers,
             controller_count: 0,
+            map_texture: None,
         };
         Ok(sdl)
     }
@@ -199,15 +205,71 @@ impl Sdl {
             sdl_mouse.x2()]);
     }
 
-    pub fn render(&mut self, game: &Game, dt: f32) {
+    pub fn pre_render_map(&mut self, game: &mut Game) {
+        let mut x_offset = 0;
+        let mut y_offset = 0;
+        let tle_list = game.list_manager.get_list(ListType::Tile).unwrap();
+        let map = game.map_manager.get_map(game.state.map).unwrap();
+        let mut rendered_map = glium::Texture2d::empty_with_format(
+            &self.window,
+            glium::texture::UncompressedFloatFormat::U8U8U8U8,
+            glium::texture::MipmapsOption::NoMipmap,
+            map.get_size_x(),
+            map.get_size_y()
+        ).unwrap();
+        for map_tile in map.tiles().iter() {
+            // blit the tiles
+            let tle_entry = map_tile.tle_rmd_entry;
+            if tle_entry.file() != 0 {
+                let file = tle_entry.file() as usize;
+                let index = tle_entry.index() as usize;
+                let rmd = game.data_manager.get_data( RmdType::Tile, file ).unwrap();
+                let entry = rmd.get_entry(index).unwrap();
+                for img in entry.images() {
+                    for id in img.get_image_id_list().iter() {
+                        let item = tle_list.get_item(*id as usize).unwrap();
+                        let sprite = game.sprite_manager.get_sprite(item.entry, SpriteType::Tile).unwrap();
+                        let mut image = Vec::<u8>::new();
+                        for pixel in sprite.image.iter() {
+                            image.push(pixel.r);
+                            image.push(pixel.g);
+                            image.push(pixel.b);
+                            image.push(pixel.a);
+                        }
+                        let raw_texture = glium::texture::RawImage2d::from_raw_rgba(image, (sprite.x_dim as u32, sprite.y_dim as u32));
+                        let texture = glium::texture::CompressedSrgbTexture2d::new(&self.window, image).unwrap();
+                        let target = glium::BlitTarget {
+                            left: x_offset,
+                            bottom: y_offset,
+                            width: sprite.x_dim as i32,
+                            height: sprite.y_dim as i32};
+                        let rect = glium::Rect {
+                            left: 0,
+                            bottom: 0,
+                            width: sprite.x_dim as u32,
+                            height: sprite.y_dim as u32};
+                        texture.as_surface().blit_color(&rect,
+                                                        &rendered_map.as_surface(),
+                                                        &target,
+                                                        glium::uniforms::MagnifySamplerFilter::Linear);
+                    }
+                }
+            }
+        }
+        self.map_texture = Some(rendered_map);
+    }
+
+    pub fn render(&mut self, game: &mut Game, dt: f32) {
         // start frame
         let mut target = self.window.draw();
 
         // draw background color
         target.clear_color(0.4, 0.7, 1.0, 1.0);
 
-        // draw_triangle(self, &mut target);
-
+        // render game map
+        if let Some(ref texture) = self.map_texture {
+            texture.as_surface().fill(&target, glium::uniforms::MagnifySamplerFilter::Linear);
+        }
 
         // draw imgui
         let dim = target.get_dimensions();
