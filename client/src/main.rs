@@ -1,12 +1,5 @@
 #![allow(dead_code)]
-// extern crate rusttype;
 extern crate sdl2;
-#[macro_use]
-extern crate glium;
-extern crate imgui;
-extern crate glium_sdl2;
-extern crate imgui_glium_renderer;
-
 extern crate core_compat;
 
 mod error;
@@ -33,9 +26,9 @@ fn main() {
     let mut game = game::Game::new();
 
     let map_number = 1;
-    game.load_map(map_number).unwrap();
+    //game.load_map(map_number).unwrap();
     game.state.map = 1;
-    sdl.pre_render_map(&mut game);
+    //sdl.pre_render_map(&mut game);
     println!("loaded map: {}", map_number);
 
     'main: loop {

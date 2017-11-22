@@ -46,7 +46,7 @@ impl MapManager {
         };
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
-        // parse map and insert into manager
+        // parse map and insert into resource_manager
         let map = parse_rmm(&data)?;
         self.maps.insert(number, Rc::new(map));
         println!("Loaded map: {}", &map_str);

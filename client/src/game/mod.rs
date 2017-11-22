@@ -1,10 +1,6 @@
 use std::path::{ PathBuf };
-use core_compat::{ MapManager, DataManager, SpriteManager, ListManager };
-use core_compat::entity::sprite_type::SpriteType;
-use core_compat::entity::rmd_type::RmdType;
-use core_compat::ListType;
 
-use error::Error;
+//use error::Error;
 
 pub mod input;
 
@@ -19,10 +15,10 @@ pub struct Game {
     pub state: State,
     pub input: input::Input,
     // data managers
-    pub map_manager: MapManager,
-    pub data_manager: DataManager,
-    pub sprite_manager: SpriteManager,
-    pub list_manager: ListManager,
+    // pub map_manager: MapManager,
+    // pub data_manager: DataManager,
+    // pub sprite_manager: SpriteManager,
+    // pub list_manager: ListManager,
 }
 
 impl Game {
@@ -37,10 +33,10 @@ impl Game {
         path_map.push("data/DATAs/Map");
         path_sprite.push("data/RLEs");
 
-        let map_manager = MapManager::new(&path_map);
-        let data_manager = DataManager::new(&path_data);
-        let sprite_manager = SpriteManager::new(&path_sprite);
-        let list_manager = ListManager::new(&path_sprite).unwrap();
+        // let map_manager = MapManager::new(&path_map);
+        // let data_manager = DataManager::new(&path_data);
+        // let sprite_manager = SpriteManager::new(&path_sprite);
+        // let list_manager = ListManager::new(&path_sprite).unwrap();
 
         Game {
             // game and input state
@@ -52,10 +48,10 @@ impl Game {
             input: input::Input::new(),
 
             // data managers
-            map_manager,
-            data_manager,
-            sprite_manager,
-            list_manager,
+            // map_manager,
+            // data_manager,
+            // sprite_manager,
+            // list_manager,
         }
     }
 
@@ -75,6 +71,7 @@ impl Game {
         }
     }
 
+    /*
     pub fn load_map(&mut self, map_number: usize) -> Result<(), Error> {
         // load the map data
         self.map_manager.load_map(map_number)?;
@@ -122,6 +119,7 @@ impl Game {
 
         Ok(())
     }
+    */
 
     pub fn get_mut_keyboard(&mut self) -> &mut input::Controller {
         &mut self.input.keyboard

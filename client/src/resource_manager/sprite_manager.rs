@@ -13,12 +13,12 @@ use parser::rle::parse_rle;
 
 pub struct SpriteManager {
     db_path: PathBuf,
-    bul_map: HashMap<Entry, Rc<Sprite>>,
-    ico_map: HashMap<Entry, Rc<Sprite>>,
-    chr_map: HashMap<Entry, Rc<Sprite>>,
-    obj_map: HashMap<Entry, Rc<Sprite>>,
-    tle_map: HashMap<Entry, Rc<Sprite>>,
-    int_map: HashMap<Entry, Rc<Sprite>>,
+    bul_map: HashMap<Entry, Rc<>>,
+    ico_map: HashMap<Entry, Rc<>>,
+    chr_map: HashMap<Entry, Rc<>>,
+    obj_map: HashMap<Entry, Rc<>>,
+    tle_map: HashMap<Entry, Rc<>>,
+    int_map: HashMap<Entry, Rc<>>,
 }
 
 impl SpriteManager {
@@ -105,7 +105,7 @@ impl SpriteManager {
         };
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
-        // parse rle file and insert into manager
+        // parse rle file and insert into resource_manager
         let resource_file = parse_rle(number, &data)?;
         for resource in resource_file.resources {
             let entry = Entry::new(number, resource.index() );

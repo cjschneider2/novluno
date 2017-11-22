@@ -1,27 +1,10 @@
-pub mod gui;
-
 use std::cell::RefCell;
 use std::borrow::BorrowMut;
-
-use imgui;
-
-use imgui_glium_renderer;
-
-use glium;
-use glium::Surface;
-use glium::index::PrimitiveType;
-
-use glium_sdl2;
-use glium_sdl2::DisplayBuild;
 
 use sdl2;
 use sdl2::event::Event;
 use sdl2::event::WindowEvent;
 use sdl2::keyboard::Keycode;
-
-use core_compat::entity::sprite_type::SpriteType;
-use core_compat::entity::rmd_type::RmdType;
-use core_compat::ListType;
 
 use error::Error;
 use game::Game;
@@ -32,23 +15,17 @@ pub struct Sdl {
     pub context: sdl2::Sdl,
     // video/rendering
     pub video: sdl2::VideoSubsystem,
-    // pub window: sdl2::video::Window,
-    pub window: glium_sdl2::SDL2Facade,
-    // gui
-    pub imgui: imgui::ImGui,
-    pub imgui_renderer: imgui_glium_renderer::Renderer,
+    pub canvas: sdl2::render::Canvas<sdl2::video::Window>,
+    pub texture_creator: sdl2::render::TextureCreator<sdl2::video::WindowContext>,
     // audio
     pub audio: sdl2::AudioSubsystem,
     pub audio_spec: sdl2::audio::AudioSpecDesired,
     // event handlers
     pub event_pump: RefCell<sdl2::EventPump>,
-    // pub last_event: RefCell<Option<sdl2::event::Event>>,
     // controllers
     pub controller: sdl2::GameControllerSubsystem,
     pub controllers: RefCell<[Option<sdl2::controller::GameController>; MAX_CTL]>,
     pub controller_count: u32,
-    // map_texture
-    pub map_texture: Option<glium::texture::Texture2d>,
 }
 
 impl Sdl {
@@ -58,9 +35,13 @@ impl Sdl {
         let video = context.video()?;
         let window = video.window("Novluno", width, height)
             .position_centered()
-            // .resizable()
             .opengl()
-            .build_glium()?;
+            .build()?;
+        let canvas = window.into_canvas()
+            .accelerated()
+            .present_vsync()
+            .build()?;
+        let texture_creator = canvas.texture_creator();
         let controller = context.game_controller()?;
         let controllers = RefCell::new([None, None, None, None]);
         let event_pump = RefCell::new(context.event_pump()?);
@@ -71,27 +52,18 @@ impl Sdl {
             samples: Some(4),
         };
 
-        // -- setup OpenGL
-        // gl::load_with(|name| video.gl_get_proc_address(name) as *const _);
-
-        // -- setup ImGui
-        let mut imgui = imgui::ImGui::init();
-        let imgui_renderer = imgui_glium_renderer::Renderer::init(&mut imgui, &window).unwrap();
-
         // -- Create SDL state object
         let sdl = Sdl {
             context,
             video,
-            window,
+            canvas,
+            texture_creator,
             event_pump,
             audio,
-            imgui,
-            imgui_renderer,
             audio_spec,
             controller,
             controllers,
             controller_count: 0,
-            map_texture: None,
         };
         Ok(sdl)
     }
@@ -109,9 +81,9 @@ impl Sdl {
         Ok(())
     }
 
-    pub fn add_game_controller(&self, index: i32) -> Result<(), Error> {
+    pub fn add_game_controller(&self, index: u32) -> Result<(), Error> {
         let mut controllers = self.controllers.borrow_mut();
-        if index < MAX_CTL as i32 && index > 0 {
+        if index < MAX_CTL as u32 && index > 0 {
             let ctrl_list = controllers.borrow_mut();
             let new_ctrl = self.controller.open(index as u32)?;
             if let Some(spot) = ctrl_list.get_mut(index as usize) {
@@ -190,33 +162,15 @@ impl Sdl {
             }
             last_event = Some(new_event);
         } // end while new SDL event
-
-        // update imgui vars
-        // -- mouse
-        let sdl_mouse = sdl2::mouse::MouseState::new(&event_pump);
-        let mouse_x: f32 = sdl_mouse.x() as f32;
-        let mouse_y: f32 = sdl_mouse.y() as f32;
-        self.imgui.set_mouse_pos(mouse_x, mouse_y);
-        self.imgui.set_mouse_down(&[
-            sdl_mouse.left(),
-            sdl_mouse.middle(),
-            sdl_mouse.right(),
-            sdl_mouse.x1(),
-            sdl_mouse.x2()]);
     }
 
+    /*
     pub fn pre_render_map(&mut self, game: &mut Game) {
         let mut x_offset = 0;
         let mut y_offset = 0;
         let tle_list = game.list_manager.get_list(ListType::Tile).unwrap();
         let map = game.map_manager.get_map(game.state.map).unwrap();
-        let mut rendered_map = glium::Texture2d::empty_with_format(
-            &self.window,
-            glium::texture::UncompressedFloatFormat::U8U8U8U8,
-            glium::texture::MipmapsOption::NoMipmap,
-            map.get_size_x(),
-            map.get_size_y()
-        ).unwrap();
+
         for map_tile in map.tiles().iter() {
             // blit the tiles
             let tle_entry = map_tile.tle_rmd_entry;
@@ -236,50 +190,24 @@ impl Sdl {
                             image.push(pixel.b);
                             image.push(pixel.a);
                         }
-                        let raw_texture = glium::texture::RawImage2d::from_raw_rgba(image, (sprite.x_dim as u32, sprite.y_dim as u32));
-                        let texture = glium::texture::CompressedSrgbTexture2d::new(&self.window, image).unwrap();
-                        let target = glium::BlitTarget {
-                            left: x_offset,
-                            bottom: y_offset,
-                            width: sprite.x_dim as i32,
-                            height: sprite.y_dim as i32};
-                        let rect = glium::Rect {
-                            left: 0,
-                            bottom: 0,
-                            width: sprite.x_dim as u32,
-                            height: sprite.y_dim as u32};
-                        texture.as_surface().blit_color(&rect,
-                                                        &rendered_map.as_surface(),
-                                                        &target,
-                                                        glium::uniforms::MagnifySamplerFilter::Linear);
                     }
                 }
             }
         }
-        self.map_texture = Some(rendered_map);
     }
+    */
 
-    pub fn render(&mut self, game: &mut Game, dt: f32) {
+    pub fn render(&mut self, _game: &mut Game, _dt: f32) {
         // start frame
-        let mut target = self.window.draw();
+        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(75, 100, 255));
 
         // draw background color
-        target.clear_color(0.4, 0.7, 1.0, 1.0);
+        self.canvas.clear();
 
         // render game map
-        if let Some(ref texture) = self.map_texture {
-            texture.as_surface().fill(&target, glium::uniforms::MagnifySamplerFilter::Linear);
-        }
-
-        // draw imgui
-        let dim = target.get_dimensions();
-        let ui = self.imgui.frame(dim, dim, dt);
-        // gui::show_file_list(&ui);
-        gui::show_game_manager_states(&ui, &game);
-        self.imgui_renderer.render(&mut target, ui).unwrap();
 
         // finish frame
-        target.finish().unwrap();
+        self.canvas.present();
     }
 }
 
@@ -303,112 +231,4 @@ fn process_keycode(
         Keycode::Space => (),
         _ => (),
     }
-}
-
-fn draw_triangle(sdl: &mut Sdl, target: &mut glium::Frame) {
-
-    let vertex_buffer = {
-        #[derive(Copy, Clone)]
-        struct Vertex {
-            pos: [f32; 2],
-            color: [f32; 3],
-        }
-        implement_vertex!(Vertex, pos, color);
-        glium::VertexBuffer::new(&sdl.window, &[
-            Vertex { pos: [-0.5, -0.5], color: [0.0, 1.0, 0.0] },
-            Vertex { pos: [0.0, 0.5], color: [0.0, 0.0, 1.0] },
-            Vertex { pos: [0.5, -0.5], color: [1.0, 1.0, 0.0] },
-        ]).unwrap()
-    };
-
-    let index_buffer = glium::IndexBuffer::new(
-        &sdl.window,
-        PrimitiveType::TrianglesList,
-        &[0u16, 1, 2]
-    ).unwrap();
-
-    let program = program!(&sdl.window,
-                140 => {
-                    vertex: "
-                        #version 140
-                        uniform mat4 matrix;
-                        in vec2 pos;
-                        in vec3 color;
-                        out vec4 vColor;
-                        void main() {
-                            gl_position = vec4(pos, 0.0, 1.0) * matrix;
-                            vColor = color;
-                        }
-                    ",
-                    fragment: "
-                        #version 140
-                        in vec3 vColor;
-                        out vec4 f_color;
-                        void main() {
-                            f_color = vec4(vColor, 1.0);
-                        }
-                    "
-                },
-
-                110 => {
-                    vertex: "
-                        #version 110
-                        uniform mat4 matrix;
-                        attribute vec2 pos;
-                        attribute vec3 color;
-                        varying vec3 vColor;
-                        void main() {
-                            gl_Position = vec4(pos, 0.0, 1.0) * matrix;
-                            vColor = color;
-                        }
-                    ",
-
-                    fragment: "
-                        #version 110
-                        varying vec3 vColor;
-                        void main() {
-                            gl_FragColor = vec4(vColor, 1.0);
-                        }
-                    ",
-                },
-
-                100 => {
-                    vertex: "
-                        #version 100
-                        uniform lowp mat4 matrix;
-                        attribute lowp vec2 pos;
-                        attribute lowp vec3 color;
-                        varying lowp vec3 vColor;
-                        void main() {
-                            gl_Position = vec4(pos, 0.0, 1.0) * matrix;
-                            vColor = color;
-                        }
-                    ",
-
-                    fragment: "
-                        #version 100
-                        varying lowp vec3 vColor;
-                        void main() {
-                            gl_FragColor = vec4(vColor, 1.0);
-                        }
-                    ",
-                },
-            ).unwrap();
-
-    let uniforms = uniform! {
-                matrix: [
-                    [1.0, 0.0, 0.0, 0.0],
-                    [0.0, 1.0, 0.0, 0.0],
-                    [0.0, 0.0, 1.0, 0.0],
-                    [0.0, 0.0, 0.0, 1.0f32],
-                ]
-            };
-
-    target.draw(
-        &vertex_buffer,
-        &index_buffer,
-        &program,
-        &uniforms,
-        &Default::default()
-    ).unwrap();
 }

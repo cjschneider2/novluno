@@ -89,7 +89,7 @@ impl DataManager {
         };
         let mut data = Vec::<u8>::new();
         file.read_to_end(&mut data)?;
-        // parse map and insert into manager
+        // parse map and insert into resource_manager
         let rmd = parse_rmd(kind, &data)?;
         match kind {
             RmdType::Tile =>   { self.tle_map.insert(number, Rc::new(rmd)); },
