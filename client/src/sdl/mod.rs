@@ -6,7 +6,11 @@ use sdl2::event::Event;
 use sdl2::event::WindowEvent;
 use sdl2::keyboard::Keycode;
 
+use core_compat::entity::sprite_type::SpriteType;
+use core_compat::entity::rmd_type::RmdType;
+
 use error::Error;
+use resource_manager::list_manager::ListType;
 use game::Game;
 use game::input::Controller;
 use game::input::MAX_CONTROLLERS as MAX_CTL;
@@ -164,15 +168,28 @@ impl Sdl {
         } // end while new SDL event
     }
 
-    /*
-    pub fn pre_render_map(&mut self, game: &mut Game) {
+
+    pub fn render(&mut self, game: &mut Game, _dt: f32) {
+        // start frame
+        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(75, 100, 255));
+
+        // draw background color
+        self.canvas.clear();
+
+        // render game map
+        self.render_map(game);
+
+        // finish frame
+        self.canvas.present();
+    }
+
+    pub fn render_map(&mut self, game: &mut Game) {
         let mut x_offset = 0;
         let mut y_offset = 0;
         let tle_list = game.list_manager.get_list(ListType::Tile).unwrap();
         let map = game.map_manager.get_map(game.state.map).unwrap();
 
         for map_tile in map.tiles().iter() {
-            // blit the tiles
             let tle_entry = map_tile.tle_rmd_entry;
             if tle_entry.file() != 0 {
                 let file = tle_entry.file() as usize;
@@ -182,32 +199,12 @@ impl Sdl {
                 for img in entry.images() {
                     for id in img.get_image_id_list().iter() {
                         let item = tle_list.get_item(*id as usize).unwrap();
-                        let sprite = game.sprite_manager.get_sprite(item.entry, SpriteType::Tile).unwrap();
-                        let mut image = Vec::<u8>::new();
-                        for pixel in sprite.image.iter() {
-                            image.push(pixel.r);
-                            image.push(pixel.g);
-                            image.push(pixel.b);
-                            image.push(pixel.a);
-                        }
+                        let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, self).unwrap();
+                        let _ = self.canvas.copy(&sprite.texture, None, None);
                     }
                 }
             }
         }
-    }
-    */
-
-    pub fn render(&mut self, _game: &mut Game, _dt: f32) {
-        // start frame
-        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(75, 100, 255));
-
-        // draw background color
-        self.canvas.clear();
-
-        // render game map
-
-        // finish frame
-        self.canvas.present();
     }
 }
 

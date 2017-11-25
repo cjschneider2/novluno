@@ -6,9 +6,9 @@ use std::fs::File;
 use std::io::Read;
 use std::rc::Rc;
 
-use entity::rmd_type::RmdType;
-use entity::rmd::Rmd;
-use parser::rmd::parse_rmd;
+use core_compat::entity::rmd_type::RmdType;
+use core_compat::entity::rmd::Rmd;
+use core_compat::parser::rmd::parse_rmd;
 use error::Error;
 
 pub struct DataManager {

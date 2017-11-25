@@ -4,10 +4,11 @@ use std::io::Read;
 use std::fs::File;
 use std::rc::Rc;
 
+use core_compat::entity::list::List;
+// use core_compat::entity::list_item::ListItem;
+use core_compat::parser::lst::parse_lst;
+
 use error::Error;
-use entity::list::List;
-use entity::list_item::ListItem;
-use parser::lst::parse_lst;
 
 #[derive(Copy, Clone, Hash, Eq, PartialEq)]
 pub enum ListType {

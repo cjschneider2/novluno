@@ -4,21 +4,30 @@ use std::rc::Rc;
 use std::fs::File;
 use std::io::Read;
 
-use entity::resource_file::ResourceFile;
+use sdl2;
+
+// use core_compat::entity::resource_file::ResourceFile;
+use core_compat::entity::entry::Entry;
+use core_compat::entity::sprite::Sprite;
+use core_compat::entity::sprite_type::SpriteType::{self, Bullet, Character, Interface, Icon, Tile, Object};
+use core_compat::parser::rle::parse_rle;
+
 use error::Error;
-use entity::entry::Entry;
-use entity::sprite::Sprite;
-use entity::sprite_type::SpriteType::{self, Bullet, Character, Interface, Icon, Tile, Object};
-use parser::rle::parse_rle;
+use sdl::Sdl;
+
+pub struct SpriteEntry {
+    pub sprite: Sprite,
+    pub texture: sdl2::render::Texture
+}
 
 pub struct SpriteManager {
     db_path: PathBuf,
-    bul_map: HashMap<Entry, Rc<>>,
-    ico_map: HashMap<Entry, Rc<>>,
-    chr_map: HashMap<Entry, Rc<>>,
-    obj_map: HashMap<Entry, Rc<>>,
-    tle_map: HashMap<Entry, Rc<>>,
-    int_map: HashMap<Entry, Rc<>>,
+    bul_map: HashMap<Entry, Rc<SpriteEntry>>,
+    ico_map: HashMap<Entry, Rc<SpriteEntry>>,
+    chr_map: HashMap<Entry, Rc<SpriteEntry>>,
+    obj_map: HashMap<Entry, Rc<SpriteEntry>>,
+    tle_map: HashMap<Entry, Rc<SpriteEntry>>,
+    int_map: HashMap<Entry, Rc<SpriteEntry>>,
 }
 
 impl SpriteManager {
@@ -34,20 +43,30 @@ impl SpriteManager {
         }
     }
 
-    pub fn get_sprite(
+    pub fn get_sprite_entry(
         &mut self,
-        req_entry: Entry,
-        sprite_type: SpriteType
-    ) -> Result<Rc<Sprite>, Error> {
-        if let Some(sprite) = self.req_sprite(&req_entry, sprite_type) {
-            Ok(sprite)
-        } else {
-            self.load_sprite(req_entry.file(), sprite_type)?;
-            if let Some(sprite) = self.req_sprite(&req_entry, sprite_type) {
-                Ok(sprite)
-            } else {
-                Err(Error::SpriteLoad)
+        req_entry: &Entry,
+        sprite_type: SpriteType,
+        sdl: &mut Sdl
+    ) -> Result<&SpriteEntry, Error> {
+
+        // TODO: Work around borrowing rules to only request the sprite once...
+        {
+            let mut need_load = false;
+
+            if self.req_sprite(req_entry, sprite_type).is_none() {
+                need_load = true;
             }
+
+            if need_load {
+                self.load_sprite(req_entry.file(), sprite_type, sdl)?;
+            }
+        }
+
+        if let Some(entry) = self.req_sprite(req_entry, sprite_type) {
+            Ok(entry)
+        } else {
+            Err(Error::SpriteLoad)
         }
     }
 
@@ -55,7 +74,7 @@ impl SpriteManager {
         &self,
         entry: &Entry,
         sprite_type: SpriteType
-    ) -> Option<Rc<Sprite>> {
+    ) -> Option<&SpriteEntry> {
         if let Some(entry) = match sprite_type {
             Bullet    => { self.bul_map.get(entry) },
             Icon      => { self.ico_map.get(entry) },
@@ -64,7 +83,7 @@ impl SpriteManager {
             Tile      => { self.tle_map.get(entry) },
             Interface => { self.int_map.get(entry) },
         } {
-            Some(entry.clone())
+            Some(entry)
         } else {
             None
         }
@@ -73,7 +92,8 @@ impl SpriteManager {
     fn load_sprite(
         &mut self,
         number: u32,
-        sprite_type: SpriteType
+        sprite_type: SpriteType,
+        sdl: &mut Sdl
     ) -> Result<(), Error> {
         // generate correct path for the sprite
         let folder_str = match sprite_type {
@@ -118,13 +138,34 @@ impl SpriteManager {
                 y_off: resource.offset_y as usize,
                 image: resource.image,
             };
+
+            let mut img = Vec::<u8>::new();
+            {
+                for p in sprite.image.iter() {
+                    img.push(p.r);
+                    img.push(p.g);
+                    img.push(p.b);
+                    img.push(p.a);
+                }
+            }
+
+            let mut texture = sdl.texture_creator.create_texture(
+                None,
+                sdl2::render::TextureAccess::Static,
+                resource.width,
+                resource.height)?;
+            let pitch = resource.width as usize * 4;
+            texture.update(None, &img, pitch).unwrap();
+
+            let sprite_entry = Rc::new(SpriteEntry { sprite, texture });
+
             match sprite_type {
-                Bullet    => { self.bul_map.insert(entry, Rc::new(sprite)); },
-                Icon      => { self.ico_map.insert(entry, Rc::new(sprite)); },
-                Character => { self.chr_map.insert(entry, Rc::new(sprite)); },
-                Object    => { self.obj_map.insert(entry, Rc::new(sprite)); },
-                Tile      => { self.tle_map.insert(entry, Rc::new(sprite)); },
-                Interface => { self.int_map.insert(entry, Rc::new(sprite)); },
+                Bullet    => { self.bul_map.insert(entry, sprite_entry); },
+                Icon      => { self.ico_map.insert(entry, sprite_entry); },
+                Character => { self.chr_map.insert(entry, sprite_entry); },
+                Object    => { self.obj_map.insert(entry, sprite_entry); },
+                Tile      => { self.tle_map.insert(entry, sprite_entry); },
+                Interface => { self.int_map.insert(entry, sprite_entry); },
             }
         }
         Ok(())

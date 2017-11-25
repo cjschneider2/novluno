@@ -8,8 +8,8 @@ path = "../core_compat"
 
 [dependencies.sdl2]
 version = "*"
-#default-features = false
-#features = ["image"]
+default-features = false
+features = ["unsafe_textures"]
 
 #[dependencies.glium_sdl2]
 #path = "../vendor/glium_sdl2"

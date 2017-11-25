@@ -5,6 +5,7 @@ extern crate core_compat;
 mod error;
 mod game;
 mod sdl;
+mod resource_manager;
 
 use sdl::Sdl;
 
@@ -26,10 +27,9 @@ fn main() {
     let mut game = game::Game::new();
 
     let map_number = 1;
-    //game.load_map(map_number).unwrap();
-    game.state.map = 1;
-    //sdl.pre_render_map(&mut game);
-    println!("loaded map: {}", map_number);
+    game.state.map = map_number;
+    game.load_map(map_number, &mut sdl).unwrap();
+    println!("loaded map: {}", game.state.map);
 
     'main: loop {
         // start frame

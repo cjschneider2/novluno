@@ -1,6 +1,16 @@
 use std::path::{ PathBuf };
 
-//use error::Error;
+use core_compat::entity::sprite_type::SpriteType;
+use core_compat::entity::rmd_type::RmdType;
+
+use sdl::Sdl;
+
+use resource_manager::map_manager::MapManager;
+use resource_manager::data_manager::DataManager;
+use resource_manager::sprite_manager::SpriteManager;
+use resource_manager::list_manager::ListManager;
+use resource_manager::list_manager::ListType;
+use error::Error;
 
 pub mod input;
 
@@ -15,10 +25,10 @@ pub struct Game {
     pub state: State,
     pub input: input::Input,
     // data managers
-    // pub map_manager: MapManager,
-    // pub data_manager: DataManager,
-    // pub sprite_manager: SpriteManager,
-    // pub list_manager: ListManager,
+    pub map_manager: MapManager,
+    pub data_manager: DataManager,
+    pub sprite_manager: SpriteManager,
+    pub list_manager: ListManager,
 }
 
 impl Game {
@@ -33,10 +43,10 @@ impl Game {
         path_map.push("data/DATAs/Map");
         path_sprite.push("data/RLEs");
 
-        // let map_manager = MapManager::new(&path_map);
-        // let data_manager = DataManager::new(&path_data);
-        // let sprite_manager = SpriteManager::new(&path_sprite);
-        // let list_manager = ListManager::new(&path_sprite).unwrap();
+        let map_manager = MapManager::new(&path_map);
+        let data_manager = DataManager::new(&path_data);
+        let sprite_manager = SpriteManager::new(&path_sprite);
+        let list_manager = ListManager::new(&path_sprite).unwrap();
 
         Game {
             // game and input state
@@ -48,10 +58,10 @@ impl Game {
             input: input::Input::new(),
 
             // data managers
-            // map_manager,
-            // data_manager,
-            // sprite_manager,
-            // list_manager,
+            map_manager,
+            data_manager,
+            sprite_manager,
+            list_manager,
         }
     }
 
@@ -71,8 +81,7 @@ impl Game {
         }
     }
 
-    /*
-    pub fn load_map(&mut self, map_number: usize) -> Result<(), Error> {
+    pub fn load_map(&mut self, map_number: usize, sdl: &mut Sdl) -> Result<(), Error> {
         // load the map data
         self.map_manager.load_map(map_number)?;
         let map = self.map_manager.get_map(map_number)?;
@@ -93,7 +102,7 @@ impl Game {
                 for img in entry.images() {
                     for id in img.get_image_id_list().iter() {
                         let item = obj_list.get_item(*id as usize).unwrap();
-                        let _sprite = self.sprite_manager.get_sprite(item.entry, SpriteType::Object)?;
+                        let _sprite = self.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Object, sdl)?;
                     }
                 }
                 // -- load animations
@@ -111,7 +120,7 @@ impl Game {
                 for img in entry.images() {
                     for id in img.get_image_id_list().iter() {
                         let item = tle_list.get_item(*id as usize).unwrap();
-                        let _sprite = self.sprite_manager.get_sprite(item.entry, SpriteType::Tile)?;
+                        let _sprite = self.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, sdl)?;
                     }
                 }
             }
@@ -119,7 +128,6 @@ impl Game {
 
         Ok(())
     }
-    */
 
     pub fn get_mut_keyboard(&mut self) -> &mut input::Controller {
         &mut self.input.keyboard

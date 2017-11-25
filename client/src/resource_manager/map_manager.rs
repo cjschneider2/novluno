@@ -4,10 +4,11 @@ use std::fs::File;
 use std::io::Read;
 use std::rc::Rc;
 
-use entity::map::Map;
-use entity::map_tile::MapTile;
+use core_compat::entity::map::Map;
+// use core_compat::entity::map_tile::MapTile;
+use core_compat::parser::rmm::parse_rmm;
+
 use error::Error;
-use parser::rmm::parse_rmm;
 
 pub struct MapManager {
     data_path: PathBuf,

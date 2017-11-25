@@ -3,6 +3,7 @@ use std::str::Utf8Error;
 
 use sdl2::IntegerOrSdlError;
 use sdl2::video::WindowBuildError;
+use sdl2::render::TextureValueError;
 
 use core_compat;
 
@@ -10,12 +11,14 @@ use core_compat;
 pub enum Error {
     SpriteLoad,
     MapLoad,
+    DataLoad,
     Rm(core_compat::error::Error),
     Io(io::Error),
     Utf8(Utf8Error),
     Str(String),
     WindowBuildError,
     IntegerOrSdlError,
+    TextureValueError,
 }
 
 impl From<core_compat::error::Error> for Error {
@@ -52,4 +55,8 @@ impl From<IntegerOrSdlError> for Error {
     fn from(_: IntegerOrSdlError) -> Error {
         Error::IntegerOrSdlError
     }
+}
+
+impl From<TextureValueError> for Error {
+    fn from(_: TextureValueError) -> Error { Error::TextureValueError }
 }
