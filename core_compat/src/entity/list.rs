@@ -13,6 +13,11 @@ impl List {
     }
 
     pub fn get_item(&self, index: usize) -> Option<&ListItem> {
-        self.items.get(index)
+        for item in self.items.iter() {
+            if item.id as usize == index {
+                return Some(item)
+            }
+        }
+        None
     }
 }

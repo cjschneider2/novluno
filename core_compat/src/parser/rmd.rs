@@ -99,8 +99,8 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
             let y2 = cursor.read_i32::<LE>()?;
             img.set_source_x(x1);
             img.set_source_y(y1);
-            img.set_source_width(x2 - x1);
-            img.set_source_height(y2 - y1);
+            img.set_source_width (x2 /* - x1 */ );
+            img.set_source_height(y2 /* - y1 */ );
             img.set_empty_1(cursor.read_u32::<LE>()?);
             img.set_dest_x(cursor.read_i32::<LE>()?);
             img.set_dest_y(cursor.read_i32::<LE>()?);

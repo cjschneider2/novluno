@@ -82,13 +82,15 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
         if resource.width < 8000 && resource.height < 8000 {
             let total_px = resource.width * resource.height;
             for _ in 0..total_px {
-                resource.image.push(Pixel::new_empty());
+                resource.image_raw.push(0);
+                resource.image_raw.push(0);
             }
         } else {
             // println!("oversized resource: W: {}, H: {}",
             //         resource.width,
             //         resource.height);
-            resource.image.push(Pixel::new_empty());
+            resource.image_raw.push(0);
+            resource.image_raw.push(0);
             continue;
         }
 
@@ -109,14 +111,15 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
                     /* Paint pixels */
                     let pixels = cursor.read_u32::<LE>()?;
                     for p in 0..pixels {
-                        let data = cursor.read_u16::<LE>()?;
-                        let (r, g, b) = format_r5g6b5_norm(data);
-                        let idx: usize = (y as usize * resource.width as usize) + x as usize;
-                        let pixel = &mut resource.image[idx];
-                        pixel.r = r;
-                        pixel.g = g;
-                        pixel.b = b;
-                        pixel.a = 255u8;
+                        let data_lo = cursor.read_u8()?;
+                        let data_hi = cursor.read_u8()?;
+                        // let (r, g, b) = format_r5g6b5_norm(data);
+                        let _y = y * 2 * resource.width as i32;
+                        let _x = x * 2;
+                        let idx: usize = _y as usize + _x as usize;
+                        resource.image_raw[idx] = data_lo;
+                        resource.image_raw[idx+1] = data_hi;
+
                         x += 1;
                     }
                 }

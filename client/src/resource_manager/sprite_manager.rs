@@ -136,26 +136,16 @@ impl SpriteManager {
                 y_dim: resource.height as usize,
                 x_off: resource.offset_x as usize,
                 y_off: resource.offset_y as usize,
-                image: resource.image,
+                image_raw: resource.image_raw,
             };
 
-            let mut img = Vec::<u8>::new();
-            {
-                for p in sprite.image.iter() {
-                    img.push(p.r);
-                    img.push(p.g);
-                    img.push(p.b);
-                    img.push(p.a);
-                }
-            }
-
             let mut texture = sdl.texture_creator.create_texture(
-                None,
+                Some(sdl2::pixels::PixelFormatEnum::RGB565),
                 sdl2::render::TextureAccess::Static,
                 resource.width,
                 resource.height)?;
-            let pitch = resource.width as usize * 4;
-            texture.update(None, &img, pitch).unwrap();
+            let pitch = resource.width as usize * 2;
+            texture.update(None, &sprite.image_raw, pitch).unwrap();
 
             let sprite_entry = Rc::new(SpriteEntry { sprite, texture });
 

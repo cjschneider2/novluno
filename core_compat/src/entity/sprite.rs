@@ -10,6 +10,7 @@ pub struct Sprite {
     pub y_dim: usize,
     pub x_off: usize,
     pub y_off: usize,
-    pub image: Vec<Pixel>,
-    // pub image: Vec<u8>, // defined to be RGBA
+    // pub image_raw: Vec<Pixel>,
+    pub image_raw: Vec<u8>, // defined to be in RGB_565_norm format
 }
+

@@ -14,7 +14,8 @@ pub struct Resource {
     pub unknown_2: u32,
     pub unknown_3: u32,
     pub unknown_4: u32,
-    pub image: Vec<Pixel>,
+    // pub image: Vec<Pixel>,
+    pub image_raw: Vec<u8>,
 }
 
 impl Resource {
@@ -32,7 +33,7 @@ impl Resource {
             unknown_2: 0,
             unknown_3: 0,
             unknown_4: 0,
-            image: Vec::new(),
+            image_raw: Vec::new(),
         }
     }
 
