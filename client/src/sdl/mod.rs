@@ -185,22 +185,27 @@ impl Sdl {
     }
 
     pub fn render_map(&mut self, game: &mut Game) {
-        let mut x_offset = 0;
-        let mut y_offset = 0;
         let tle_list = game.list_manager.get_list(ListType::Tile).unwrap();
+        let obj_list = game.list_manager.get_list(ListType::Object).unwrap();
         let map = game.map_manager.get_map(game.state.map).unwrap();
+        let tile_stride = map.size_x() as i32;
+        let tile_height = 24;
+        let tile_width = 48;
+        let mut tile_x = 0;
+        let mut tile_y = 0;
+        let mut img_count = 0;
 
-        for map_tile in map.tiles().iter()
-        //let map_tile = map.tiles().get(1).unwrap();
-        {
+        for map_tile in map.tiles().iter() {
+            let x_offset = tile_x * tile_width;
+            let y_offset = tile_y * tile_height;
+            // draw tile
             let tle_entry = map_tile.tle_rmd_entry;
             if tle_entry.file() != 0 {
                 let file = tle_entry.file() as usize;
                 let index = tle_entry.index() as usize;
-                let rmd = game.data_manager.get_data( RmdType::Tile, file ).unwrap();
+                let rmd = game.data_manager.get_data(RmdType::Tile, file).unwrap();
                 let entry = rmd.get_entry(index).unwrap();
                 for img in entry.images() {
-                    // println!("rmd_image {:?}", img);
                     for id in img.get_image_id_list().iter() {
                         let item = tle_list.get_item(*id as usize).unwrap();
                         let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, self).unwrap();
@@ -211,22 +216,52 @@ impl Sdl {
                             img.source_height() as u32);
                         let dst_rect = Rect::new(
                             x_offset, y_offset,
-                            48, 24 );
-                        // println!("sprite.x_dim {:?}", sprite.sprite.x_dim);
-                        // println!("sprite.y_dim {:?}", sprite.sprite.y_dim);
-                        // println!("{:?}", src_rect);
+                            tile_width as u32, tile_height as u32);
                         let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
 
                         self.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 100, 100));
                         let _ = self.canvas.draw_rect(dst_rect);
-
-                        x_offset += 48;
-                        if x_offset > 800 {
-                            x_offset = 0;
-                            y_offset += 24;
-                        }
                     }
                 }
+            }
+            // draw tile objects
+            if img_count < 20 {
+
+            let obj_entry = map_tile.obj_rmd_entry;
+            if obj_entry.file() != 0 {
+                let file = obj_entry.file() as usize;
+                let index = obj_entry.index() as usize;
+                let rmd = game.data_manager.get_data(RmdType::Object, file).unwrap();
+                let entry = rmd.get_entry(index).unwrap();
+                for img in entry.images() {
+                    for id in img.get_image_id_list().iter() {
+                        let item = obj_list.get_item(*id as usize).unwrap();
+                        let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Object, self).unwrap();
+                        let src_rect = Rect::new(
+                            img.source_x(),
+                            img.source_y(),
+                            img.source_width() as u32,
+                            img.source_height() as u32);
+                        let dst_rect = Rect::new(
+                            x_offset + img.dest_x(),
+                            y_offset + img.dest_y(),
+                            img.source_width() as u32,
+                            img.source_height() as u32);
+                        let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
+
+                        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 255, 100));
+                        let _ = self.canvas.draw_rect(dst_rect);
+                        img_count += 1;
+                    }
+                }
+            }
+
+            }
+            // update tile positions
+            tile_x += 1;
+            if tile_x >= tile_stride {
+                tile_x = 0;
+                tile_y += 1;
             }
         }
     }

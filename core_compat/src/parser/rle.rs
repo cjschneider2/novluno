@@ -80,17 +80,16 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
 
         // Pre-fill the image buffer with 0's
         if resource.width < 8000 && resource.height < 8000 {
-            let total_px = resource.width * resource.height;
+            let total_px = resource.width * resource.height * 4 /* bytes / pixel */;
             for _ in 0..total_px {
-                resource.image_raw.push(0);
-                resource.image_raw.push(0);
+                resource.image_raw.push(0x0);
             }
         } else {
-            // println!("oversized resource: W: {}, H: {}",
-            //         resource.width,
-            //         resource.height);
-            resource.image_raw.push(0);
-            resource.image_raw.push(0);
+            // oversized resource
+            resource.image_raw.push(0xFF); // R
+            resource.image_raw.push(0xFF); // G
+            resource.image_raw.push(0xFF); // B
+            resource.image_raw.push(0xFF); // A
             continue;
         }
 
@@ -111,14 +110,15 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
                     /* Paint pixels */
                     let pixels = cursor.read_u32::<LE>()?;
                     for p in 0..pixels {
-                        let data_lo = cursor.read_u8()?;
-                        let data_hi = cursor.read_u8()?;
-                        // let (r, g, b) = format_r5g6b5_norm(data);
-                        let _y = y * 2 * resource.width as i32;
-                        let _x = x * 2;
+                        let data = cursor.read_u16::<LE>()?;
+                        let (r, g, b) = format_r5g6b5_norm(data);
+                        let _y = y * 4 * resource.width as i32;
+                        let _x = x * 4;
                         let idx: usize = _y as usize + _x as usize;
-                        resource.image_raw[idx] = data_lo;
-                        resource.image_raw[idx+1] = data_hi;
+                        resource.image_raw[idx]   = r;
+                        resource.image_raw[idx+1] = g;
+                        resource.image_raw[idx+2] = b;
+                        resource.image_raw[idx+3] = 0xFF;
 
                         x += 1;
                     }
@@ -126,7 +126,7 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
                 0x02 => {
                     /* Move `x` pos */
                     let pixels = cursor.read_i32::<LE>()?;
-                    x += pixels / 2;
+                    x += pixels / 2; // NOTE: the two is probaby a u16 jump?
                 }
                 0x03 => {
                     /* Next line */

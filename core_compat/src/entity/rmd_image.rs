@@ -8,36 +8,29 @@ pub struct RmdImage {
     source_y: i32,
     source_width: i32,
     source_height: i32,
-    // source_rect: Rectangle<i32>,
     empty_1: u32,
     empty_2: u32,
     render_z: i32,
     dest_x: i32,
     dest_y: i32,
-    // dest_point: Point<i32>,
     draw_type: i32,
     // enum { Shadow, skill, normal }
     image_id_count: i32,
-    image_id: Vec<i32> // Lst row/entry pointer entries
+    image_id: Vec<i32>    // Lst row/entry pointer entries
 }
 
 impl RmdImage {
     pub fn new() -> RmdImage {
-        let location = Point { x: 0, y: 0 };
-        let size = Size { width: 0, height: 0 };
-        let dest_point = Point { x: 0, y: 0 };
         RmdImage {
             source_x: 0,
             source_y: 0,
             source_width: 0,
             source_height: 0,
-            // source_rect: Rectangle { location, size },
             empty_1: 0,
             empty_2: 0,
             render_z: 0,
             dest_x: 0,
             dest_y: 0,
-            // dest_point,
             draw_type: 0,
             image_id_count: 0,
             image_id: Vec::new(),
@@ -68,44 +61,20 @@ impl RmdImage {
 
     pub fn dest_y(&self) -> i32 { self.dest_y }
 
-    pub fn set_source_x(&mut self, val: i32) {
-        // self.source_rect.location.x = val;
-        self.source_x = val;
-    }
+    pub fn set_source_x(&mut self, val: i32) { self.source_x = val; }
 
-    pub fn set_source_y(&mut self, val: i32) {
-        // self.source_rect.location.y = val;
-        self.source_y = val;
-    }
+    pub fn set_source_y(&mut self, val: i32) { self.source_y = val; }
 
-    pub fn set_source_height(&mut self, val: i32) {
-        // self.source_rect.size.height = val;
-        self.source_height = val;
-    }
+    pub fn set_source_height(&mut self, val: i32) { self.source_height = val; }
 
-    pub fn set_source_width(&mut self, val: i32) {
-        // self.source_rect.size.width = val;
-        self.source_width = val;
-    }
+    pub fn set_source_width(&mut self, val: i32) { self.source_width = val; }
 
-    pub fn source_x(&self) -> i32 {
-        // self.source_rect.location.x
-        self.source_x
-    }
+    pub fn source_x(&self) -> i32 { self.source_x }
 
-    pub fn source_y(&self) -> i32 {
-        // self.source_rect.location.y
-        self.source_y
-    }
+    pub fn source_y(&self) -> i32 { self.source_y }
 
-    pub fn source_width(&self) -> i32 {
-        // self.source_rect.size.width
-        self.source_width
-    }
+    pub fn source_width(&self) -> i32 { self.source_width }
 
-    pub fn source_height(&self) -> i32 {
-        // self.source_rect.size.height
-        self.source_height
-    }
+    pub fn source_height(&self) -> i32 { self.source_height }
 }
 

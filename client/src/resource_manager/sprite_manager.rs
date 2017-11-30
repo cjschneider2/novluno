@@ -140,11 +140,13 @@ impl SpriteManager {
             };
 
             let mut texture = sdl.texture_creator.create_texture(
-                Some(sdl2::pixels::PixelFormatEnum::RGB565),
+                //Some(sdl2::pixels::PixelFormatEnum::RGB565),
+                Some(sdl2::pixels::PixelFormatEnum::ABGR8888),
                 sdl2::render::TextureAccess::Static,
                 resource.width,
                 resource.height)?;
-            let pitch = resource.width as usize * 2;
+            texture.set_blend_mode(sdl2::render::BlendMode::Blend);
+            let pitch = resource.width as usize * 4;
             texture.update(None, &sprite.image_raw, pitch).unwrap();
 
             let sprite_entry = Rc::new(SpriteEntry { sprite, texture });
