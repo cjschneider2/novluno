@@ -97,12 +97,29 @@ impl Game {
                 let file = obj_entry.file() as usize;
                 let index = obj_entry.index() as usize;
                 let rmd = self.data_manager.get_data(RmdType::Object,file)?;
-                let entry = rmd.get_entry(index).unwrap();
-                // -- load images
-                for img in entry.images() {
-                    for id in img.get_image_id_list().iter() {
-                        let item = obj_list.get_item(*id as usize).unwrap();
-                        let _sprite = self.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Object, sdl)?;
+                match rmd.get_entry(index) {
+                    Some(entry) => {
+                        // -- load images
+                        for img in entry.images() {
+                            println!("object img: {:?}", img);
+                            for id in img.image_id.iter() {
+                                let idx = *id as usize;
+                                let item = obj_list.get_item(idx).unwrap();
+                                let _sprite =
+                                    self.sprite_manager
+                                        .get_sprite_entry(&item.entry,
+                                                          SpriteType::Object,
+                                                          sdl)?;
+                                println!("  sprite{{ x_dim: {}, y_dim: {}}}",
+                                         _sprite.sprite.x_dim,
+                                         _sprite.sprite.y_dim);
+                            }
+                        }
+                    },
+                    None => {
+                        println!("failed to get rmd entry for map object");
+                        println!("file:  {}", file);
+                        println!("index: {}", index);
                     }
                 }
                 // -- load animations
@@ -116,15 +133,32 @@ impl Game {
                 let file = tle_entry.file() as usize;
                 let index = tle_entry.index() as usize;
                 let rmd = self.data_manager.get_data(RmdType::Tile, file)?;
-                let entry = rmd.get_entry(index).unwrap();
-                for img in entry.images() {
-                    for id in img.get_image_id_list().iter() {
-                        let item = tle_list.get_item(*id as usize).unwrap();
-                        let _sprite = self.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, sdl)?;
+                match rmd.get_entry(index) {
+                    Some(entry) => {
+                        for img in entry.images() {
+                            for id in img.image_id.iter() {
+                                let item = tle_list.get_item(*id as usize).unwrap();
+                                let _sprite = self.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, sdl)?;
+                            }
+                        }
+                    },
+                    None => {
+                        println!("failed to get rmd entry for map tile");
+                        println!("file:  {}", file);
+                        println!("index: {}", index);
                     }
                 }
             }
+
+            // debugging
+            {
+                // println!("map_tile.collision: 0x{:2x}", map_tile.collision);
+            }
         }
+
+        println!("loaded map: {}", map_number);
+        println!("X: {}", map.size_x());
+        println!("Y: {}", map.size_y());
 
         Ok(())
     }

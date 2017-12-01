@@ -140,7 +140,6 @@ impl SpriteManager {
             };
 
             let mut texture = sdl.texture_creator.create_texture(
-                //Some(sdl2::pixels::PixelFormatEnum::RGB565),
                 Some(sdl2::pixels::PixelFormatEnum::ABGR8888),
                 sdl2::render::TextureAccess::Static,
                 resource.width,

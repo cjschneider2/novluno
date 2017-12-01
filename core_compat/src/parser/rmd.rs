@@ -92,24 +92,19 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
         entry.set_image_count(cursor.read_i32::<LE>()?);
         for _ in 0..entry.image_count() {
             let mut img = RmdImage::new();
-            // NOTE: the source bounds are defined as the space between two `Point`s
-            let x1 = cursor.read_i32::<LE>()?;
-            let y1 = cursor.read_i32::<LE>()?;
-            let x2 = cursor.read_i32::<LE>()?;
-            let y2 = cursor.read_i32::<LE>()?;
-            img.set_source_x(x1);
-            img.set_source_y(y1);
-            img.set_source_width (x2 /* - x1 */ );
-            img.set_source_height(y2 /* - y1 */ );
-            img.set_empty_1(cursor.read_u32::<LE>()?);
-            img.set_dest_x(cursor.read_i32::<LE>()?);
-            img.set_dest_y(cursor.read_i32::<LE>()?);
-            img.set_empty_2(cursor.read_u32::<LE>()?);
-            img.set_render_z(cursor.read_i32::<LE>()?);
-            img.set_draw_type(cursor.read_i32::<LE>()?);
-            img.set_image_id_count(cursor.read_i32::<LE>()?);
-            for _ in 0..img.image_id_count() {
-                img.add_image_id(cursor.read_i32::<LE>()?);
+            img.source_x1 = cursor.read_i32::<LE>()?;
+            img.source_y1 = cursor.read_i32::<LE>()?;
+            img.source_x2 = cursor.read_i32::<LE>()?;
+            img.source_y2 = cursor.read_i32::<LE>()?;
+            img.dest_x    = cursor.read_i32::<LE>()?;
+            img.dest_y    = cursor.read_i32::<LE>()?;
+            img.empty_1   = cursor.read_i32::<LE>()?;
+            img.empty_2   = cursor.read_i32::<LE>()?;
+            img.render_z  = cursor.read_i32::<LE>()?;
+            img.draw_type = cursor.read_i32::<LE>()?;
+            img.image_id_count = cursor.read_i32::<LE>()?;
+            for _ in 0..img.image_id_count {
+                img.image_id.push(cursor.read_i32::<LE>()?);
             }
             entry.add_image(img);
         }

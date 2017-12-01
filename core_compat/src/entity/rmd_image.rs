@@ -4,28 +4,27 @@ use utility::point::Point;
 
 #[derive(Debug)]
 pub struct RmdImage {
-    source_x: i32,
-    source_y: i32,
-    source_width: i32,
-    source_height: i32,
-    empty_1: u32,
-    empty_2: u32,
-    render_z: i32,
-    dest_x: i32,
-    dest_y: i32,
-    draw_type: i32,
-    // enum { Shadow, skill, normal }
-    image_id_count: i32,
-    image_id: Vec<i32>    // Lst row/entry pointer entries
+    pub source_x1: i32,
+    pub source_y1: i32,
+    pub source_x2: i32,
+    pub source_y2: i32,
+    pub empty_1: i32,
+    pub empty_2: i32,
+    pub render_z: i32,
+    pub dest_x: i32,
+    pub dest_y: i32,
+    pub draw_type: i32, // enum { Shadow, skill, normal }
+    pub image_id_count: i32,
+    pub image_id: Vec<i32>    // Lst row/entry pointer entries
 }
 
 impl RmdImage {
     pub fn new() -> RmdImage {
         RmdImage {
-            source_x: 0,
-            source_y: 0,
-            source_width: 0,
-            source_height: 0,
+            source_x1: 0,
+            source_y1: 0,
+            source_x2: 0,
+            source_y2: 0,
             empty_1: 0,
             empty_2: 0,
             render_z: 0,
@@ -36,45 +35,5 @@ impl RmdImage {
             image_id: Vec::new(),
         }
     }
-
-    pub fn add_image_id(&mut self, id: i32) { self.image_id.push(id); }
-
-    pub fn set_image_id_count(&mut self, count: i32) { self.image_id_count = count; }
-
-    pub fn image_id_count(&self) -> i32 { self.image_id_count }
-
-    pub fn get_image_id_list(&self) -> &[i32] { &self.image_id }
-
-    pub fn set_draw_type(&mut self, val: i32) { self.draw_type = val; }
-
-    pub fn set_render_z(&mut self, val: i32) { self.render_z = val; }
-
-    pub fn set_empty_1(&mut self, val: u32) { self.empty_1 = val; }
-
-    pub fn set_empty_2(&mut self, val: u32) { self.empty_2 = val; }
-
-    pub fn set_dest_y(&mut self, val: i32) { self.dest_x = val; }
-
-    pub fn set_dest_x(&mut self, val: i32) { self.dest_y = val; }
-
-    pub fn dest_x(&self) -> i32 { self.dest_x }
-
-    pub fn dest_y(&self) -> i32 { self.dest_y }
-
-    pub fn set_source_x(&mut self, val: i32) { self.source_x = val; }
-
-    pub fn set_source_y(&mut self, val: i32) { self.source_y = val; }
-
-    pub fn set_source_height(&mut self, val: i32) { self.source_height = val; }
-
-    pub fn set_source_width(&mut self, val: i32) { self.source_width = val; }
-
-    pub fn source_x(&self) -> i32 { self.source_x }
-
-    pub fn source_y(&self) -> i32 { self.source_y }
-
-    pub fn source_width(&self) -> i32 { self.source_width }
-
-    pub fn source_height(&self) -> i32 { self.source_height }
 }
 

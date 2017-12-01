@@ -26,27 +26,30 @@ fn main() {
     // Setup initial game state
     let mut game = game::Game::new();
 
-    let map_number = 1;
+    let map_number = 4;
     game.state.map = map_number;
     game.load_map(map_number, &mut sdl).unwrap();
-    println!("loaded map: {}", game.state.map);
 
     'main: loop {
-        // start frame
+
         let start_time = Instant::now();
 
         // Processes events
         sdl.handle_events(&mut game);
 
-        // Update game
+        // Update
         if game.input.should_quit {
             break 'main;
         }
         game.update();
 
-        // render our window
+        // Render
         let ft = frame_time(&start_time);
         sdl.render(&mut game, ft);
+
+        // worst frame limiter ever
+        let dur = std::time::Duration::from_millis(200);
+        std::thread::sleep(dur);
     }
 }
 
