@@ -132,18 +132,18 @@ impl SpriteManager {
             let sprite = Sprite {
                 class: sprite_type,
                 rle_entry: entry,
-                x_dim: resource.width as usize,
-                y_dim: resource.height as usize,
-                x_off: resource.offset_x as usize,
-                y_off: resource.offset_y as usize,
+                x_dim: resource.width,
+                y_dim: resource.height,
+                x_off: resource.offset_x,
+                y_off: resource.offset_y,
                 image_raw: resource.image_raw,
             };
 
             let mut texture = sdl.texture_creator.create_texture(
                 Some(sdl2::pixels::PixelFormatEnum::ABGR8888),
                 sdl2::render::TextureAccess::Static,
-                resource.width,
-                resource.height)?;
+                resource.width as u32,
+                resource.height as u32)?;
             texture.set_blend_mode(sdl2::render::BlendMode::Blend);
             let pitch = resource.width as usize * 4;
             texture.update(None, &sprite.image_raw, pitch).unwrap();

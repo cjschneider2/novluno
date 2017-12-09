@@ -69,10 +69,10 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
 
         // read the resource header
         resource.len = cursor.read_u32::<LE>()?;
-        resource.offset_x = cursor.read_u32::<LE>()?;
-        resource.offset_y = cursor.read_u32::<LE>()?;
-        resource.width = cursor.read_u32::<LE>()?;
-        resource.height = cursor.read_u32::<LE>()?;
+        resource.offset_x = cursor.read_i32::<LE>()?;
+        resource.offset_y = cursor.read_i32::<LE>()?;
+        resource.width = cursor.read_i32::<LE>()?;
+        resource.height = cursor.read_i32::<LE>()?;
         resource.unknown_1 = cursor.read_u32::<LE>()?;
         resource.unknown_2 = cursor.read_u32::<LE>()?;
         resource.unknown_3 = cursor.read_u32::<LE>()?;

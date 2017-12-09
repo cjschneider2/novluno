@@ -84,7 +84,7 @@ fn load_1_2(cursor: &mut Cursor<&[u8]>) -> Result<List, Error> {
     let mut list = List::new();
     let mut string = Vec::<u8>::new();
 
-    // Unknown u32
+    // Unknown u32 -- assumed to be the next free ID
     let next_free_id = cursor.read_u32::<LE>()?;
     // list Entry counts
     let entry_count = cursor.read_u32::<LE>()?;

@@ -26,7 +26,7 @@ fn main() {
     // Setup initial game state
     let mut game = game::Game::new();
 
-    let map_number = 4;
+    let map_number = 0;
     game.state.map = map_number;
     game.load_map(map_number, &mut sdl).unwrap();
 
@@ -38,17 +38,24 @@ fn main() {
         sdl.handle_events(&mut game);
 
         // Update
+        let old_map = game.state.map;
         if game.input.should_quit {
             break 'main;
         }
         game.update();
+
+        // change maps?
+        let new_map = game.state.map;
+        if old_map != new_map {
+            game.load_map(new_map, &mut sdl).unwrap();
+        }
 
         // Render
         let ft = frame_time(&start_time);
         sdl.render(&mut game, ft);
 
         // worst frame limiter ever
-        let dur = std::time::Duration::from_millis(200);
+        let dur = std::time::Duration::from_millis(100);
         std::thread::sleep(dur);
     }
 }

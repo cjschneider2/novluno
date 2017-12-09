@@ -18,6 +18,8 @@ pub struct State {
     pub player_x: usize,
     pub player_y: usize,
     pub map: usize,
+    pub map_off_x: i32,
+    pub map_off_y: i32,
 }
 
 pub struct Game {
@@ -54,6 +56,8 @@ impl Game {
                 player_x: 50,
                 player_y: 50,
                 map: 0,
+                map_off_x: 0,
+                map_off_y: 0,
             },
             input: input::Input::new(),
 
@@ -68,16 +72,32 @@ impl Game {
     pub fn update(&mut self) {
         // Update
         if self.input.keyboard.action_up.pressed {
-            self.state.player_y += 1;
+            // self.state.player_y += 1;
+            self.state.map_off_y += 100;
         }
         if self.input.keyboard.action_down.pressed {
-            self.state.player_y -= 1;
+            // self.state.player_y -= 1;
+            self.state.map_off_y -= 100;
         }
         if self.input.keyboard.action_right.pressed {
-            self.state.player_x -= 1;
+            // self.state.player_x -= 1;
+            self.state.map_off_x -= 100;
         }
         if self.input.keyboard.action_left.pressed {
-            self.state.player_x += 1;
+            // self.state.player_x += 1;
+            self.state.map_off_x += 100;
+        }
+        if self.input.keyboard.move_down.pressed {
+            if self.state.map > 0 {
+                self.state.map -= 1;
+                self.state.map_off_x = 0;
+                self.state.map_off_y = 0;
+            }
+        }
+        if self.input.keyboard.move_up.pressed {
+            self.state.map += 1;
+            self.state.map_off_x = 0;
+            self.state.map_off_y = 0;
         }
     }
 
@@ -101,7 +121,7 @@ impl Game {
                     Some(entry) => {
                         // -- load images
                         for img in entry.images() {
-                            println!("object img: {:?}", img);
+                            // println!("object img: {:?}", img);
                             for id in img.image_id.iter() {
                                 let idx = *id as usize;
                                 let item = obj_list.get_item(idx).unwrap();
@@ -110,9 +130,11 @@ impl Game {
                                         .get_sprite_entry(&item.entry,
                                                           SpriteType::Object,
                                                           sdl)?;
-                                println!("  sprite{{ x_dim: {}, y_dim: {}}}",
-                                         _sprite.sprite.x_dim,
-                                         _sprite.sprite.y_dim);
+                                // println!("  sprite{{ x_dim: {}, y_dim: {}, x_offset: {}, y_offset: {}}}",
+                                //         _sprite.sprite.x_dim,
+                                //         _sprite.sprite.y_dim,
+                                //         _sprite.sprite.x_off,
+                                //         _sprite.sprite.y_off);
                             }
                         }
                     },
