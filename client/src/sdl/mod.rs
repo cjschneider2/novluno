@@ -183,7 +183,8 @@ impl Sdl {
 
         // render game map
         self.render_map_tiles(game);
-        self.render_map_objects(game);
+        self.render_map_objects(game, 2);
+        self.render_map_objects(game, 0);
 
         // finish frame
         self.canvas.present();
@@ -203,10 +204,10 @@ impl Sdl {
         let __moy = game.state.map_off_y;
         let __width  = WINDOW_WIDTH as i32;
         let __height = WINDOW_HEIGHT as i32;
-        let view_x1 = -50i32;
-        let view_y1 = -50i32;
-        let view_x2 = __width  + 50;
-        let view_y2 = __height + 50;
+        let view_x1 = -100;
+        let view_y1 = -100;
+        let view_x2 = __width  + 100;
+        let view_y2 = __height + 100;
 
         for map_tile in map.tiles().iter() {
             // tile offset
@@ -228,25 +229,26 @@ impl Sdl {
             if tle_entry.file() != 0 {
                 let file = tle_entry.file() as usize;
                 let index = tle_entry.index() as usize;
-                let rmd = game.data_manager.get_data(RmdType::Tile, file).unwrap();
-                if let Some(entry) = rmd.get_entry(index) {
-                    for img in entry.images() {
-                        for id in img.image_id.iter() {
-                            let item = tle_list.get_item(*id as usize).unwrap();
-                            let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, self).unwrap();
-                            let _w = (img.source_x2 - img.source_x1) as u32;
-                            let _h = (img.source_y2 - img.source_y1) as u32;
-                            let src_rect = Rect::new( img.source_x1, img.source_y1, _w, _h);
-                            let mut dst_rect = Rect::new( 0, 0, tile_width as u32, tile_height as u32);
-                            dst_rect.offset(x_offset, y_offset);
-                            dst_rect.offset(game.state.map_off_x, game.state.map_off_y);
-                            let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
+                if let Ok(rmd) = game.data_manager.get_data(RmdType::Tile, file) {
+                    if let Some(entry) = rmd.get_entry(index) {
+                        for img in entry.images() {
+                            for id in img.image_id.iter() {
+                                let item = tle_list.get_item(*id as usize).unwrap();
+                                let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, self).unwrap();
+                                let _w = (img.source_x2 - img.source_x1) as u32;
+                                let _h = (img.source_y2 - img.source_y1) as u32;
+                                let src_rect = Rect::new( img.source_x1, img.source_y1, _w, _h);
+                                let mut dst_rect = Rect::new( 0, 0, tile_width as u32, tile_height as u32);
+                                dst_rect.offset(x_offset, y_offset);
+                                dst_rect.offset(game.state.map_off_x, game.state.map_off_y);
+                                let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
 
-                            // match map_tile.collision {
-                            //     0 => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 10)),
-                            //     _ => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 255, 10)),
-                            // }
-                            // let _ = self.canvas.draw_rect(dst_rect);
+                                // match map_tile.collision {
+                                //     0 => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 10)),
+                                //     _ => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 255, 10)),
+                                // }
+                                // let _ = self.canvas.draw_rect(dst_rect);
+                            }
                         }
                     }
                 }
@@ -260,7 +262,7 @@ impl Sdl {
         }
     }
 
-    pub fn render_map_objects(&mut self, game: &mut Game) {
+    pub fn render_map_objects(&mut self, game: &mut Game, layer: i32) {
         let obj_list = game.list_manager.get_list(ListType::Object).unwrap();
         let map = game.map_manager.get_map(game.state.map).unwrap();
         let tile_stride = map.size_x() as i32;
@@ -301,45 +303,48 @@ impl Sdl {
             if obj_entry.file() != 0 {
                 let file = obj_entry.file() as usize;
                 let index = obj_entry.index() as usize;
-                let rmd = game.data_manager.get_data(RmdType::Object, file).unwrap();
-                if let Some(entry) = rmd.get_entry(index) {
-                    for img in entry.images() {
-                        for id in img.image_id.iter() {
-                            let _id : usize = *id as usize;
-                            let item = obj_list.get_item(_id).unwrap();
-                            let sprite = game.sprite_manager
-                                                         .get_sprite_entry(&item.entry,
-                                                                           SpriteType::Object,
-                                                                           self).unwrap();
-                            let img_rect = Rect::new(0, 0,
-                                                     sprite.sprite.x_dim as u32,
-                                                     sprite.sprite.y_dim as u32);
-                            let img_x_1_off = img.source_x1 - sprite.sprite.x_off;
-                            let img_y_1_off = img.source_y1 - sprite.sprite.y_off;
-                            let _src_pts = [
-                                (img_x_1_off, img_y_1_off).into(),
-                                (img.source_x2 - sprite.sprite.x_off,
-                                 img.source_y2 - sprite.sprite.y_off).into() ];
-                            let mut _x_diff = 0;
-                            let mut _y_diff = 0;
-                            let mut src_rect = Rect::from_enclose_points(&_src_pts, None).unwrap();
-                            if let Some(rect) = src_rect.intersection(img_rect) {
-                                if img_x_1_off < 0 { _x_diff = -img_x_1_off; }
-                                if img_y_1_off < 0 { _y_diff = -img_y_1_off; }
-                                src_rect = rect;
-                            }
-                            let mut dst_rect = Rect::new(_x_diff, _y_diff,
-                                                         src_rect.width(),
-                                                         src_rect.height());
-                            dst_rect.offset(game.state.map_off_x,
-                                            game.state.map_off_y);
-                            dst_rect.offset(x_offset, y_offset);
-                            dst_rect.offset(-tile_width, -tile_height);
-                            dst_rect.offset(img.dest_x, img.dest_y);
-                            {
-                                let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
-                                self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
-                                let _ = self.canvas.draw_rect(dst_rect);
+                if let Ok(rmd) = game.data_manager.get_data(RmdType::Object, file) {
+                    if let Some(entry) = rmd.get_entry(index) {
+                        for img in entry.images() {
+                            for id in img.image_id.iter() {
+                                let _id : usize = *id as usize;
+                                let item = obj_list.get_item(_id).unwrap();
+                                let sprite = game.sprite_manager
+                                    .get_sprite_entry(&item.entry,
+                                                      SpriteType::Object,
+                                                      self).unwrap();
+                                let img_rect = Rect::new(0, 0,
+                                                         sprite.sprite.x_dim as u32,
+                                                         sprite.sprite.y_dim as u32);
+                                let img_x_1_off = img.source_x1 - sprite.sprite.x_off;
+                                let img_y_1_off = img.source_y1 - sprite.sprite.y_off;
+                                let _src_pts = [
+                                    (img_x_1_off, img_y_1_off).into(),
+                                    (img.source_x2 - sprite.sprite.x_off,
+                                     img.source_y2 - sprite.sprite.y_off).into() ];
+                                let mut _x_diff = 0;
+                                let mut _y_diff = 0;
+                                let mut src_rect = Rect::from_enclose_points(&_src_pts, None).unwrap();
+                                if let Some(rect) = src_rect.intersection(img_rect) {
+                                    if img_x_1_off < 0 { _x_diff = -img_x_1_off; }
+                                    if img_y_1_off < 0 { _y_diff = -img_y_1_off; }
+                                    src_rect = rect;
+                                }
+                                let mut dst_rect = Rect::new(_x_diff, _y_diff,
+                                                             src_rect.width(),
+                                                             src_rect.height());
+                                dst_rect.offset(game.state.map_off_x,
+                                                game.state.map_off_y);
+                                dst_rect.offset(x_offset, y_offset);
+                                // dst_rect.offset(-tile_width, -tile_height);
+                                dst_rect.offset(img.dest_x, img.dest_y);
+
+                                // render
+                                if layer == img.render_z {
+                                    let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
+                                    // self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
+                                    // let _ = self.canvas.draw_rect(dst_rect);
+                                }
                             }
                         }
                     }

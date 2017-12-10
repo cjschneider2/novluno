@@ -56,8 +56,8 @@ impl Game {
                 player_x: 50,
                 player_y: 50,
                 map: 0,
-                map_off_x: 0,
-                map_off_y: 0,
+                map_off_x: -24,
+                map_off_y: -48,
             },
             input: input::Input::new(),
 
@@ -90,14 +90,14 @@ impl Game {
         if self.input.keyboard.move_down.pressed {
             if self.state.map > 0 {
                 self.state.map -= 1;
-                self.state.map_off_x = 0;
-                self.state.map_off_y = 0;
+                self.state.map_off_x = -24;
+                self.state.map_off_y = -48;
             }
         }
         if self.input.keyboard.move_up.pressed {
             self.state.map += 1;
-            self.state.map_off_x = 0;
-            self.state.map_off_y = 0;
+            self.state.map_off_x = -24;
+            self.state.map_off_y = -48;
         }
     }
 
@@ -120,39 +120,41 @@ impl Game {
                 // -- load entry data
                 let file = obj_entry.file() as usize;
                 let index = obj_entry.index() as usize;
-                let rmd = self.data_manager.get_data(RmdType::Object,file)?;
-                match rmd.get_entry(index) {
-                    Some(entry) => {
-                        // -- load images
-                        for img in entry.images() {
-                            println!("({:3}, {:3})   dest_x: {}, dest_y: {}",
-                                     tile_x, tile_y,
-                                     img.dest_x, img.dest_y);
-                            for id in img.image_id.iter() {
-                                let idx = *id as usize;
-                                let item = obj_list.get_item(idx).unwrap();
-                                let _sprite =
-                                    self.sprite_manager
-                                        .get_sprite_entry(&item.entry,
-                                                          SpriteType::Object,
-                                                          sdl)?;
-                                // println!("  sprite{{ x_dim: {}, y_dim: {}, x_offset: {}, y_offset: {}}}",
-                                //         _sprite.sprite.x_dim,
-                                //         _sprite.sprite.y_dim,
-                                //         _sprite.sprite.x_off,
-                                //         _sprite.sprite.y_off);
+                if let Ok(rmd) = self.data_manager.get_data(RmdType::Object,file) {
+                    match rmd.get_entry(index) {
+                        Some(entry) => {
+                            // -- load images
+                            for img in entry.images() {
+                                // debug
+                                if (img.render_z != 2) && (img.render_z != 0) {
+                                    println!("({:3}, {:3})   dest_x: {:3}, dest_y: {:3}, z: {}",
+                                             tile_x, tile_y, img.dest_x, img.dest_y, img.render_z);
+                                }
+
+                                for id in img.image_id.iter() {
+                                    let idx = *id as usize;
+                                    let item = obj_list.get_item(idx).unwrap();
+                                    let _sprite =
+                                        self.sprite_manager
+                                            .get_sprite_entry(&item.entry,
+                                                              SpriteType::Object,
+                                                              sdl)?;
+                                }
                             }
+                        },
+                        None => {
+                            println!("failed to get rmd entry for map object");
+                            println!("file:  {}", file);
+                            println!("index: {}", index);
                         }
-                    },
-                    None => {
-                        println!("failed to get rmd entry for map object");
-                        println!("file:  {}", file);
-                        println!("index: {}", index);
                     }
-                }
-                // -- load animations
-                for _ani in rmd.animations() {
-                    // todo
+
+                    // -- load animations
+                    for _ani in rmd.animations() {
+                        // todo
+                    }
+                } else {
+                    continue;
                 }
             }
             // -- map tile sprites
@@ -160,21 +162,24 @@ impl Game {
             if tle_entry.file() != 0 {
                 let file = tle_entry.file() as usize;
                 let index = tle_entry.index() as usize;
-                let rmd = self.data_manager.get_data(RmdType::Tile, file)?;
-                match rmd.get_entry(index) {
-                    Some(entry) => {
-                        for img in entry.images() {
-                            for id in img.image_id.iter() {
-                                let item = tle_list.get_item(*id as usize).unwrap();
-                                let _sprite = self.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, sdl)?;
+                if let Ok(rmd) = self.data_manager.get_data(RmdType::Tile, file) {
+                    match rmd.get_entry(index) {
+                        Some(entry) => {
+                            for img in entry.images() {
+                                for id in img.image_id.iter() {
+                                    let item = tle_list.get_item(*id as usize).unwrap();
+                                    let _sprite = self.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, sdl)?;
+                                }
                             }
+                        },
+                        None => {
+                            println!("failed to get rmd entry for map tile");
+                            println!("file:  {}", file);
+                            println!("index: {}", index);
                         }
-                    },
-                    None => {
-                        println!("failed to get rmd entry for map tile");
-                        println!("file:  {}", file);
-                        println!("index: {}", index);
                     }
+                } else {
+                    continue;
                 }
             }
 
