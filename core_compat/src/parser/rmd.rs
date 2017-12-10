@@ -96,10 +96,10 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
             img.source_y1 = cursor.read_i32::<LE>()?;
             img.source_x2 = cursor.read_i32::<LE>()?;
             img.source_y2 = cursor.read_i32::<LE>()?;
-            img.dest_x    = cursor.read_i32::<LE>()?;
-            img.dest_y    = cursor.read_i32::<LE>()?;
             img.empty_1   = cursor.read_i32::<LE>()?;
             img.empty_2   = cursor.read_i32::<LE>()?;
+            img.dest_x    = cursor.read_i32::<LE>()?;
+            img.dest_y    = cursor.read_i32::<LE>()?;
             img.render_z  = cursor.read_i32::<LE>()?;
             img.draw_type = cursor.read_i32::<LE>()?;
             img.image_id_count = cursor.read_i32::<LE>()?;
