@@ -26,7 +26,7 @@ fn main() {
     // Setup initial game state
     let mut game = game::Game::new();
 
-    let map_number = 3;
+    let map_number = 9;
     game.state.map = map_number;
     game.load_map(map_number, &mut sdl).unwrap();
 

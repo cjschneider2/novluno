@@ -105,6 +105,10 @@ impl Game {
         // load the map data
         self.map_manager.load_map(map_number)?;
         let map = self.map_manager.get_map(map_number)?;
+        // debug
+        let mut tile_x = 0;
+        let mut tile_y = 0;
+        let tile_stride = map.size_x();
         // load the tile data
         let obj_list = self.list_manager.get_list(ListType::Object).unwrap();
         let tle_list = self.list_manager.get_list(ListType::Tile).unwrap();
@@ -121,7 +125,9 @@ impl Game {
                     Some(entry) => {
                         // -- load images
                         for img in entry.images() {
-                            // println!("object img: {:?}", img);
+                            println!("({:3}, {:3})   dest_x: {}, dest_y: {}",
+                                     tile_x, tile_y,
+                                     img.dest_x, img.dest_y);
                             for id in img.image_id.iter() {
                                 let idx = *id as usize;
                                 let item = obj_list.get_item(idx).unwrap();
@@ -174,6 +180,11 @@ impl Game {
 
             // debugging
             {
+                tile_x += 1;
+                if tile_x >= tile_stride {
+                    tile_x = 0;
+                    tile_y += 1;
+                }
                 // println!("map_tile.collision: 0x{:2x}", map_tile.collision);
             }
         }
