@@ -132,6 +132,7 @@ fn parse_v1(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     Ok(tile)
 }
 
+// NOTE: This was a test to see if pulling out the bit fields could be made a little better
 fn parse_v2(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     let b_0: u32 = cursor.read_u8()? as u32;
     let b_1: u32 = cursor.read_u8()? as u32;

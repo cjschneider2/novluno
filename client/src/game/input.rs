@@ -7,7 +7,9 @@ pub struct Input {
     pub should_quit: bool,
     pub should_resize: Option<(i32, i32)>,
     // mouse inputs
-    pub mouse_buttons: [ButtonState; MAX_MOUSE_BUTTONS],
+    pub mouse_left: ButtonState,
+    pub mouse_right: ButtonState,
+    pub mouse_middle: ButtonState,
     pub mouse_x: i32,
     pub mouse_y: i32,
     pub mouse_z: i32,
@@ -22,7 +24,9 @@ impl Input {
         Input {
             should_quit: false,
             should_resize: None,
-            mouse_buttons: [ButtonState::new(); MAX_MOUSE_BUTTONS],
+            mouse_left: ButtonState::new(),
+            mouse_right: ButtonState::new(),
+            mouse_middle: ButtonState::new(),
             mouse_x: 0,
             mouse_y: 0,
             mouse_z: 0,

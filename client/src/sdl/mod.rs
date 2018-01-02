@@ -155,6 +155,36 @@ impl Sdl {
                         }
                     }
                     Event::MouseMotion { .. } => (),
+                    Event::MouseButtonDown { mouse_btn: btn, .. } => {
+                        let is_down = true;
+                        match btn {
+                            sdl2::mouse::MouseButton::Left => {
+                                game.input.mouse_left.key_press(is_down);
+                            },
+                            sdl2::mouse::MouseButton::Middle => {
+                                game.input.mouse_middle.key_press(is_down);
+                            },
+                            sdl2::mouse::MouseButton::Right => {
+                                game.input.mouse_right.key_press(is_down);
+                            },
+                            _ => {}
+                        }
+                    },
+                    Event::MouseButtonUp { mouse_btn: btn, .. } => {
+                        let is_down = false;
+                        match btn {
+                            sdl2::mouse::MouseButton::Left => {
+                                game.input.mouse_left.key_press(is_down);
+                            },
+                            sdl2::mouse::MouseButton::Middle => {
+                                game.input.mouse_middle.key_press(is_down);
+                            },
+                            sdl2::mouse::MouseButton::Right => {
+                                game.input.mouse_right.key_press(is_down);
+                            },
+                            _ => {}
+                        }
+                    },
                     Event::ControllerDeviceAdded { which: index, .. } => {
                         println!("{:?}: {:?}", new_event, index);
                         self.add_game_controller(index).unwrap();
@@ -183,7 +213,9 @@ impl Sdl {
 
         // render game map
         self.render_map_tiles(game);
+        self.render_map_objects(game, 3);
         self.render_map_objects(game, 2);
+        self.render_map_objects(game, 1);
         self.render_map_objects(game, 0);
 
         // finish frame
@@ -196,7 +228,7 @@ impl Sdl {
         let tile_stride = map.size_x() as i32;
         let tile_height = 24i32;
         let tile_width = 48i32;
-        let mut tile_x = 0i32;
+        let mut tile_x = -1i32;
         let mut tile_y = 0i32;
 
         // view bounds
@@ -210,18 +242,18 @@ impl Sdl {
         let view_y2 = __height + 100;
 
         for map_tile in map.tiles().iter() {
+            // update tile positions
+            tile_x += 1;
+            if tile_x >= tile_stride {
+                tile_x = 0;
+                tile_y += 1;
+            }
             // tile offset
             let x_offset = tile_x * tile_width;
             let y_offset = tile_y * tile_height;
             // tile in view?
-            if x_offset < view_x1 - __mox || y_offset < view_y1 - __moy
-            || x_offset > view_x2 - __mox || y_offset > view_y2 - __moy {
-                // update tile positions
-                tile_x += 1;
-                if tile_x >= tile_stride {
-                    tile_x = 0;
-                    tile_y += 1;
-                }
+            if x_offset < view_x1 - __mox || x_offset > view_x2 - __mox
+            || y_offset < view_y1 - __moy || y_offset > view_y2 - __moy {
                 continue;
             }
             // draw map tile
@@ -253,12 +285,6 @@ impl Sdl {
                     }
                 }
             }
-            // update tile positions
-            tile_x += 1;
-            if tile_x >= tile_stride {
-                tile_x = 0;
-                tile_y += 1;
-            }
         }
     }
 
@@ -276,8 +302,8 @@ impl Sdl {
         let __moy = game.state.map_off_y;
         let __width  = WINDOW_WIDTH as i32;
         let __height = WINDOW_HEIGHT as i32;
-        let view_x1 = -50i32;
-        let view_y1 = -50i32;
+        let view_x1 = -100i32;
+        let view_y1 = -100i32;
         let view_x2 = __width  + 50;
         let view_y2 = __height + 50;
 
@@ -336,7 +362,6 @@ impl Sdl {
                                 dst_rect.offset(game.state.map_off_x,
                                                 game.state.map_off_y);
                                 dst_rect.offset(x_offset, y_offset);
-                                // dst_rect.offset(-tile_width, -tile_height);
                                 dst_rect.offset(img.dest_x, img.dest_y);
 
                                 // render

@@ -126,10 +126,10 @@ impl Game {
                             // -- load images
                             for img in entry.images() {
                                 // debug
-                                if (img.render_z != 2) && (img.render_z != 0) {
-                                    println!("({:3}, {:3})   dest_x: {:3}, dest_y: {:3}, z: {}",
-                                             tile_x, tile_y, img.dest_x, img.dest_y, img.render_z);
-                                }
+                                // if (img.render_z != 2) && (img.render_z != 0) {
+                                //     println!("({:3}, {:3})   dest_x: {:3}, dest_y: {:3}, z: {}",
+                                //              tile_x, tile_y, img.dest_x, img.dest_y, img.render_z);
+                                // }
 
                                 for id in img.image_id.iter() {
                                     let idx = *id as usize;
