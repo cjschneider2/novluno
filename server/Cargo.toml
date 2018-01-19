@@ -1,0 +1,7 @@
+[package]
+name = "server"
+version = "0.1.0"
+authors = ["Charles J. Schneider <schneider@br-tech.de>"]
+
+[dependencies]
+net2 = "0.2"

@@ -107,7 +107,7 @@ impl Game {
         let map = self.map_manager.get_map(map_number)?;
         // debug
         let mut tile_x = 0;
-        let mut tile_y = 0;
+        let mut _tile_y = 0;
         let tile_stride = map.size_x();
         // load the tile data
         let obj_list = self.list_manager.get_list(ListType::Object).unwrap();
@@ -188,7 +188,7 @@ impl Game {
                 tile_x += 1;
                 if tile_x >= tile_stride {
                     tile_x = 0;
-                    tile_y += 1;
+                    _tile_y += 1;
                 }
                 // println!("map_tile.collision: 0x{:2x}", map_tile.collision);
             }
