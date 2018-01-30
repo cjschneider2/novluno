@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables)]
 
 mod crypto;
 
@@ -7,8 +8,8 @@ use std::io::BufReader;
 use std::thread;
 use std::net::Shutdown;
 
-const CLIENT_LISTEN_ADDR: &'static str = "192.168.56.1:10101";
 // const RM_PORT: u16 = 10101;
+const CLIENT_LISTEN_ADDR: &'static str = "192.168.56.1:10101";
 const SERVER_ADDR: &'static str = "198.24.149.46:10101";
 const MAX_MSG_SIZE: usize = 2048;
 
@@ -60,6 +61,9 @@ fn handle_client(client_stream: TcpStream) {
                 let decrypted = crypto::decrypt(&client_msg);
                 println!("`-> decrypted  : {:?}", decrypted);
                 println!("`-> as string  : {:?}", String::from_utf8_lossy(&decrypted));
+                if let Some(message) = parse(&decrypted) {
+                    println!("`-> as message : {:?}", message);
+                }
 
                 // send client message to server
                 server_write.write(&mut client_msg).unwrap();
@@ -104,6 +108,10 @@ fn handle_client(client_stream: TcpStream) {
 
         println!("Ending client connection thread");
     });
+}
+
+fn parse(bytes: &[u8]) -> Option<()> {
+    None
 }
 
 fn check_stream_errors (client: &TcpStream, server: &TcpStream) -> Option<()> {

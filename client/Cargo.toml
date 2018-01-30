@@ -3,6 +3,10 @@ name = "client"
 version = "0.1.0"
 authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
 
+[dependencies]
+rusttype = "*"
+lazy_static = "*"
+
 [dependencies.core_compat]
 path = "../core_compat"
 
@@ -19,4 +23,3 @@ features = ["unsafe_textures"]
 #sdl2-sys = "0.30"
 #imgui = "*"
 #imgui-glium-renderer = "*"
-#rusttype = "*"
