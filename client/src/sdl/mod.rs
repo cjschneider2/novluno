@@ -234,68 +234,74 @@ impl Sdl {
         self.render_map_objects(game, 0);
 
         // draw text
-        {
-            let text = format!("{}, {}", game.input.mouse_x, game.input.mouse_y);
-            let height: f32 = 24.0;
-            let scale = rusttype::Scale{ x: height, y: height };
-            let start = rusttype::point(0.0, FONT.v_metrics(scale).ascent);
-            let glyphs: Vec<PositionedGlyph> = FONT.layout(&text, scale, start).collect();
-            let width = glyphs.iter()
-                                    .rev()
-                                    .filter_map( |g| {
-                                        g.pixel_bounding_box()
-                                         .map( |b| {
-                                             b.min.x as f32 + g.unpositioned().h_metrics().advance_width
-                                         })
-                                    }).next().unwrap_or(height * 2.0).ceil() as usize;
-            let height = height.ceil() as usize; // TODO: this is weird...
-            let bpp = 4; // bytes per pixel
-
-            let mut texture = self.texture_creator.create_texture(
-                Some(sdl2::pixels::PixelFormatEnum::RGBA8888),
-                sdl2::render::TextureAccess::Streaming,
-                width as u32,
-                height as u32).unwrap();
-            texture.set_blend_mode(sdl2::render::BlendMode::Blend);
-            // texture.set_alpha_mod(255);
-
-            // let pitch = width;
-            // texture.update(None, &rasterized_glyph, pitch).unwrap();
-
-            texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
-                for glyph in glyphs {
-                    if let Some(b_box) = glyph.pixel_bounding_box() {
-                        glyph.draw( |x, y, v| {
-                            // `v` is the pixel coverage of the glyph (aka alpha)
-                            let alpha = (v * 255.0) as u8;
-                            let x = x as i32 + b_box.min.x;
-                            let y = y as i32 + b_box.min.y;
-
-                            // the glyph coord could still be out of the texture
-                            // bounds so we need to check
-                            if x >= 0 && x < width  as i32
-                            && y >= 0 && y < height as i32 {
-                                let y_off: usize = y as usize * pitch;
-                                let x_off: usize = x as usize * bpp;
-                                let offset = y_off + x_off;
-                                buffer[offset+0] = alpha;
-                                buffer[offset+1] =  50 as u8;
-                                buffer[offset+2] = 100 as u8;
-                                buffer[offset+3] = 255 as u8;
-                            }
-                        })
-                    }
-                }
-            }).expect("texture with_lock");
-
-            let src_rect = Rect::new( 0, 0, width as u32, height as u32);
-            let dst_rect = Rect::new( 0, 0, width as u32, height as u32);
-
-            let _ = self.canvas.copy(&texture, src_rect, dst_rect);
-        }
+        let text = format!("{}, {}", game.input.mouse_x, game.input.mouse_y);
+        self.render_text_line(&text, game.input.mouse_x, game.input.mouse_y);
 
         // finish frame
         self.canvas.present();
+    }
+
+
+    fn render_text_line(&mut self, text: &str, x: i32, y: i32) {
+        let bpp = 4; // bytes per pixel
+        let height: f32 = 24.0;
+        let scale = rusttype::Scale{ x: height, y: height };
+        let start = rusttype::point(0.0, FONT.v_metrics(scale).ascent);
+        let glyphs: Vec<PositionedGlyph> = FONT.layout(&text, scale, start).collect();
+        let width = glyphs.iter()
+                                .rev()
+                                .filter_map( |glyph| {
+                                    glyph.pixel_bounding_box()
+                                        .map( |b_box| {
+                                            b_box.min.x as f32
+                                            + glyph.unpositioned()
+                                                   .h_metrics()
+                                                   .advance_width
+                                        })
+                                }).next()
+                                .unwrap_or(height * 2.0).ceil() as usize;
+
+        // NOTE: this is a little weird to have to cap the integer height of
+        //       the texture to fit the (possibly) non-integer glyph height...
+        //       but ohh well... *shrug*
+        let height = height.ceil() as usize;
+
+        let mut texture = self.texture_creator.create_texture(
+            Some(sdl2::pixels::PixelFormatEnum::RGBA8888),
+            sdl2::render::TextureAccess::Streaming,
+            width as u32,
+            height as u32).unwrap();
+        texture.set_blend_mode(sdl2::render::BlendMode::Blend);
+        texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
+            for glyph in glyphs {
+                if let Some(b_box) = glyph.pixel_bounding_box() {
+                    glyph.draw( |x, y, v| {
+                        // `v` is the pixel coverage of the glyph (aka alpha)
+                        let alpha = (v * 255.0) as u8;
+                        let x = x as i32 + b_box.min.x;
+                        let y = y as i32 + b_box.min.y;
+
+                        // the glyph coord could still be out of the texture
+                        // bounds so we need to check it
+                        if x >= 0 && x < width  as i32
+                        && y >= 0 && y < height as i32 {
+                            let y_off: usize = y as usize * pitch;
+                            let x_off: usize = x as usize * bpp;
+                            let offset = y_off + x_off;
+                            buffer[offset+0] = alpha;
+                            buffer[offset+1] = 255 as u8;
+                            buffer[offset+2] = 255 as u8;
+                            buffer[offset+3] = 255 as u8;
+                        }
+                    })
+                }
+            }
+        }).unwrap();
+
+        let src_rect = Rect::new( 0, 0, width as u32, height as u32);
+        let dst_rect = Rect::new( x, y, width as u32, height as u32);
+
+        let _ = self.canvas.copy(&texture, src_rect, dst_rect);
     }
 
     pub fn render_map_tiles(&mut self, game: &mut Game) {
