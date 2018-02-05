@@ -1,6 +1,6 @@
-use utility::rectangle::Rectangle;
-use utility::size::Size;
-use utility::point::Point;
+use geometry::rectangle::Rectangle;
+use geometry::size::Size;
+use geometry::point::Point;
 
 #[derive(Debug)]
 pub struct RmdImage {

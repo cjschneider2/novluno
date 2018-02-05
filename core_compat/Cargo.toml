@@ -3,6 +3,9 @@ name = "core_compat"
 version = "0.0.1"
 authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
 
+[dependencies.geometry]
+path = "../geometry"
+
 [dependencies]
 byteorder = "*"
 

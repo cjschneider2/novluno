@@ -1,6 +1,9 @@
 #![allow(dead_code)]
-extern crate sdl2;
+
 extern crate core_compat;
+extern crate geometry;
+
+extern crate sdl2;
 extern crate rusttype;
 #[macro_use]
 extern crate lazy_static;
@@ -13,6 +16,7 @@ mod resource_manager;
 use sdl::Sdl;
 
 use std::time::Instant;
+
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;

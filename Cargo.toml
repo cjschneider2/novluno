@@ -1,6 +1,11 @@
 [workspace]
 
-members = ["core_compat", "client", "server"]
+members = [
+    "geometry",
+    "core_compat",
+    "client",
+    "server",
+]
 
 [profile.release]
 debug = true

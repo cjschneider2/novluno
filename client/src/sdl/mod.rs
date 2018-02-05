@@ -10,6 +10,8 @@ use sdl2::keyboard::Keycode;
 use rusttype;
 use rusttype::PositionedGlyph;
 
+use geometry::rectangle::Rectangle;
+
 use core_compat::entity::sprite_type::SpriteType;
 use core_compat::entity::rmd_type::RmdType;
 
@@ -380,10 +382,12 @@ impl Sdl {
         let mut tile_y = 0i32;
 
         // view bounds
-        let __mox = game.state.map_off_x;
-        let __moy = game.state.map_off_y;
-        let __width  = WINDOW_WIDTH as i32;
-        let __height = WINDOW_HEIGHT as i32;
+        let window_bounds= Rectangle::new_from_points(
+            (game.state.map_off_x, game.state.map_off_y),
+            (WINDOW_WIDTH as i32, WINDOW_HEIGHT as i32)
+        );
+
+        let view_bounds = (-100i32    fffffffffffffffffffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeehhhhhwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwswwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww)
         let view_x1 = -100i32;
         let view_y1 = -100i32;
         let view_x2 = __width  + 50;
