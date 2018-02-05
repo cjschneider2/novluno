@@ -387,11 +387,10 @@ impl Sdl {
             (WINDOW_WIDTH as i32, WINDOW_HEIGHT as i32)
         );
 
-        let view_bounds = (-100i32    fffffffffffffffffffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeehhhhhwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwswwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww)
-        let view_x1 = -100i32;
-        let view_y1 = -100i32;
-        let view_x2 = __width  + 50;
-        let view_y2 = __height + 50;
+        let view_bounds = Rectangle::new_from_points(
+            (-100i32, -100i32),
+            (WINDOW_WIDTH + 50i32, WINDOW_HEIGHT + 50i32)
+        );
 
         for map_tile in map.tiles().iter() {
             // tile offset
