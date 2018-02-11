@@ -24,12 +24,13 @@ impl <T> Rectangle<T> where
     }
 
     pub fn contains_point(&self, point: &Point<T>) -> bool {
-        if point.x > self.location.x && point.y > self.location.y {
-            let f: T = self.location.x + self.size.width;
-            if point.x < f {
-                return true;
-            }
+        if point.x >= self.location.x
+        && point.y >= self.location.y
+        && point.x <= self.location.x + self.size.width
+        && point.y <= self.location.y + self.size.height {
+            true
+        } else {
+            false
         }
-        false
     }
 }

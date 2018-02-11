@@ -13,9 +13,14 @@ const CLIENT_LISTEN_ADDR: &'static str = "192.168.56.1:10101";
 const SERVER_ADDR: &'static str = "198.24.149.46:10101";
 const MAX_MSG_SIZE: usize = 2048;
 
+enum MessageType {
+    ReqVersion,
+    RspVersion,
+}
 
 fn main() {
-    let listener = TcpListener::bind(CLIENT_LISTEN_ADDR).unwrap();
+    let msg = format!("Client listen address `{}` could not be bound", CLIENT_LISTEN_ADDR);
+    let listener = TcpListener::bind(CLIENT_LISTEN_ADDR).expect(&msg);
 
     // NOTE: This iterator will not yield a `None` value so is equivalent to a loop
     println!("listening for connections on `{}`", CLIENT_LISTEN_ADDR);

@@ -1,3 +1,5 @@
+extern crate geometry;
+
 use std::cell::RefCell;
 use std::borrow::BorrowMut;
 
@@ -11,6 +13,7 @@ use rusttype;
 use rusttype::PositionedGlyph;
 
 use geometry::rectangle::Rectangle;
+use geometry::point::Point;
 
 use core_compat::entity::sprite_type::SpriteType;
 use core_compat::entity::rmd_type::RmdType;
@@ -230,14 +233,11 @@ impl Sdl {
 
         // render game map
         self.render_map_tiles(game);
-        self.render_map_objects(game, 3);
-        self.render_map_objects(game, 2);
-        self.render_map_objects(game, 1);
-        self.render_map_objects(game, 0);
+        self.render_map_objects(game);
 
         // draw text
-        let text = format!("{}, {}", game.input.mouse_x, game.input.mouse_y);
-        self.render_text_line(&text, game.input.mouse_x, game.input.mouse_y);
+        // let text = format!("{}, {}", game.input.mouse_x, game.input.mouse_y);
+        // self.render_text_line(&text, game.input.mouse_x, game.input.mouse_y);
 
         // finish frame
         self.canvas.present();
@@ -312,34 +312,24 @@ impl Sdl {
         let tile_stride = map.size_x() as i32;
         let tile_height = 24i32;
         let tile_width = 48i32;
-        let mut tile_x = -1i32;
+        let mut tile_x = 0i32;
         let mut tile_y = 0i32;
 
-        // view bounds
-        let __mox = game.state.map_off_x;
-        let __moy = game.state.map_off_y;
-        let __width  = WINDOW_WIDTH as i32;
-        let __height = WINDOW_HEIGHT as i32;
-        let view_x1 = -100;
-        let view_y1 = -100;
-        let view_x2 = __width  + 100;
-        let view_y2 = __height + 100;
+        let view_bounds = Rectangle::new_from_points(
+            (-100 - game.state.map_off_x, -100 - game.state.map_off_y),
+            ( 100 + WINDOW_WIDTH as i32, 100 + WINDOW_HEIGHT as i32)
+        );
 
         for map_tile in map.tiles().iter() {
-            // update tile positions
-            tile_x += 1;
-            if tile_x >= tile_stride {
-                tile_x = 0;
-                tile_y += 1;
-            }
-            // tile offset
-            let x_offset = tile_x * tile_width;
-            let y_offset = tile_y * tile_height;
-            // tile in view?
-            if x_offset < view_x1 - __mox || x_offset > view_x2 - __mox
-            || y_offset < view_y1 - __moy || y_offset > view_y2 - __moy {
+            let tile_offset = Point::new ( tile_x * tile_width, tile_y * tile_height );
+            let mouse_offset = Point::new(game.input.mouse_x, game.input.mouse_y);
+
+            // skip tiles which out out of view
+            if view_bounds.contains_point(&tile_offset) == false {
+                next_tile(&mut tile_x, &mut tile_y, tile_stride);
                 continue;
             }
+
             // draw map tile
             let tle_entry = map_tile.tle_rmd_entry;
             if tle_entry.file() != 0 {
@@ -355,24 +345,36 @@ impl Sdl {
                                 let _h = (img.source_y2 - img.source_y1) as u32;
                                 let src_rect = Rect::new( img.source_x1, img.source_y1, _w, _h);
                                 let mut dst_rect = Rect::new( 0, 0, tile_width as u32, tile_height as u32);
-                                dst_rect.offset(x_offset, y_offset);
+                                dst_rect.offset(tile_offset.x, tile_offset.y);
                                 dst_rect.offset(game.state.map_off_x, game.state.map_off_y);
+
+                                // render
                                 let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
 
-                                // match map_tile.collision {
-                                //     0 => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 10)),
-                                //     _ => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 255, 10)),
-                                // }
-                                // let _ = self.canvas.draw_rect(dst_rect);
+                                // debug render
+                                {
+                                    let _rect = Rectangle::new_from_points((dst_rect.x(), dst_rect.y()), (dst_rect.width() as i32, dst_rect.height() as i32));
+                                    if _rect.contains_point(&mouse_offset) {
+                                        match map_tile.collision {
+                                            0 => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 10)),
+                                            _ => self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 255, 10)),
+                                        }
+                                        let _ = self.canvas.draw_rect(dst_rect);
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+
+            // update tile positions
+            next_tile(&mut tile_x, &mut tile_y, tile_stride);
         }
     }
 
-    pub fn render_map_objects(&mut self, game: &mut Game, layer: i32) {
+    pub fn render_map_objects(&mut self, game: &mut Game) {
+
         let obj_list = game.list_manager.get_list(ListType::Object).unwrap();
         let map = game.map_manager.get_map(game.state.map).unwrap();
         let tile_stride = map.size_x() as i32;
@@ -381,34 +383,25 @@ impl Sdl {
         let mut tile_x = 0i32;
         let mut tile_y = 0i32;
 
-        // view bounds
-        let window_bounds= Rectangle::new_from_points(
-            (game.state.map_off_x, game.state.map_off_y),
-            (WINDOW_WIDTH as i32, WINDOW_HEIGHT as i32)
-        );
-
         let view_bounds = Rectangle::new_from_points(
-            (-100i32, -100i32),
-            (WINDOW_WIDTH + 50i32, WINDOW_HEIGHT + 50i32)
+            (-100 - game.state.map_off_x, -100 - game.state.map_off_y),
+            ( 100 + WINDOW_WIDTH as i32, 100 + WINDOW_HEIGHT as i32)
         );
 
         for map_tile in map.tiles().iter() {
-            // tile offset
-            let x_offset = tile_x * tile_width;
-            let y_offset = tile_y * tile_height;
-            // tile in view?
-            if x_offset < view_x1 - __mox
-            || y_offset < view_y1 - __moy
-            || x_offset > view_x2 - __mox
-            || y_offset > view_y2 - __moy { 
-                // update tile positions
-                tile_x += 1;
-                if tile_x >= tile_stride {
-                    tile_x = 0;
-                    tile_y += 1;
-                }
+            let tile_offset = Point::new ( tile_x * tile_width, tile_y * tile_height );
+            let mouse_offset = Point::new(game.input.mouse_x, game.input.mouse_y);
+
+            // skip tiles which out out of view
+            let tile_rect = Rectangle::new_from_points((tile_offset.x, tile_offset.y), (tile_width, tile_height));
+
+            if view_bounds.contains_point(&tile_offset) == false
+            // || tile_rect.contains_point(&mouse_offset) == false
+            {
+                next_tile(&mut tile_x, &mut tile_y, tile_stride);
                 continue;
             }
+
             // draw tile objects
             let obj_entry = map_tile.obj_rmd_entry;
             if obj_entry.file() != 0 {
@@ -418,21 +411,16 @@ impl Sdl {
                     if let Some(entry) = rmd.get_entry(index) {
                         for img in entry.images() {
                             for id in img.image_id.iter() {
+                                // get the sprite
                                 let _id : usize = *id as usize;
                                 let item = obj_list.get_item(_id).unwrap();
-                                let sprite = game.sprite_manager
-                                    .get_sprite_entry(&item.entry,
-                                                      SpriteType::Object,
-                                                      self).unwrap();
-                                let img_rect = Rect::new(0, 0,
-                                                         sprite.sprite.x_dim as u32,
-                                                         sprite.sprite.y_dim as u32);
+                                let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Object, self).unwrap();
+
+                                // calculate the sprite's image offsets
+                                let img_rect = Rect::new(0, 0, sprite.sprite.x_dim as u32, sprite.sprite.y_dim as u32);
                                 let img_x_1_off = img.source_x1 - sprite.sprite.x_off;
                                 let img_y_1_off = img.source_y1 - sprite.sprite.y_off;
-                                let _src_pts = [
-                                    (img_x_1_off, img_y_1_off).into(),
-                                    (img.source_x2 - sprite.sprite.x_off,
-                                     img.source_y2 - sprite.sprite.y_off).into() ];
+                                let _src_pts = [ (img_x_1_off, img_y_1_off).into(), (img.source_x2 - sprite.sprite.x_off, img.source_y2 - sprite.sprite.y_off).into() ];
                                 let mut _x_diff = 0;
                                 let mut _y_diff = 0;
                                 let mut src_rect = Rect::from_enclose_points(&_src_pts, None).unwrap();
@@ -441,32 +429,50 @@ impl Sdl {
                                     if img_y_1_off < 0 { _y_diff = -img_y_1_off; }
                                     src_rect = rect;
                                 }
-                                let mut dst_rect = Rect::new(_x_diff, _y_diff,
-                                                             src_rect.width(),
-                                                             src_rect.height());
-                                dst_rect.offset(game.state.map_off_x,
-                                                game.state.map_off_y);
-                                dst_rect.offset(x_offset, y_offset);
+
+                                // actually move the destination rectangle into position
+                                let mut dst_rect = Rect::new(_x_diff, _y_diff, src_rect.width(), src_rect.height());
+                                dst_rect.offset(game.state.map_off_x, game.state.map_off_y);
+                                dst_rect.offset(tile_offset.x, tile_offset.y);
                                 dst_rect.offset(img.dest_x, img.dest_y);
 
                                 // render
-                                if layer == img.render_z {
-                                    let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
-                                    // self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
-                                    // let _ = self.canvas.draw_rect(dst_rect);
+                                let _ = self.canvas.copy(&sprite.texture, src_rect, dst_rect);
+
+                                // debug renders
+                                {
+                                    // TODO: make an into or something...
+                                    let d_rect = Rectangle::new_from_points((dst_rect.x(), dst_rect.y()), (dst_rect.width() as i32, dst_rect.height() as i32));
+                                    if d_rect.contains_point(&mouse_offset) {
+                                        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
+                                        let _ = self.canvas.draw_rect(dst_rect);
+                                    }
+                                    let tile_rect = Rectangle::new_from_points((tile_offset.x, tile_offset.y), (tile_width, tile_height));
+                                    if tile_rect.contains_point(&mouse_offset) {
+                                        let mut t_rect = Rect::new( tile_offset.x, tile_offset.y, tile_width as u32, tile_height as u32);
+                                        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(100, 10, 10));
+                                        let _ = self.canvas.draw_rect(t_rect);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
+            } // end if obj_entry != 0
+
             // update tile positions
-            tile_x += 1;
-            if tile_x >= tile_stride {
-                tile_x = 0;
-                tile_y += 1;
-            }
+            next_tile(&mut tile_x, &mut tile_y, tile_stride);
         }
+    }
+}
+
+/// Helper function to move to the next map tile in order.
+/// TODO: Probably fold into `map` entity iterator?
+fn next_tile(x: &mut i32, y: &mut i32, stride: i32) {
+    *x += 1;
+    if *x >= stride {
+        *x  = 0;
+        *y += 1;
     }
 }
 
