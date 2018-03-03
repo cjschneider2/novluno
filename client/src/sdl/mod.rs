@@ -134,7 +134,7 @@ impl Sdl {
 
     pub fn handle_events(
         &mut self,
-        game: &mut Game
+        game: &mut Game,
     ) {
         let mut event_pump = self.event_pump.borrow_mut();
         let mut last_event: Option<Event> = None;
@@ -174,37 +174,37 @@ impl Sdl {
                     Event::MouseMotion { x, y, .. } => {
                         game.input.mouse_x = x;
                         game.input.mouse_y = y;
-                    },
+                    }
                     Event::MouseButtonDown { mouse_btn: btn, .. } => {
                         let is_down = true;
                         match btn {
                             sdl2::mouse::MouseButton::Left => {
                                 game.input.mouse_left.key_press(is_down);
-                            },
+                            }
                             sdl2::mouse::MouseButton::Middle => {
                                 game.input.mouse_middle.key_press(is_down);
-                            },
+                            }
                             sdl2::mouse::MouseButton::Right => {
                                 game.input.mouse_right.key_press(is_down);
-                            },
+                            }
                             _ => {}
                         }
-                    },
+                    }
                     Event::MouseButtonUp { mouse_btn: btn, .. } => {
                         let is_down = false;
                         match btn {
                             sdl2::mouse::MouseButton::Left => {
                                 game.input.mouse_left.key_press(is_down);
-                            },
+                            }
                             sdl2::mouse::MouseButton::Middle => {
                                 game.input.mouse_middle.key_press(is_down);
-                            },
+                            }
                             sdl2::mouse::MouseButton::Right => {
                                 game.input.mouse_right.key_press(is_down);
-                            },
+                            }
                             _ => {}
                         }
-                    },
+                    }
                     Event::ControllerDeviceAdded { which: index, .. } => {
                         println!("{:?}: {:?}", new_event, index);
                         self.add_game_controller(index).unwrap();
@@ -247,21 +247,21 @@ impl Sdl {
     fn render_text_line(&mut self, text: &str, x: i32, y: i32) {
         let bpp = 4; // bytes per pixel
         let height: f32 = 24.0;
-        let scale = rusttype::Scale{ x: height, y: height };
+        let scale = rusttype::Scale { x: height, y: height };
         let start = rusttype::point(0.0, FONT.v_metrics(scale).ascent);
         let glyphs: Vec<PositionedGlyph> = FONT.layout(&text, scale, start).collect();
         let width = glyphs.iter()
-                                .rev()
-                                .filter_map( |glyph| {
-                                    glyph.pixel_bounding_box()
-                                        .map( |b_box| {
-                                            b_box.min.x as f32
-                                            + glyph.unpositioned()
-                                                   .h_metrics()
-                                                   .advance_width
-                                        })
-                                }).next()
-                                .unwrap_or(height * 2.0).ceil() as usize;
+            .rev()
+            .filter_map(|glyph| {
+                glyph.pixel_bounding_box()
+                    .map(|b_box| {
+                        b_box.min.x as f32
+                            + glyph.unpositioned()
+                            .h_metrics()
+                            .advance_width
+                    })
+            }).next()
+            .unwrap_or(height * 2.0).ceil() as usize;
 
         // NOTE: this is a little weird to have to cap the integer height of
         //       the texture to fit the (possibly) non-integer glyph height...
@@ -277,7 +277,7 @@ impl Sdl {
         texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
             for glyph in glyphs {
                 if let Some(b_box) = glyph.pixel_bounding_box() {
-                    glyph.draw( |x, y, v| {
+                    glyph.draw(|x, y, v| {
                         // `v` is the pixel coverage of the glyph (aka alpha)
                         let alpha = (v * 255.0) as u8;
                         let x = x as i32 + b_box.min.x;
@@ -285,23 +285,25 @@ impl Sdl {
 
                         // the glyph coord could still be out of the texture
                         // bounds so we need to check it
-                        if x >= 0 && x < width  as i32
-                        && y >= 0 && y < height as i32 {
+                        if x >= 0 && x < width as i32
+                            && y >= 0 && y < height as i32 {
                             let y_off: usize = y as usize * pitch;
                             let x_off: usize = x as usize * bpp;
                             let offset = y_off + x_off;
-                            buffer[offset+0] = alpha;
-                            buffer[offset+1] = 255 as u8;
-                            buffer[offset+2] = 255 as u8;
-                            buffer[offset+3] = 255 as u8;
+                            buffer[offset + 0] = alpha;
+                            buffer[offset + 1] = 255_u8;
+                            buffer[offset + 2] = 255_u8;
+                            buffer[offset + 3] = 255_u8;
                         }
                     })
                 }
             }
         }).unwrap();
 
-        let src_rect = Rect::new( 0, 0, width as u32, height as u32);
-        let dst_rect = Rect::new( x, y, width as u32, height as u32);
+        let width = width as u32;
+        let height = height as u32;
+        let src_rect = Rect::new(0, 0, width, height);
+        let dst_rect = Rect::new(x, y, width, height);
 
         let _ = self.canvas.copy(&texture, src_rect, dst_rect);
     }
@@ -317,11 +319,11 @@ impl Sdl {
 
         let view_bounds = Rectangle::new_from_points(
             (-100 - game.state.map_off_x, -100 - game.state.map_off_y),
-            ( 100 + WINDOW_WIDTH as i32, 100 + WINDOW_HEIGHT as i32)
+            (100 + WINDOW_WIDTH as i32, 100 + WINDOW_HEIGHT as i32),
         );
 
         for map_tile in map.tiles().iter() {
-            let tile_offset = Point::new ( tile_x * tile_width, tile_y * tile_height );
+            let tile_offset = Point::new(tile_x * tile_width, tile_y * tile_height);
             let mouse_offset = Point::new(game.input.mouse_x, game.input.mouse_y);
 
             // skip tiles which out out of view
@@ -343,8 +345,8 @@ impl Sdl {
                                 let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Tile, self).unwrap();
                                 let _w = (img.source_x2 - img.source_x1) as u32;
                                 let _h = (img.source_y2 - img.source_y1) as u32;
-                                let src_rect = Rect::new( img.source_x1, img.source_y1, _w, _h);
-                                let mut dst_rect = Rect::new( 0, 0, tile_width as u32, tile_height as u32);
+                                let src_rect = Rect::new(img.source_x1, img.source_y1, _w, _h);
+                                let mut dst_rect = Rect::new(0, 0, tile_width as u32, tile_height as u32);
                                 dst_rect.offset(tile_offset.x, tile_offset.y);
                                 dst_rect.offset(game.state.map_off_x, game.state.map_off_y);
 
@@ -374,7 +376,6 @@ impl Sdl {
     }
 
     pub fn render_map_objects(&mut self, game: &mut Game) {
-
         let obj_list = game.list_manager.get_list(ListType::Object).unwrap();
         let map = game.map_manager.get_map(game.state.map).unwrap();
         let tile_stride = map.size_x() as i32;
@@ -385,19 +386,18 @@ impl Sdl {
 
         let view_bounds = Rectangle::new_from_points(
             (-100 - game.state.map_off_x, -100 - game.state.map_off_y),
-            ( 100 + WINDOW_WIDTH as i32, 100 + WINDOW_HEIGHT as i32)
+            (100 + WINDOW_WIDTH as i32, 100 + WINDOW_HEIGHT as i32),
         );
 
         for map_tile in map.tiles().iter() {
-            let tile_offset = Point::new ( tile_x * tile_width, tile_y * tile_height );
+            let tile_offset = Point::new(tile_x * tile_width, tile_y * tile_height);
             let mouse_offset = Point::new(game.input.mouse_x, game.input.mouse_y);
 
-            // skip tiles which out out of view
+            // skip tiles which are out out of view
             let tile_rect = Rectangle::new_from_points((tile_offset.x, tile_offset.y), (tile_width, tile_height));
 
             if view_bounds.contains_point(&tile_offset) == false
-            // || tile_rect.contains_point(&mouse_offset) == false
-            {
+            || tile_rect.contains_point(&mouse_offset) == false {
                 next_tile(&mut tile_x, &mut tile_y, tile_stride);
                 continue;
             }
@@ -412,7 +412,7 @@ impl Sdl {
                         for img in entry.images() {
                             for id in img.image_id.iter() {
                                 // get the sprite
-                                let _id : usize = *id as usize;
+                                let _id: usize = *id as usize;
                                 let item = obj_list.get_item(_id).unwrap();
                                 let sprite = game.sprite_manager.get_sprite_entry(&item.entry, SpriteType::Object, self).unwrap();
 
@@ -420,7 +420,7 @@ impl Sdl {
                                 let img_rect = Rect::new(0, 0, sprite.sprite.x_dim as u32, sprite.sprite.y_dim as u32);
                                 let img_x_1_off = img.source_x1 - sprite.sprite.x_off;
                                 let img_y_1_off = img.source_y1 - sprite.sprite.y_off;
-                                let _src_pts = [ (img_x_1_off, img_y_1_off).into(), (img.source_x2 - sprite.sprite.x_off, img.source_y2 - sprite.sprite.y_off).into() ];
+                                let _src_pts = [(img_x_1_off, img_y_1_off).into(), (img.source_x2 - sprite.sprite.x_off, img.source_y2 - sprite.sprite.y_off).into()];
                                 let mut _x_diff = 0;
                                 let mut _y_diff = 0;
                                 let mut src_rect = Rect::from_enclose_points(&_src_pts, None).unwrap();
@@ -441,18 +441,8 @@ impl Sdl {
 
                                 // debug renders
                                 {
-                                    // TODO: make an into or something...
-                                    let d_rect = Rectangle::new_from_points((dst_rect.x(), dst_rect.y()), (dst_rect.width() as i32, dst_rect.height() as i32));
-                                    if d_rect.contains_point(&mouse_offset) {
-                                        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
-                                        let _ = self.canvas.draw_rect(dst_rect);
-                                    }
-                                    let tile_rect = Rectangle::new_from_points((tile_offset.x, tile_offset.y), (tile_width, tile_height));
-                                    if tile_rect.contains_point(&mouse_offset) {
-                                        let mut t_rect = Rect::new( tile_offset.x, tile_offset.y, tile_width as u32, tile_height as u32);
-                                        self.canvas.set_draw_color(sdl2::pixels::Color::RGB(100, 10, 10));
-                                        let _ = self.canvas.draw_rect(t_rect);
-                                    }
+                                    self.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
+                                    let _ = self.canvas.draw_rect(dst_rect);
                                 }
                             }
                         }
@@ -471,7 +461,7 @@ impl Sdl {
 fn next_tile(x: &mut i32, y: &mut i32, stride: i32) {
     *x += 1;
     if *x >= stride {
-        *x  = 0;
+        *x = 0;
         *y += 1;
     }
 }
@@ -479,7 +469,7 @@ fn next_tile(x: &mut i32, y: &mut i32, stride: i32) {
 fn process_keycode(
     key: sdl2::keyboard::Keycode,
     is_down: bool,
-    input: &mut Controller
+    input: &mut Controller,
 ) {
     match key {
         Keycode::W => input.move_up.key_press(is_down),
