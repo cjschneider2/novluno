@@ -2,11 +2,11 @@
 
 mod crypto;
 
-use std::io::prelude::*;
-use std::net::{TcpListener, TcpStream};
 use std::io::BufReader;
-use std::thread;
+use std::io::prelude::*;
 use std::net::Shutdown;
+use std::net::{TcpListener, TcpStream};
+use std::thread;
 use std::time::Duration;
 
 // const RM_PORT: u16 = 10101;
@@ -65,12 +65,14 @@ fn handle_client(client_stream: TcpStream) {
                     assert!(bytes < MAX_MSG_SIZE);
                     println!("got {} bytes", bytes);
                     unsafe { client_msg.set_len(bytes); }
-                    println!("client->server : {:?}", &client_msg);
+                    println!("client->server   : {:?}", &client_msg);
                     let decrypted = crypto::decrypt(&client_msg);
-                    println!("`-> decrypted  : {:?}", decrypted);
-                    println!("`-> as string  : {:?}", String::from_utf8_lossy(&decrypted));
+                    println!("`-> decrypted    : {:?}", decrypted);
+                    println!("`-> as string    : {:?}", String::from_utf8_lossy(&decrypted));
+                    // println!("`-> as utf16(+0) : {:?}", String::from_utf16_lossy(&decrypted[..]));
+                    // println!("`-> as utf16(+1) : {:?}", String::from_utf16_lossy(&decrypted[1..]));
                     if let Some(message) = parse(&decrypted) {
-                        println!("`-> as message : {:?}", message);
+                        println!("`-> as message   : {:?}", message);
                     }
 
                     // send client message to server
@@ -91,10 +93,12 @@ fn handle_client(client_stream: TcpStream) {
                 if bytes > 0  {
                     println!("got {} bytes", bytes);
                     unsafe{ server_msg.set_len(bytes); }
-                    println!("server->client : {:?}", &server_msg);
+                    println!("server->client   : {:?}", &server_msg);
                     let decrypted = crypto::decrypt(&server_msg);
-                    println!("`-> decrypted  : {:?}", decrypted);
-                    println!("`-> as string  : {:?}", String::from_utf8_lossy(&decrypted));
+                    println!("`-> decrypted    : {:?}", decrypted);
+                    println!("`-> as utf8      : {:?}", String::from_utf8_lossy(&decrypted));
+                    // println!("`-> as utf16(+0) : {:?}", String::from_utf16_lossy(&decrypted));
+                    // println!("`-> as utf16(+1) : {:?}", String::from_utf16_lossy(&decrypted[1..]));
 
                     // send server messages to client
                     client_write.write(&mut server_msg).unwrap();

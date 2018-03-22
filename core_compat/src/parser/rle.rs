@@ -79,12 +79,14 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
         resource.unknown_4 = cursor.read_u32::<LE>()?;
 
         // Pre-fill the image buffer with 0's
-        if resource.width < 8000 && resource.height < 8000 {
+        if resource.width < 8000 && resource.width > 0
+            && resource.height < 8000 && resource.height > 0 {
             let total_px = resource.width * resource.height * 4 /* bytes / pixel */;
             for _ in 0..total_px {
                 resource.image_raw.push(0x0);
             }
         } else {
+            println!("wrongly sized resource: ({}, {})", resource.width, resource.height);
             // oversized resource
             resource.image_raw.push(0xFF); // R
             resource.image_raw.push(0xFF); // G

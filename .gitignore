@@ -16,6 +16,9 @@ Cargo.lock
 
 # Generated files from our programs
 rle2sqlite/rm.sqlite
+temp/
+client/lib/msvc/64/
+doc/server_comm_logs/
 
 # Files generated from `cargo fmt`
 /*/*.fmt
@@ -25,3 +28,4 @@ rle2sqlite/rm.sqlite
 */.idea
 .vscode
 */.vscode
+

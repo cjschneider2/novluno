@@ -5,6 +5,7 @@ members = [
     "core_compat",
     "client",
     "server",
+    "data_converter"
 ]
 
 [profile.release]

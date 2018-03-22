@@ -1,3 +1,5 @@
+mod scene;
+
 use std::path::{ PathBuf };
 
 use core_compat::entity::sprite_type::SpriteType;
@@ -24,6 +26,7 @@ pub struct State {
 
 pub struct Game {
     // game and input state
+    // pub scene: Box<Scene>,
     pub state: State,
     pub input: input::Input,
     // data managers
