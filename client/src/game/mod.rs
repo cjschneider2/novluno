@@ -17,16 +17,14 @@ use error::Error;
 pub mod input;
 
 pub struct State {
-    pub player_x: usize,
-    pub player_y: usize,
+    pub player_pos: (usize, usize),
     pub map: usize,
-    pub map_off_x: i32,
-    pub map_off_y: i32,
+    pub map_off: (i32, i32),
 }
 
 pub struct Game {
     // game and input state
-    // pub scene: Box<Scene>,
+    pub window: (i32, i32),
     pub state: State,
     pub input: input::Input,
     // data managers
@@ -54,13 +52,14 @@ impl Game {
         let list_manager = ListManager::new(&path_sprite).unwrap();
 
         Game {
+            // window state
+            window: (800, 600),
+
             // game and input state
             state: State {
-                player_x: 50,
-                player_y: 50,
+                player_pos: (50, 50),
                 map: 0,
-                map_off_x: -24,
-                map_off_y: -48,
+                map_off: (-24, -48),
             },
             input: input::Input::new(),
 
@@ -73,35 +72,36 @@ impl Game {
     }
 
     pub fn update(&mut self) {
-        // Update
         if self.input.keyboard.action_up.pressed {
             // self.state.player_y += 1;
-            self.state.map_off_y += 100;
+            self.state.map_off.1 += 100;
         }
         if self.input.keyboard.action_down.pressed {
             // self.state.player_y -= 1;
-            self.state.map_off_y -= 100;
+            self.state.map_off.1 -= 100;
         }
         if self.input.keyboard.action_right.pressed {
             // self.state.player_x -= 1;
-            self.state.map_off_x -= 100;
+            self.state.map_off.0 -= 100;
         }
         if self.input.keyboard.action_left.pressed {
             // self.state.player_x += 1;
-            self.state.map_off_x += 100;
+            self.state.map_off.0 += 100;
         }
         if self.input.keyboard.move_down.pressed {
             if self.state.map > 0 {
                 self.state.map -= 1;
-                self.state.map_off_x = -24;
-                self.state.map_off_y = -48;
+                self.state.map_off = (-24, -48);
             }
         }
         if self.input.keyboard.move_up.pressed {
             self.state.map += 1;
-            self.state.map_off_x = -24;
-            self.state.map_off_y = -48;
+            self.state.map_off = (-24, -48);
         }
+        if let Some(coords) = self.input.should_resize {
+            self.window = coords;
+        }
+
     }
 
     pub fn load_map(&mut self, map_number: usize, sdl: &mut Sdl) -> Result<(), Error> {

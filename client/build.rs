@@ -6,7 +6,7 @@ fn main() {
     if target.contains("pc-windows") {
         let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
         let out_dir = std::env::var("OUT_DIR").unwrap();
-        let out_path = PathBuf::from(out_dir);
+        let _out_path = PathBuf::from(out_dir);
         let mut lib_dir = manifest_dir.clone();
         let mut dll_dir = manifest_dir.clone();
         // println!("target is windows");

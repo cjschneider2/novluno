@@ -17,15 +17,10 @@ use sdl::Sdl;
 
 use std::time::Instant;
 
-
-const WINDOW_WIDTH: u32 = 800;
-const WINDOW_HEIGHT: u32 = 600;
-
 fn main() {
 
     // Setup SDL2
-    let mut sdl = Sdl::new(WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
-    sdl.init_game_controllers().unwrap();
+    let mut sdl = Sdl::new(800, 600).unwrap();
 
     // Setup initial game state
     let mut game = game::Game::new();
