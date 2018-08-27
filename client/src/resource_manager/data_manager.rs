@@ -118,7 +118,7 @@ mod tests {
     fn test_load_tle_rmd_00001() {
         let data_path = Path::new("../data/DATAs/");
         let mut rmd = DataManager::new(&data_path);
-        let rmd_no = 1usize;
-        let data = rmd.get_data(RmdType::Tile, 1).unwrap();
+        let _rmd_no = 1usize;
+        let _data = rmd.get_data(RmdType::Tile, 1).unwrap();
     }
 }

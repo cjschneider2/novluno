@@ -13,3 +13,4 @@ pub mod rmd_entry;
 pub mod rmd_type;
 pub mod sprite;
 pub mod sprite_type;
+pub mod rmi;

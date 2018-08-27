@@ -6,6 +6,9 @@ authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
 [dependencies.geometry]
 path = "../geometry"
 
+[dependencies.cp949]
+path = "../cp949"
+
 [dependencies]
 byteorder = "*"
 

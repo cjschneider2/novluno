@@ -1,16 +1,17 @@
 extern crate core_compat;
-
-use std::path::Path;
-
-use core_compat::DataManager;
-use core_compat::MapManager;
-use core_compat::SpriteManager;
-use core_compat::{ListManager, ListType};
-use core_compat::entity::rmd_type::RmdType;
-use core_compat::entity::sprite_type::SpriteType;
+// use std::path::Path;
+// use core_compat::DataManager;
+// use core_compat::MapManager;
+// use core_compat::SpriteManager;
+// use core_compat::{ListManager, ListType};
+// use core_compat::entity::rmd_type::RmdType;
+// use core_compat::entity::sprite_type::SpriteType;
 
 #[test]
+#[ignore] // this test is very broken now that the xxxManagers moved to
+          // the client and are not part of the compatibility library anymore...
 fn test_map_sprite_load_map00001() {
+/*
     // setup needed paths
     let data_path = Path::new("../data/DATAs/");
     let map_path = Path::new("../data/DATAs/Map/");
@@ -50,8 +51,10 @@ fn test_map_sprite_load_map00001() {
                 }
             }
             // -- load animations
-            for ani in rmd.animations() {
+            for idx in rmd.animations() {
                 // Note: These indexes point to RmdEntries in _this_ RMD file
+                println!("animation index: {:?}", idx);
+                panic!();
             }
         }
         // -- map tile sprites
@@ -78,5 +81,6 @@ fn test_map_sprite_load_map00001() {
             }
         }
     }
+*/
     assert!(false);
 }

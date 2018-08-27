@@ -187,17 +187,24 @@ impl Sdl {
 
         // render
         // -- game map
-        render::map::tiles(self, game);
-        render::map::objects(self, game);
+        {
+            // render::map::tiles(self, game);
+            // render::map::objects(self, game);
+        }
         // -- character(s) / NPC(s)
+        {
+            render::chars::chars(self, game);
+        }
         // -- skill(s)
         // -- window(s)
         // -- interface(s)
         // -- window-chrome
 
         // draw text
-        // let text = format!("{}, {}", game.input.mouse_x, game.input.mouse_y);
-        // self.render_text_line(&text, game.input.mouse_x, game.input.mouse_y);
+        {
+            // let text = format!("{}, {}", game.input.mouse_x, game.input.mouse_y);
+            // self.render_text_line(&text, game.input.mouse_x, game.input.mouse_y);
+        }
 
         // finish frame
         self.canvas.present();
@@ -220,6 +227,10 @@ fn process_keycode(
         Keycode::Down  => input.action_down.key_press(is_down),
         Keycode::Right => input.action_right.key_press(is_down),
         Keycode::Left  => input.action_left.key_press(is_down),
+        Keycode::K     => input.player_up.key_press(is_down),
+        Keycode::J     => input.player_down.key_press(is_down),
+        Keycode::H     => input.player_right.key_press(is_down),
+        Keycode::L     => input.player_left.key_press(is_down),
         Keycode::F     => (),
         Keycode::Space => (),
         _              => (),

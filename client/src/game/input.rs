@@ -75,6 +75,10 @@ pub struct Controller {
     pub right_shoulder: ButtonState,
     pub btn_back: ButtonState,
     pub btn_start: ButtonState,
+    pub player_up: ButtonState,
+    pub player_down: ButtonState,
+    pub player_left: ButtonState,
+    pub player_right: ButtonState,
 }
 
 impl Controller {
@@ -96,6 +100,10 @@ impl Controller {
             right_shoulder: ButtonState::new(),
             btn_back: ButtonState::new(),
             btn_start: ButtonState::new(),
+            player_up: ButtonState::new(),
+            player_down: ButtonState::new(),
+            player_left: ButtonState::new(),
+            player_right: ButtonState::new(),
         }
     }
 }

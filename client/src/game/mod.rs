@@ -1,4 +1,5 @@
 mod scene;
+mod character;
 
 use std::path::{ PathBuf };
 
@@ -12,12 +13,17 @@ use resource_manager::data_manager::DataManager;
 use resource_manager::sprite_manager::SpriteManager;
 use resource_manager::list_manager::ListManager;
 use resource_manager::list_manager::ListType;
+
 use error::Error;
+
+use self::character::Player;
+
+// public interface
 
 pub mod input;
 
 pub struct State {
-    pub player_pos: (usize, usize),
+    pub player: character::Player,
     pub map: usize,
     pub map_off: (i32, i32),
 }
@@ -57,7 +63,7 @@ impl Game {
 
             // game and input state
             state: State {
-                player_pos: (50, 50),
+                player: Player::new(),
                 map: 0,
                 map_off: (-24, -48),
             },
@@ -102,6 +108,28 @@ impl Game {
             self.window = coords;
         }
 
+        // player movements ( with keyboard )
+        if self.input.keyboard.player_up.pressed {
+            // self.state.player_y += 1;
+            self.state.player.position.1 -= 5;
+        }
+        if self.input.keyboard.player_down.pressed {
+            // self.state.player_y -= 1;
+            self.state.player.position.1 += 5;
+        }
+        if self.input.keyboard.player_right.pressed {
+            // self.state.player_x -= 1;
+            self.state.player.position.0 -= 5;
+        }
+        if self.input.keyboard.player_left.pressed {
+            // self.state.player_x += 1;
+            self.state.player.position.0 += 5;
+        }
+    }
+
+    pub fn load_chr(&mut self, _chr_number: usize, _sdl: &mut Sdl) -> Result<(), Error> {
+
+        Ok(())
     }
 
     pub fn load_map(&mut self, map_number: usize, sdl: &mut Sdl) -> Result<(), Error> {

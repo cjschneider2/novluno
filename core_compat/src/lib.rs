@@ -2,6 +2,7 @@
 
 // local
 extern crate geometry;
+extern crate cp949;
 // external
 extern crate byteorder;
 

@@ -53,7 +53,10 @@ use entity::rmd_animation::RmdAnimation;
 use entity::rmd_entry::RmdEntry;
 use entity::rmd_type::RmdType;
 use entity::rmd_image::RmdImage;
+
 use error::Error;
+
+use utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
 
 pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     let mut cursor = Cursor::new(data);
@@ -73,14 +76,16 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     if padding != 0 { println!("p3: {}", padding); }
 
     // let string = parse_string(&mut cursor)?;
-    let string = parse_u8_vec(&mut cursor)?;
-    // println!("str 1: `{:?}`", string);
+    // let string = parse_u8_vec(&mut cursor)?;
+    let string = parse_cp949(&mut cursor)?;
+    println!("str 1: `{:?}`", string);
 
     rmd.set_animation_parts(cursor.read_i32::<LE>()?);
     rmd.set_animation_entry_count(cursor.read_i32::<LE>()?);
 
-    let string = parse_string(&mut cursor)?;
-    // println!("str 2: `{}`", string);
+    // let string = parse_u8_vec(&mut cursor)?;
+    let string = parse_cp949(&mut cursor)?;
+    println!("str 2: `{:?}`", string);
 
     rmd.set_entry_count(cursor.read_i32::<LE>()?);
 
@@ -125,30 +130,16 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     Ok(rmd)
 }
 
-fn parse_string(cursor: &mut Cursor<&[u8]>) -> Result<String, Error> {
-    let string_length = cursor.read_u8()?;
-    let mut str_vec = Vec::<u8>::new();
-    for _ in 0..string_length {
-        let chr = cursor.read_u8()?;
-        str_vec.push(chr);
-    }
-    let string = String::from_utf8(str_vec)?;
-    Ok(string)
-}
-
-fn parse_u8_vec(cursor: &mut Cursor<&[u8]>) -> Result<Vec<u8>, Error> {
-    let string_length = cursor.read_u8()?;
-    let mut vec = Vec::<u8>::new();
-    for _ in 0..string_length {
-        let chr = cursor.read_u8()?;
-        vec.push(chr);
-    }
-    Ok(vec)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn print_ani_info(rmd: &Rmd) {
+        println!();
+        println!("rmd.animation_count: {:?}", &rmd.animation_count());
+        println!("rmd.image_count:     {:?}", &rmd.entry_count());
+        assert!(false);
+    }
 
     #[test]
     fn test_tle_00001() {
@@ -170,6 +161,7 @@ mod tests {
     fn test_chr_00001() {
         let data = include_bytes!("../../../data/DATAs/Chr/chr00001.rmd");
         let rmd = parse_rmd(RmdType::Character, data).unwrap();
+        // print_ani_info(&rmd);
         // assert!(rmd.row_count as usize == rmd.rows.len());
         // assert!(rmd.animation_count as usize == rmd.animations.len());
     }

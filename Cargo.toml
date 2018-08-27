@@ -5,7 +5,8 @@ members = [
     "core_compat",
     "client",
     "server",
-    "data_converter"
+    "data_converter",
+    "cp949"
 ]
 
 [profile.release]
