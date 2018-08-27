@@ -14,6 +14,9 @@ Cargo.lock
 # The data directory
 /data/
 
+# Other directories
+/experiments/rmduo
+
 # Generated files from our programs
 rle2sqlite/rm.sqlite
 temp/
