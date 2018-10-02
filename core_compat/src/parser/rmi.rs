@@ -20,36 +20,49 @@ pub fn parse_rmi(data: &[u8]) -> Result<Rmi, Error> {
     let file_type_string = parse_string(&mut cursor).unwrap();
     println!("file_type_string: {:?}", file_type_string);
 
-    let unknown_1 = cursor.read_i32::<LE>()?;
-    println!("unknown_1: {:?}", unknown_1);
-
-    let unknown_2 = cursor.read_i32::<LE>()?;
-    println!("unknown_2: {:?}", unknown_2);
-
-    let pad_1 = cursor.read_i16::<LE>()?;
-    println!("pad_1: {:?}", pad_1);
-
-    let unknown_3 = cursor.read_i32::<LE>()?;
-    println!("unknown_3: {:?}", unknown_3);
+    let count = cursor.read_i32::<LE>()?;
+    println!("count?: {:?}", count);
 
     // -- entries
-    for idx in 0..unknown_2 {
+    for idx in 0..count {
         println!("----------");
         println!("-- Cursor Start @ 0x{:x}", cursor.position());
 
-        let e_unknown_1 = cursor.read_i32::<LE>()?;
-        println!("e_unknown_1: {:?}", e_unknown_1);
+        let event_type = cursor.read_i32::<LE>()?;
+        println!("event_type: {:?}", event_type);
+        assert_eq!(68, event_type);
 
-        let e_string_1 = parse_cp949(&mut cursor).unwrap();
+        let event_pad_1 = cursor.read_u8()?;
+        println!("event_pad_1: {:?}", event_pad_1);
+        let event_pad_2 = cursor.read_u8()?;
+        println!("event_pad_2: {:?}", event_pad_2);
 
-        println!("e_string_1: {:?}", e_string_1);
-        let null_byte = cursor.read_u8()?;
-        println!("null_byte: {:?}", null_byte);
+        let event_count = cursor.read_i32::<LE>()?;
+        println!("event_count: {:?}", event_count);
 
-        let e_string_2 = parse_cp949(&mut cursor).unwrap();
-        println!("e_string_2: {:?}", e_string_2);
+        for e_idx in 0..event_count {
+            println!("{{");
+            println!("    idx: {:?}", e_idx);
 
-        assert_eq!(null_byte, 0);
+            let action_timeout = cursor.read_i32::<LE>()?;
+            println!("    action_timout: {:?}", action_timeout);
+
+            let pos = cursor.position();
+            let byte = cursor.read_u8()?;
+            if byte != 0 { cursor.set_position(pos); }
+            let trigger_string = parse_cp949(&mut cursor).unwrap();
+            println!("    trigger_string: {:?}", trigger_string);
+
+
+            let pos = cursor.position();
+            let byte = cursor.read_u8()?;
+            if byte != 0 { cursor.set_position(pos); }
+            let action_string = parse_cp949(&mut cursor).unwrap();
+            println!("    action_string: {:?}", action_string);
+
+            println!("}}");
+        }
+
     }
 
     Ok(rmi)

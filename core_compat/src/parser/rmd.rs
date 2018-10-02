@@ -78,14 +78,14 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     // let string = parse_string(&mut cursor)?;
     // let string = parse_u8_vec(&mut cursor)?;
     let string = parse_cp949(&mut cursor)?;
-    println!("str 1: `{:?}`", string);
+    // println!("str 1: `{:?}`", string);
 
     rmd.set_animation_parts(cursor.read_i32::<LE>()?);
     rmd.set_animation_entry_count(cursor.read_i32::<LE>()?);
 
     // let string = parse_u8_vec(&mut cursor)?;
     let string = parse_cp949(&mut cursor)?;
-    println!("str 2: `{:?}`", string);
+    // println!("str 2: `{:?}`", string);
 
     rmd.set_entry_count(cursor.read_i32::<LE>()?);
 

@@ -20,10 +20,13 @@ pub fn parse_string(cursor: &mut Cursor<&[u8]>) -> Result<String, Error> {
 
 pub fn parse_cp949(cursor: &mut Cursor<&[u8]>) -> Result<String, Error> {
     let string_length = cursor.read_u8()?;
+    // println!("string_length: {:?}", string_length);
     let mut str_vec = Vec::<u8>::new();
     for _ in 0..string_length {
         let chr = cursor.read_u8()?;
-        str_vec.push(chr);
+        if chr != 0 {
+            str_vec.push(chr);
+        }
     }
     let string = cp949_to_utf8(&str_vec);
     Ok(string)
