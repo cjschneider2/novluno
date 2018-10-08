@@ -1,5 +1,5 @@
 [workspace]
-
+edition = "2018"
 members = [
     "geometry",
     "core_compat",
