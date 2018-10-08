@@ -6,7 +6,7 @@ use std::io::Cursor;
 
 use byteorder::ReadBytesExt;
 
-use character_table::CP949_TABLE;
+use crate::character_table::CP949_TABLE;
 
 const REPLACEMENT_CHARACTER: u32 = 0xFFFD;
 

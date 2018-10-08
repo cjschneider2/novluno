@@ -1,6 +1,6 @@
 
-use entity::event::Event;
-use entity::map_tile::MapTile;
+use crate::entity::event::Event;
+use crate::entity::map_tile::MapTile;
 
 #[derive(Debug)]
 pub struct Map {

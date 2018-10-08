@@ -1,12 +1,12 @@
-use sdl::Sdl;
-use game::Game;
-use resource_manager::list_manager::ListType;
+use crate::sdl::Sdl;
+use crate::game::Game;
+use crate::resource_manager::list_manager::ListType;
 use geometry::rectangle::Rectangle;
 use geometry::point::Point;
 use core_compat::entity::rmd_type::RmdType;
 use sdl2;
 use sdl2::rect::Rect;
-use sdl::render::map::next_tile;
+use crate::sdl::render::map::next_tile;
 use core_compat::entity::sprite_type::SpriteType;
 
 pub fn tiles(sdl: &mut Sdl, game: &mut Game) {

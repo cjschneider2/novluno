@@ -6,11 +6,9 @@ use std::io::Cursor;
 use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
-use entity::rmi::Rmi;
-
-use error::Error;
-
-use utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
+use crate::entity::rmi::Rmi;
+use crate::error::Error;
+use crate::utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
 
 pub fn parse_rmi(data: &[u8]) -> Result<Rmi, Error> {
     let mut cursor = Cursor::new(data);

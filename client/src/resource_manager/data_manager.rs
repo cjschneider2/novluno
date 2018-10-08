@@ -6,10 +6,11 @@ use std::fs::File;
 use std::io::Read;
 use std::rc::Rc;
 
+use crate::error::Error;
+
 use core_compat::entity::rmd_type::RmdType;
 use core_compat::entity::rmd::Rmd;
 use core_compat::parser::rmd::parse_rmd;
-use error::Error;
 
 pub struct DataManager {
     data_path: PathBuf,

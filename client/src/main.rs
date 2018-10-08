@@ -13,9 +13,9 @@ mod game;
 mod sdl;
 mod resource_manager;
 
-use sdl::Sdl;
-
 use std::time::Instant;
+
+use crate::sdl::Sdl;
 
 fn main() {
 

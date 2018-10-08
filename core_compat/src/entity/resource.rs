@@ -1,4 +1,4 @@
-use utility::pixel::Pixel;
+use crate::utility::pixel::Pixel;
 
 #[derive(Debug)]
 pub struct Resource {

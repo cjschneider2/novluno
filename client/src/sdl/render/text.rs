@@ -4,8 +4,8 @@ use sdl2::rect::Rect;
 use rusttype;
 use rusttype::PositionedGlyph;
 
-use sdl::Sdl;
-use sdl::FONT;
+use crate::sdl::Sdl;
+use crate::sdl::FONT;
 
 fn line(sdl: &mut Sdl, text: &str, x: i32, y: i32) {
     let bpp = 4; // bytes per pixel

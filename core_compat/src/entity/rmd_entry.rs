@@ -1,5 +1,5 @@
-use entity::rmd_animation::RmdAnimation;
-use entity::rmd_image::RmdImage;
+use crate::entity::rmd_animation::RmdAnimation;
+use crate::entity::rmd_image::RmdImage;
 
 #[derive(Debug)]
 pub struct RmdEntry {

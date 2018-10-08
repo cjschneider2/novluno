@@ -12,8 +12,8 @@ use core_compat::entity::sprite::Sprite;
 use core_compat::entity::sprite_type::SpriteType::{self, Bullet, Character, Interface, Icon, Tile, Object};
 use core_compat::parser::rle::parse_rle;
 
-use error::Error;
-use sdl::Sdl;
+use crate::error::Error;
+use crate::sdl::Sdl;
 
 pub struct SpriteEntry {
     pub sprite: Sprite,

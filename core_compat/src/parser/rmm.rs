@@ -35,12 +35,11 @@ use std::io::SeekFrom;
 use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
-use error::Error;
-use entity::map::Map;
-use entity::map_tile::MapTile;
-use entity::event::Event;
-use entity::entry::Entry;
-
+use crate::error::Error;
+use crate::entity::map::Map;
+use crate::entity::map_tile::MapTile;
+use crate::entity::event::Event;
+use crate::entity::entry::Entry;
 
 pub fn parse_rmm(data: &[u8]) -> Result<Map, Error> {
     let mut cursor = Cursor::new(data);

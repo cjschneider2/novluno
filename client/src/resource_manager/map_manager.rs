@@ -8,7 +8,7 @@ use core_compat::entity::map::Map;
 // use core_compat::entity::map_tile::MapTile;
 use core_compat::parser::rmm::parse_rmm;
 
-use error::Error;
+use crate::error::Error;
 
 pub struct MapManager {
     data_path: PathBuf,

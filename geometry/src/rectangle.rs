@@ -1,7 +1,7 @@
 use std::ops::Add;
 
-use point::Point;
-use size::Size;
+use crate::point::Point;
+use crate::size::Size;
 
 #[derive(Debug)]
 pub struct Rectangle<T> {

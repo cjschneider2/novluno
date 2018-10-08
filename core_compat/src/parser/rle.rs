@@ -9,10 +9,10 @@ use std::io::SeekFrom;
 use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
-use error::Error;
-use utility::pixel::Pixel;
-use entity::resource::Resource;
-use entity::resource_file::ResourceFile;
+use crate::error::Error;
+use crate::utility::pixel::Pixel;
+use crate::entity::resource::Resource;
+use crate::entity::resource_file::ResourceFile;
 
 pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
     let mut cursor = Cursor::new(data);

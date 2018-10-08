@@ -1,5 +1,5 @@
 
-use entity::list_item::ListItem;
+use crate::entity::list_item::ListItem;
 
 pub struct List {
     pub items: Vec<ListItem>,

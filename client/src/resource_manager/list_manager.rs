@@ -8,7 +8,7 @@ use core_compat::entity::list::List;
 // use core_compat::entity::list_item::ListItem;
 use core_compat::parser::lst::parse_lst;
 
-use error::Error;
+use crate::error::Error;
 
 #[derive(Copy, Clone, Hash, Eq, PartialEq)]
 pub enum ListType {

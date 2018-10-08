@@ -6,10 +6,10 @@ use std::io::SeekFrom;
 use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
-use error::Error;
-use entity::entry::Entry;
-use entity::list::List;
-use entity::list_item::ListItem;
+use crate::error::Error;
+use crate::entity::entry::Entry;
+use crate::entity::list::List;
+use crate::entity::list_item::ListItem;
 
 pub fn parse_lst(data: &[u8], use_v2: bool) -> Result<List, Error> {
     let mut cursor = Cursor::new(data);

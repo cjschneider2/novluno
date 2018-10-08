@@ -6,15 +6,15 @@ use std::path::{ PathBuf };
 use core_compat::entity::sprite_type::SpriteType;
 use core_compat::entity::rmd_type::RmdType;
 
-use sdl::Sdl;
+use crate::sdl::Sdl;
 
-use resource_manager::map_manager::MapManager;
-use resource_manager::data_manager::DataManager;
-use resource_manager::sprite_manager::SpriteManager;
-use resource_manager::list_manager::ListManager;
-use resource_manager::list_manager::ListType;
+use crate::resource_manager::map_manager::MapManager;
+use crate::resource_manager::data_manager::DataManager;
+use crate::resource_manager::sprite_manager::SpriteManager;
+use crate::resource_manager::list_manager::ListManager;
+use crate::resource_manager::list_manager::ListType;
 
-use error::Error;
+use crate::error::Error;
 
 use self::character::Player;
 

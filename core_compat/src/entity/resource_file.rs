@@ -1,4 +1,4 @@
-use entity::resource::Resource;
+use crate::entity::resource::Resource;
 
 pub struct ResourceFile {
     pub name: String,

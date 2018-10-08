@@ -48,15 +48,13 @@ use std::io::SeekFrom;
 use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
 
-use entity::rmd::Rmd;
-use entity::rmd_animation::RmdAnimation;
-use entity::rmd_entry::RmdEntry;
-use entity::rmd_type::RmdType;
-use entity::rmd_image::RmdImage;
-
-use error::Error;
-
-use utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
+use crate::entity::rmd::Rmd;
+use crate::entity::rmd_animation::RmdAnimation;
+use crate::entity::rmd_entry::RmdEntry;
+use crate::entity::rmd_type::RmdType;
+use crate::entity::rmd_image::RmdImage;
+use crate::error::Error;
+use crate::utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
 
 pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     let mut cursor = Cursor::new(data);

@@ -12,10 +12,10 @@ use sdl2::keyboard::Keycode;
 
 use rusttype;
 
-use error::Error;
-use game::Game;
-use game::input::Controller;
-use game::input::MAX_CONTROLLERS as MAX_CTL;
+use crate::error::Error;
+use crate::game::Game;
+use crate::game::input::Controller;
+use crate::game::input::MAX_CONTROLLERS as MAX_CTL;
 
 // setup Rusttype
 lazy_static! {

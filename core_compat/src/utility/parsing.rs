@@ -5,7 +5,7 @@ use byteorder::LittleEndian as LE;
 
 use cp949::cp949_to_utf8;
 
-use error::Error;
+use crate::error::Error;
 
 pub fn parse_string(cursor: &mut Cursor<&[u8]>) -> Result<String, Error> {
     let string_length = cursor.read_u8()?;

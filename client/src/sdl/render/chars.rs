@@ -1,8 +1,8 @@
 #![allow(unused_imports)]
-use sdl::Sdl;
-use game::Game;
+use crate::sdl::Sdl;
+use crate::game::Game;
+use crate::resource_manager::list_manager::ListType;
 
-use resource_manager::list_manager::ListType;
 use geometry::rectangle::Rectangle;
 use geometry::point::Point;
 use core_compat::entity::rmd_type::RmdType;

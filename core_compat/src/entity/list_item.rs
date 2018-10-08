@@ -1,4 +1,4 @@
-use entity::entry::Entry;
+use crate::entity::entry::Entry;
 
 #[derive(Debug, Clone)]
 pub struct ListItem {

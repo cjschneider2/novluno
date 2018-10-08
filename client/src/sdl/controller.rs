@@ -1,9 +1,8 @@
 use std::borrow::BorrowMut;
 
-use sdl::Sdl;
-use error::Error;
-
-use game::input::MAX_CONTROLLERS as MAX_CTL;
+use crate::sdl::Sdl;
+use crate::error::Error;
+use crate::game::input::MAX_CONTROLLERS as MAX_CTL;
 
 pub fn init(sdl: &mut Sdl) -> Result<(), Error> {
     let num_joy = sdl.controller.num_joysticks()?;
