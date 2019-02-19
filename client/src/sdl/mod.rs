@@ -202,8 +202,15 @@ impl Sdl {
 
         // draw text
         {
-            // let text = format!("{}, {}", game.input.mouse_x, game.input.mouse_y);
-            // self.render_text_line(&text, game.input.mouse_x, game.input.mouse_y);
+            let (x, y) = game.state.map_off;
+            let map_name = format!("Map {} @ X:{}, Y:{}",
+                                   game.state.map,
+                                   -1 * x, -1 * y);
+            let mouse_coord = format!("Mouse X:{}, Y:{}",
+                                      game.input.mouse_x,
+                                      game.input.mouse_y);
+            render::text::line(self, &map_name, 10, 10);
+            render::text::line(self, &mouse_coord, 10, 34);
         }
 
         // finish frame

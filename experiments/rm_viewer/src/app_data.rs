@@ -45,18 +45,11 @@ impl AppData {
                 self.height = resource.height as usize;
                 self.offset_x = resource.offset_x as usize;
                 self.offset_y = resource.offset_y as usize;
-                let mut vec = Vec::<u8>::new();
-                for pixel in resource.image.iter() {
-                    vec.push(pixel.r);
-                    vec.push(pixel.g);
-                    vec.push(pixel.b);
-                    vec.push(pixel.a);
-                }
-                vec
+                resource.image_raw.clone()
             };
             self.pixbuf = Some(Pixbuf::new_from_vec(
                 img_vec,
-                0, /* GDK_COLORSPACE_RGB */
+                gdk_pixbuf::Colorspace::Rgb,
                 true,
                 8, /* color depth */
                 self.width as i32,

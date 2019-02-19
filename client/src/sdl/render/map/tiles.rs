@@ -4,7 +4,6 @@ use crate::resource_manager::list_manager::ListType;
 use geometry::rectangle::Rectangle;
 use geometry::point::Point;
 use core_compat::entity::rmd_type::RmdType;
-use sdl2;
 use sdl2::rect::Rect;
 use crate::sdl::render::map::next_tile;
 use core_compat::entity::sprite_type::SpriteType;
@@ -25,7 +24,7 @@ pub fn tiles(sdl: &mut Sdl, game: &mut Game) {
 
     for map_tile in map.tiles().iter() {
         let tile_offset = Point::new(tile_x * tile_width, tile_y * tile_height);
-        let mouse_offset = Point::new(game.input.mouse_x, game.input.mouse_y);
+        let _mouse_offset = Point::new(game.input.mouse_x, game.input.mouse_y);
 
         // skip tiles which out out of view
         if view_bounds.contains_point(&tile_offset) == false {
@@ -55,16 +54,16 @@ pub fn tiles(sdl: &mut Sdl, game: &mut Game) {
                             let _ = sdl.canvas.copy(&sprite.texture, src_rect, dst_rect);
 
                             // debug render
-                            {
-                                let _rect = Rectangle::new_from_points((dst_rect.x(), dst_rect.y()), (dst_rect.width() as i32, dst_rect.height() as i32));
-                                if _rect.contains_point(&mouse_offset) {
-                                    match map_tile.collision {
-                                        0 => sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 10)),
-                                        _ => sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 255, 10)),
-                                    }
-                                    let _ = sdl.canvas.draw_rect(dst_rect);
-                                }
-                            }
+                            // {
+                            //     let _rect = Rectangle::new_from_points((dst_rect.x(), dst_rect.y()), (dst_rect.width() as i32, dst_rect.height() as i32));
+                            //     if _rect.contains_point(&mouse_offset) {
+                            //         match map_tile.collision {
+                            //             0 => sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 10)),
+                            //             _ => sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 255, 10)),
+                            //         }
+                            //         let _ = sdl.canvas.draw_rect(dst_rect);
+                            //     }
+                            // }
                         }
                     }
                 }
