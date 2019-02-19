@@ -4,7 +4,6 @@ use crate::resource_manager::list_manager::ListType;
 use geometry::rectangle::Rectangle;
 use geometry::point::Point;
 use core_compat::entity::rmd_type::RmdType;
-use sdl2;
 use sdl2::rect::Rect;
 use crate::sdl::render::map::next_tile;
 use core_compat::entity::sprite_type::SpriteType;
@@ -31,7 +30,7 @@ pub fn objects(sdl: &mut Sdl, game: &mut Game) {
         let tile_rect = Rectangle::new_from_points((tile_offset.x, tile_offset.y), (tile_width, tile_height));
 
         // debug: active rectangle
-        let is_active = tile_rect.contains_point(&mouse_offset) == false;
+        let _is_active = tile_rect.contains_point(&mouse_offset) == false;
 
         // draw tile objects
         let obj_entry = map_tile.obj_rmd_entry;
@@ -71,14 +70,14 @@ pub fn objects(sdl: &mut Sdl, game: &mut Game) {
                             let _ = sdl.canvas.copy(&sprite.texture, src_rect, dst_rect);
 
                             // debug renders
-                            {
-                                if is_active {
-                                    sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
-                                } else {
-                                    sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 255));
-                                }
-                                let _ = sdl.canvas.draw_rect(dst_rect);
-                            }
+                            // {
+                            //     if is_active {
+                            //         sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
+                            //     } else {
+                            //         sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 255));
+                            //     }
+                            //     let _ = sdl.canvas.draw_rect(dst_rect);
+                            // }
                         }
                     }
                 }

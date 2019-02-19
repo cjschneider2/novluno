@@ -4,7 +4,7 @@ version = "0.0.1"
 authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
 
 [dependencies.core_compat]
-path = "../core_compat"
+path = "../../core_compat"
 
 [dependencies.gtk]
 version = "*"

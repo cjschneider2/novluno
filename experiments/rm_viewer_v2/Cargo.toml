@@ -1,0 +1,10 @@
+[package]
+name = "rm_viewer_v2"
+version = "0.1.0"
+authors = ["Charles J. Schneider <cjschneider2@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+gtk = "*"
+relm = "*"
+relm-derive = "*"

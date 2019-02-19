@@ -1,0 +1,7 @@
+[package]
+name = "client_amethyst"
+version = "0.1.0"
+authors = []
+
+[dependencies]
+amethyst = "0.9.0"

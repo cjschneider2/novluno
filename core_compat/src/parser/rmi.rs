@@ -10,6 +10,9 @@ use crate::entity::rmi::Rmi;
 use crate::error::Error;
 use crate::utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
 
+const ITEM_INFO_HDR: &str = "RedMoon ItemInfo File 1.0";
+const EVENT_INFO_HDR: &str = "RedMoon EventInfo File 1.0";
+
 pub fn parse_rmi(data: &[u8]) -> Result<Rmi, Error> {
     let mut cursor = Cursor::new(data);
     let rmi = Rmi::new();
@@ -21,49 +24,69 @@ pub fn parse_rmi(data: &[u8]) -> Result<Rmi, Error> {
     let count = cursor.read_i32::<LE>()?;
     println!("count?: {:?}", count);
 
-    // -- entries
     for idx in 0..count {
-        println!("----------");
-        println!("-- Cursor Start @ 0x{:x}", cursor.position());
-
-        let event_type = cursor.read_i32::<LE>()?;
-        println!("event_type: {:?}", event_type);
-        assert_eq!(68, event_type);
-
-        let event_pad_1 = cursor.read_u8()?;
-        println!("event_pad_1: {:?}", event_pad_1);
-        let event_pad_2 = cursor.read_u8()?;
-        println!("event_pad_2: {:?}", event_pad_2);
-
-        let event_count = cursor.read_i32::<LE>()?;
-        println!("event_count: {:?}", event_count);
-
-        for e_idx in 0..event_count {
-            println!("{{");
-            println!("    idx: {:?}", e_idx);
-
-            let action_timeout = cursor.read_i32::<LE>()?;
-            println!("    action_timout: {:?}", action_timeout);
-
-            let pos = cursor.position();
-            let byte = cursor.read_u8()?;
-            if byte != 0 { cursor.set_position(pos); }
-            let trigger_string = parse_cp949(&mut cursor).unwrap();
-            println!("    trigger_string: {:?}", trigger_string);
-
-
-            let pos = cursor.position();
-            let byte = cursor.read_u8()?;
-            if byte != 0 { cursor.set_position(pos); }
-            let action_string = parse_cp949(&mut cursor).unwrap();
-            println!("    action_string: {:?}", action_string);
-
-            println!("}}");
-        }
-
+        let _ = parse_event_entry(&mut cursor, idx).unwrap();
     }
 
     Ok(rmi)
+}
+
+fn parse_event_entry(
+    cursor: &mut Cursor<&[u8]>,
+    idx: i32)
+    -> Result<(), Error>
+{
+    println!("-- Entry {}", idx);
+    println!("-- Cursor Start @ 0x{:x}", cursor.position());
+
+    let event_type = cursor.read_u16::<LE>()?;
+    println!("event_type: {:?}", event_type);
+    if event_type != 0x44 || event_type != 0x60EA {
+        println!("unknown event type {:?}", event_type);
+    }
+
+    let event_unknown = cursor.read_i32::<LE>()?;
+    println!("event_unknown: {:?}", event_unknown);
+
+    let event_count = cursor.read_i32::<LE>()?;
+    println!("event_count: {:?}", event_count);
+
+    for e_idx in 0..event_count {
+        println!("{{");
+        println!("    idx: {:?}", e_idx);
+
+        let action_timeout = cursor.read_i32::<LE>()?;
+        println!("    action_timout: {:?}", action_timeout);
+
+        let trigger_string = parse_cp949(cursor).unwrap();
+        println!("    trigger_string: {:?}", trigger_string);
+
+        let pos = cursor.position();
+        let byte = cursor.read_u8()?;
+        if byte != 0 {
+            cursor.set_position(pos);
+            println!("    -- byte value 0x{:x} @ 0x{:x}", byte, pos);
+        }
+
+        let mut cont = true;
+        while cont {
+            let action_string = parse_cp949(cursor).unwrap();
+            println!("    action_string: {:?}", action_string);
+            let pos = cursor.position();
+            let byte = cursor.read_u8()?;
+            println!("    -- byte value 0x{:x} @ 0x{:x}", byte, pos);
+            if byte <= 1
+            || byte == 0x44
+            || byte == 0x60 {
+                cont = false;
+            }
+            cursor.set_position(pos);
+        }
+
+        println!("}}");
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]

@@ -7,7 +7,7 @@ use rusttype::PositionedGlyph;
 use crate::sdl::Sdl;
 use crate::sdl::FONT;
 
-fn line(sdl: &mut Sdl, text: &str, x: i32, y: i32) {
+pub fn line(sdl: &mut Sdl, text: &str, x: i32, y: i32) {
     let bpp = 4; // bytes per pixel
     let height: f32 = 24.0;
     let scale = rusttype::Scale { x: height, y: height };
@@ -54,9 +54,9 @@ fn line(sdl: &mut Sdl, text: &str, x: i32, y: i32) {
                         let x_off: usize = x as usize * bpp;
                         let offset = y_off + x_off;
                         buffer[offset + 0] = alpha;
-                        buffer[offset + 1] = 255_u8;
-                        buffer[offset + 2] = 255_u8;
-                        buffer[offset + 3] = 255_u8;
+                        buffer[offset + 1] = 0xFF_u8;
+                        buffer[offset + 2] = 0xFF_u8;
+                        buffer[offset + 3] = 0xFF_u8;
                     }
                 })
             }

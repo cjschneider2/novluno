@@ -1,12 +1,15 @@
 [workspace]
-edition = "2018"
 members = [
     "geometry",
     "core_compat",
     "client",
     "server",
     "data_converter",
-    "cp949"
+    "cp949",
+    # Experiments
+    "experiments/client_amethyst",
+    #"experiments/rm_viewer"
+    "experiments/rm_viewer_v2"
 ]
 
 [profile.release]

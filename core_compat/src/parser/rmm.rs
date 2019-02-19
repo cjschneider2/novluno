@@ -108,7 +108,7 @@ fn parse_v1(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     let b_6: u32 = cursor.read_u8()? as u32;
     let b_7: u32 = cursor.read_u8()? as u32;
 
-    assert!(b_0 & 0x2 == 0);
+    assert_eq!(b_0 & 0x2, 0);
 
     let obj_file_num = (b_0 / 4) + (b_1 % 32) * 64;
     let tle_file_idx = ((b_2 % 128) * 8) + (b_1 / 32);
@@ -142,7 +142,7 @@ fn parse_v2(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     let b_6: u32 = cursor.read_u8()? as u32;
     let b_7: u32 = cursor.read_u8()? as u32;
 
-    assert!(b_0 & 0x2 == 0);
+    assert_eq!(b_0 & 0x2, 0);
 
     let obj_file_num = (b_0 >> 2) + ((b_1 & 0x1F) << 6);
     let tle_file_idx = (b_1 >> 5) + ((b_2 & 0x7F) << 3);
