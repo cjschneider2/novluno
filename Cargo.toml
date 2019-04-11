@@ -7,9 +7,9 @@ members = [
     "data_converter",
     "cp949",
     # Experiments
-    "experiments/client_amethyst",
+    #"experiments/client_amethyst",
     #"experiments/rm_viewer"
-    "experiments/rm_viewer_v2"
+    #"experiments/rm_viewer_v2"
 ]
 
 [profile.release]

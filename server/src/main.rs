@@ -1,4 +1,4 @@
-gmail.com#![allow(dead_code, unused_variables)]
+#![allow(dead_code, unused_variables)]
 
 mod crypto;
 
