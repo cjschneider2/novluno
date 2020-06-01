@@ -30,9 +30,9 @@ pub fn add(sdl: &Sdl, index: u32) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn remove(sdl: &Sdl, index: i32) -> Result<(), Error> {
+pub fn remove(sdl: &Sdl, index: u32) -> Result<(), Error> {
     let mut controllers = sdl.controllers.borrow_mut();
-    if index < MAX_CTL as i32 && index > 0 {
+    if index < MAX_CTL as u32 && index > 0 {
         let ctrl_list = controllers.borrow_mut();
         if let Some(spot) = ctrl_list.get_mut(index as usize) {
             *spot = None;

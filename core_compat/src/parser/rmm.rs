@@ -116,7 +116,7 @@ fn parse_v1(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     let warp = b_4;
     let collision = b_6;
     let obj_file_idx = if collision % 24 == 0 {
-        (b_7 << 1)
+        b_7 << 1
     } else {
         (b_7 << 1) + 1
     };
@@ -151,7 +151,7 @@ fn parse_v2(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
     // let collision    = (b_6 & 0xF0) >> 4;
     let collision = b_6;
     let obj_file_idx = if b_6 % 24 == 0 {
-        (b_7 << 1)
+        b_7 << 1
     } else {
         (b_7 << 1) + 1
     };

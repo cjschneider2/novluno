@@ -28,13 +28,13 @@ pub fn cp949_to_utf8(input: &[u8]) -> String {
     while cursor.position() < input_len {
         let idx = cursor.position();
         let uni_code_point: u32 = match cursor.read_u8().unwrap() as u32 {
-            val @ 0x00 ... 0x7F => val as u32,
+            val @ 0x00 ..= 0x7F => val as u32,
             0x80 | 0xFF         => REPLACEMENT_CHARACTER, // undefined values
-            val @ 0x81 ... 0xFE => {
+            val @ 0x81 ..= 0xFE => {
                 // lead byte encountered
                 if idx + 1 < input_len {
                     let next = cursor.read_u8().unwrap() as u16;
-                    let mut c: u16 = ((val as u16) << 8) + next;
+                    let c: u16 = ((val as u16) << 8) + next;
                     lookup_949_char(c) as u32
                 } else {
                     REPLACEMENT_CHARACTER

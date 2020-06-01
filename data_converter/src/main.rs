@@ -12,8 +12,6 @@ use std::io::Read;
 // use std::io::Write;
 use std::io::BufWriter;
 
-use png::HasParameters;
-
 use core_compat::entity::resource_file::ResourceFile;
 use core_compat::entity::resource::Resource;
 use core_compat::entity::rmd::Rmd;
@@ -308,8 +306,8 @@ fn convert_rle_data() {
                                 let mut encoder = png::Encoder::new(writer,
                                                                     rle.width as u32,
                                                                     rle.height as u32) ;
-                                encoder.set(png::ColorType::RGBA)
-                                    .set(png::BitDepth::Eight);
+                                encoder.set_color(png::ColorType::RGBA);
+                                encoder.set_depth(png::BitDepth::Eight);
                                 let mut writer = encoder.write_header().unwrap();
 
                                 writer.write_image_data(&rle.image_raw).unwrap();

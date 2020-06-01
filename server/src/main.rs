@@ -25,7 +25,7 @@ fn main() {
 
     // NOTE: This iterator will not yield a `None` value so is equivalent to a loop
     println!("listening for connections on `{}`", CLIENT_LISTEN_ADDR);
-    for mut maybe_stream in listener.incoming() {
+    for maybe_stream in listener.incoming() {
         match maybe_stream {
             Ok(client_stream) => handle_client(client_stream),
             Err(error) => println!("Client Connection Listener failed with: `{}`", error),

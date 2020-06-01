@@ -21,8 +21,8 @@ use crate::game::input::MAX_CONTROLLERS as MAX_CTL;
 lazy_static! {
     static ref FONT: rusttype::Font<'static> = {
         let font_data = include_bytes!("../../static/noto_font/NotoMono-Regular.ttf");
-        let font_collection = rusttype::FontCollection::from_bytes(font_data as &[u8]).expect("cannot create font collection");
-        font_collection.into_font().unwrap()
+        let font = rusttype::Font::try_from_bytes(font_data as &[u8]).expect("cannot create font collection");
+        font
     };
 }
 
