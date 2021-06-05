@@ -1,12 +1,22 @@
-use crate::sdl::Sdl;
+use crate::core_compat::entity::rmd_type::RmdType;
+use crate::core_compat::entity::sprite_type::SpriteType;
 use crate::game::Game;
+use crate::geometry::point::Point;
+use crate::geometry::rectangle::Rectangle;
 use crate::resource_manager::list_manager::ListType;
-use geometry::rectangle::Rectangle;
-use geometry::point::Point;
-use core_compat::entity::rmd_type::RmdType;
-use sdl2::rect::Rect;
+use crate::sdl2::rect::Rect;
+use crate::sdl::Sdl;
 use crate::sdl::render::map::next_tile;
-use core_compat::entity::sprite_type::SpriteType;
+use sdl::render;
+
+
+struct DrawObject {
+    texture: *mut sdl2::sys::SDL_Texture,
+    src: Rect,
+    dst: Rect,
+    z: i32,
+    highlight: bool,
+}
 
 pub fn objects(sdl: &mut Sdl, game: &mut Game) {
     let obj_list = game.list_manager.get_list(ListType::Object).unwrap();
@@ -22,15 +32,24 @@ pub fn objects(sdl: &mut Sdl, game: &mut Game) {
         (100 + game.window.0, 100 + game.window.1),
     );
 
+    let mut draw_list = Vec::<DrawObject>::new();
+
     for map_tile in map.tiles().iter() {
-        let tile_offset = Point::new(tile_x * tile_width, tile_y * tile_height);
-        let mouse_offset = Point::new(game.input.mouse_x, game.input.mouse_y);
+        let (map_x, map_y) = game.state.map_off;
+        let tile_offset = Point::new(
+            tile_x * tile_width,
+            tile_y * tile_height,
+        );
+        let mouse_offset = Point::new(
+            game.input.mouse_x - map_x,
+            game.input.mouse_y - map_y,
+        );
 
         // skip tiles which are out out of view
         let tile_rect = Rectangle::new_from_points((tile_offset.x, tile_offset.y), (tile_width, tile_height));
 
         // debug: active rectangle
-        let _is_active = tile_rect.contains_point(&mouse_offset) == false;
+        let is_active = tile_rect.contains_point(&mouse_offset);
 
         // draw tile objects
         let obj_entry = map_tile.obj_rmd_entry;
@@ -66,18 +85,13 @@ pub fn objects(sdl: &mut Sdl, game: &mut Game) {
                             dst_rect.offset(tile_offset.x, tile_offset.y);
                             dst_rect.offset(img.dest_x, img.dest_y);
 
-                            // render
-                            let _ = sdl.canvas.copy(&sprite.texture, src_rect, dst_rect);
-
-                            // debug renders
-                            // {
-                            //     if is_active {
-                            //         sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
-                            //     } else {
-                            //         sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 10, 255));
-                            //     }
-                            //     let _ = sdl.canvas.draw_rect(dst_rect);
-                            // }
+                            draw_list.push(DrawObject {
+                                texture: sprite.texture.raw(),
+                                src: src_rect,
+                                dst: dst_rect,
+                                z: tile_x + tile_y - img.render_z,
+                                highlight: is_active,
+                            });
                         }
                     }
                 }
@@ -87,4 +101,37 @@ pub fn objects(sdl: &mut Sdl, game: &mut Game) {
         // update tile positions
         next_tile(&mut tile_x, &mut tile_y, tile_stride);
     }
+
+    // sort by z-index
+    draw_list.sort_unstable_by(|obj1, obj2| {
+        obj1.z.partial_cmp(&obj2.z).unwrap()
+    });
+
+    // render
+    struct DebugList {
+        dst: Rect,
+        z: i32,
+    }
+    let mut debug_list = Vec::<DebugList>::new();
+    draw_list.iter().for_each(|obj| {
+        let texture = unsafe {
+            sdl.texture_creator.raw_create_texture(obj.texture)
+        };
+        let _ = sdl.canvas.copy(&texture, obj.src, obj.dst);
+        if obj.highlight {
+            debug_list.push(DebugList {
+                dst: obj.dst,
+                z: obj.z
+            })
+        }
+    });
+
+    // debug renders
+    debug_list.iter().for_each(|obj| {
+        // let (x, y) = game.state.map_off;
+        sdl.canvas.set_draw_color(sdl2::pixels::Color::RGB(10, 10, 255));
+        let _ = sdl.canvas.draw_rect(obj.dst);
+        let z_idx = format!("z:{}", obj.z);
+        render::text::line(sdl, &z_idx, obj.dst.left(), obj.dst.top());
+    });
 }
