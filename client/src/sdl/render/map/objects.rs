@@ -89,7 +89,7 @@ pub fn objects(sdl: &mut Sdl, game: &mut Game) {
                                 texture: sprite.texture.raw(),
                                 src: src_rect,
                                 dst: dst_rect,
-                                z: tile_x + tile_y - img.render_z,
+                                z: tile_x + tile_y + img.render_z,
                                 highlight: is_active,
                             });
                         }
@@ -113,6 +113,8 @@ pub fn objects(sdl: &mut Sdl, game: &mut Game) {
         z: i32,
     }
     let mut debug_list = Vec::<DebugList>::new();
+
+    //println!("{:?}", draw_list.len());
     draw_list.iter().for_each(|obj| {
         let texture = unsafe {
             sdl.texture_creator.raw_create_texture(obj.texture)

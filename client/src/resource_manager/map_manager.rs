@@ -5,7 +5,6 @@ use std::io::Read;
 use std::rc::Rc;
 
 use core_compat::entity::map::Map;
-// use core_compat::entity::map_tile::MapTile;
 use core_compat::parser::rmm::parse_rmm;
 
 use crate::error::Error;
@@ -16,7 +15,6 @@ pub struct MapManager {
 }
 
 impl MapManager {
-
     pub fn new(data_path: &Path) -> MapManager {
         MapManager {
             data_path: data_path.into(),
