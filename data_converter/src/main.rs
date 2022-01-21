@@ -276,8 +276,7 @@ fn convert_rle_data() {
         for rle in resources.iter() {
             if let Some(file_num) = rle.file_num {
                 for item in &list.items {
-                    if item.entry.file() == file_num
-                        && item.entry.index() == rle.index()
+                    if item.entry.index() == rle.index()
                         {
                             matches += 1;
                             let file_name = format!("{}_{}.png",

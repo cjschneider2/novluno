@@ -13,4 +13,4 @@ path = "../cp949"
 byteorder = "*"
 
 [dev-dependencies]
-png = "*"
+png = "0.17.2"
