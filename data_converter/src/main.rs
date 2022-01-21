@@ -305,7 +305,7 @@ fn convert_rle_data() {
                                 let mut encoder = png::Encoder::new(writer,
                                                                     rle.width as u32,
                                                                     rle.height as u32) ;
-                                encoder.set_color(png::ColorType::RGBA);
+                                encoder.set_color(png::ColorType::Rgba);
                                 encoder.set_depth(png::BitDepth::Eight);
                                 let mut writer = encoder.write_header().unwrap();
 
