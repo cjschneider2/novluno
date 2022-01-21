@@ -46,25 +46,29 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
         resource_offsets.push(val);
     }
 
-    // println!("Loading {} resources at offsets:{:?}", total_resources, resource_offsets);
+    /*
+    dbg!(file_number);
+    println!("Loading {} resources at offsets:{:?}", total_resources, resource_offsets);
+    dbg!(data.len());
+    */
 
     for (idx, offset) in resource_offsets.iter().enumerate() {
-
-        let offset = *offset;
-
-        if offset == 0 {
-            // we'll skip 0 (null) offsets as I think they are just placeholders in the file
-            // but we can't ignore them in the resource offset list because the index of the
-            // resource is important
-            continue;
-        }
+        let offset = match *offset {
+            0 => {
+                // we'd skip 0 (null) offsets as I think they are just placeholders in the file
+                // but we can't ignore them in the resource offset list because the index of the
+                // resource is important.
+                continue;
+            }
+            offset => offset
+        };
 
         let mut resource = Resource::new();
         cursor.seek(SeekFrom::Start(offset as u64))?;
 
         // resource id's
-        resource.file_num = Some(file_number);
-        resource.set_index(idx as u32);
+        resource.file_num = file_number;
+        resource.index = idx as u32;
         resource.offset = offset;
 
         // read the resource header
@@ -87,6 +91,7 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
             }
         } else {
             println!("wrongly sized resource: ({}, {})", resource.width, resource.height);
+            // dbg!(&(resource.file_num, resource.index));
             // oversized resource
             resource.image_raw.push(0xFF); // R
             resource.image_raw.push(0xFF); // G
@@ -117,10 +122,10 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
                         let _y = y * 4 * resource.width as i32;
                         let _x = x * 4;
                         let idx: usize = _y as usize + _x as usize;
-                        resource.image_raw[idx]   = r;
-                        resource.image_raw[idx+1] = g;
-                        resource.image_raw[idx+2] = b;
-                        resource.image_raw[idx+3] = 0xFF;
+                        resource.image_raw[idx] = r;
+                        resource.image_raw[idx + 1] = g;
+                        resource.image_raw[idx + 2] = b;
+                        resource.image_raw[idx + 3] = 0xFF;
 
                         x += 1;
                     }
@@ -172,6 +177,12 @@ mod tests {
     fn test_c0000042_rle() {
         let data = include_bytes!("../../../data/RLEs/Chr/C00/c0000042.rle");
         let rle = parse_rle(42, data).unwrap();
+    }
+
+    #[test]
+    fn test_c0200188_rle() {
+        let data = include_bytes!("../../../data/RLEs/Chr/C02/c0200188.rle");
+        let rle = parse_rle(188, data).unwrap();
     }
 
     #[test]

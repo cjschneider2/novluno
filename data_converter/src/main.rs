@@ -4,12 +4,12 @@ extern crate core_compat;
 extern crate png;
 extern crate xml_writer;
 
+
 use std::path::Path;
 use std::path::PathBuf;
 use std::fs::File;
 use std::fs::read_dir;
 use std::io::Read;
-// use std::io::Write;
 use std::io::BufWriter;
 
 use core_compat::entity::resource_file::ResourceFile;
@@ -24,40 +24,40 @@ use core_compat::parser::rmd::parse_rmd;
 use core_compat::parser::rmm::parse_rmm;
 use core_compat::parser::lst::parse_lst;
 
-static OUTPUT_PATH: &'static str = "../temp/";
+static OUTPUT_PATH: &'static str = "./temp/";
 
 // This is the list of data folder's and list files for them
 static RLE_ENTRIES: [(&'static str, &'static str, &'static str, &'static str, bool); 16] = [
     // type      |short| source path           | source list path          | type 2?
-    ("bullets",   "bul", "../data/RLEs/Bul",     "../data/RLEs/bul.lst",     false),
-    ("icons",     "ico", "../data/RLEs/Ico",     "../data/RLEs/ico.lst",     false),
-    ("objects",   "obj", "../data/RLEs/Obj",     "../data/RLEs/obj.lst",     true),
-    ("tiles",     "tle", "../data/RLEs/Tle",     "../data/RLEs/tle.lst",     false),
-    ("interface", "int", "../data/RLEs/Int",     "../data/RLEs/int.lst",     false),
-    ("philar",    "ch0", "../data/RLEs/Chr/C00", "../data/RLEs/Chr/c00.lst", false),
-    ("azlar",     "ch1", "../data/RLEs/Chr/C01", "../data/RLEs/Chr/c01.lst", false),
-    ("sadad",     "ch2", "../data/RLEs/Chr/C02", "../data/RLEs/Chr/c02.lst", false),
-    ("destino",   "ch3", "../data/RLEs/Chr/C03", "../data/RLEs/Chr/c03.lst", false),
-    ("jarexx",    "ch4", "../data/RLEs/Chr/C04", "../data/RLEs/Chr/c04.lst", false),
-    ("canon",     "ch5", "../data/RLEs/Chr/C05", "../data/RLEs/Chr/c05.lst", false),
-    ("kitara",    "ch6", "../data/RLEs/Chr/C06", "../data/RLEs/Chr/c06.lst", false),
-    ("lunarena",  "ch7", "../data/RLEs/Chr/C07", "../data/RLEs/Chr/c07.lst", false),
-    ("lavita",    "ch8", "../data/RLEs/Chr/C08", "../data/RLEs/Chr/c08.lst", false),
-    ("ch_9_gm",   "ch9", "../data/RLEs/Chr/C09", "../data/RLEs/Chr/c09.lst", false),
-    ("extra_chr", "etc", "../data/RLEs/Chr/Etc", "../data/RLEs/Chr/etc.lst", false),
+    ("bullets",   "bul", "./data/RLEs/Bul",     "./data/RLEs/bul.lst",     false),
+    ("icons",     "ico", "./data/RLEs/Ico",     "./data/RLEs/ico.lst",     false),
+    ("objects",   "obj", "./data/RLEs/Obj",     "./data/RLEs/obj.lst",     true),
+    ("tiles",     "tle", "./data/RLEs/Tle",     "./data/RLEs/tle.lst",     false),
+    ("interface", "int", "./data/RLEs/Int",     "./data/RLEs/int.lst",     false),
+    ("philar",    "ch0", "./data/RLEs/Chr/C00", "./data/RLEs/Chr/c00.lst", false),
+    ("azlar",     "ch1", "./data/RLEs/Chr/C01", "./data/RLEs/Chr/c01.lst", false),
+    ("sadad",     "ch2", "./data/RLEs/Chr/C02", "./data/RLEs/Chr/c02.lst", false),
+    ("destino",   "ch3", "./data/RLEs/Chr/C03", "./data/RLEs/Chr/c03.lst", false),
+    ("jarexx",    "ch4", "./data/RLEs/Chr/C04", "./data/RLEs/Chr/c04.lst", false),
+    ("canon",     "ch5", "./data/RLEs/Chr/C05", "./data/RLEs/Chr/c05.lst", false),
+    ("kitara",    "ch6", "./data/RLEs/Chr/C06", "./data/RLEs/Chr/c06.lst", false),
+    ("lunarena",  "ch7", "./data/RLEs/Chr/C07", "./data/RLEs/Chr/c07.lst", false),
+    ("lavita",    "ch8", "./data/RLEs/Chr/C08", "./data/RLEs/Chr/c08.lst", false),
+    ("ch_9_gm",   "ch9", "./data/RLEs/Chr/C09", "./data/RLEs/Chr/c09.lst", false),
+    ("extra_chr", "etc", "./data/RLEs/Chr/Etc", "./data/RLEs/Chr/etc.lst", false),
     // The sounds one is the only one which is a little different...
     // ("Sounds", "snd", "../data/RLEs/Snd", "../data/RLEs/snd.lst"),
 ];
 
 static RMM_ENTRY: (&'static str, &'static str) =
-    ("maps", "../data/DATAs/Map");
+    ("maps", "./data/DATAs/Map");
 
 static RMD_ENTRIES: [(&'static str, &'static str, &'static str, RmdType); 5] = [
-    ("bullet", "bul", "../data/DATAs/Bul", RmdType::Bullet),
-    ("char",   "chr", "../data/DATAs/Chr", RmdType::Character),
-    ("icon",   "ico", "../data/DATAs/Ico", RmdType::Icon),
-    ("object", "obj", "../data/DATAs/Obj", RmdType::Object),
-    ("tile",   "tle", "../data/DATAs/Tle", RmdType::Tile),
+    ("bullet", "bul", "./data/DATAs/Bul", RmdType::Bullet),
+    ("char",   "chr", "./data/DATAs/Chr", RmdType::Character),
+    ("icon",   "ico", "./data/DATAs/Ico", RmdType::Icon),
+    ("object", "obj", "./data/DATAs/Obj", RmdType::Object),
+    ("tile",   "tle", "./data/DATAs/Tle", RmdType::Tile),
 ];
 
 fn main() {
@@ -253,68 +253,76 @@ fn convert_rle_data() {
         let list_path = Path::new(list);
         let list = load_list_data(&list_path, use_v2).unwrap();
 
-        println!("list.items.len() == {:?}", list.items.len());
+        dbg!(list.items.len());
 
         // load the actual sprites into the database
-        let rle_paths = read_dir(folder).unwrap();
+        let rle_paths: Vec<std::fs::DirEntry> = read_dir(folder).unwrap().filter_map(|ent| ent.ok()).collect();
         let mut resources = Vec::<Resource>::new();
 
-        for entry in rle_paths {
-            let entry = entry.unwrap();
+        dbg!(rle_paths.len());
+        for entry in rle_paths.into_iter() {
             let path = entry.path();
 
-            let res_file: ResourceFile = load_rle_data(&path).unwrap();
-
-            for resource in res_file.resources {
-                resources.push(resource);
+            match load_rle_data(&path) {
+                Err(e) => {
+                    dbg!(e);
+                }
+                Ok(res_file) => {
+                    for resource in res_file.resources {
+                        resources.push(resource);
+                    }
+                }
             }
         }
+
+        dbg!(&resources.len());
 
         // Commit all of the sprite objects in one transaction
         let mut combi_entries: Vec<RleCombiEntry> = Vec::new();
         let mut matches = 0;
+
         for rle in resources.iter() {
-            if let Some(file_num) = rle.file_num {
-                for item in &list.items {
-                    if item.entry.index() == rle.index()
-                        {
-                            matches += 1;
-                            let file_name = format!("{}_{}.png",
-                                                    &short_kind,
-                                                    item.id);
-                            let ent = RleCombiEntry {
-                                id: item.id,
-                                name: item.name.clone(),
-                                x_offset: rle.offset_x,
-                                y_offset: rle.offset_y,
-                                width: rle.width,
-                                height: rle.height,
-                                file_name: file_name.clone(),
-                            };
-                            combi_entries.push(ent);
+            for item in &list.items {
+                if item.entry.file() == rle.file_num
+                    && item.entry.index() == rle.index
+                {
+                    matches += 1;
+                    let file_name = format!("{}_{}.png",
+                                            &short_kind,
+                                            item.id);
+                    let ent = RleCombiEntry {
+                        id: item.id,
+                        name: item.name.clone(),
+                        x_offset: rle.offset_x,
+                        y_offset: rle.offset_y,
+                        width: rle.width,
+                        height: rle.height,
+                        file_name: file_name.clone(),
+                    };
+                    combi_entries.push(ent);
 
-                            // Generate the png files
-                            let mut path_buf = PathBuf::new();
-                            path_buf.push(OUTPUT_PATH);
-                            path_buf.push(&short_kind);
-                            path_buf.push(file_name);
-                            println!("{:?}", &path_buf);
-                            if let Ok(file) = File::create(&path_buf) {
-                                let ref mut writer = BufWriter::new(file);
+                    // Generate the png files
+                    let mut path_buf = PathBuf::new();
+                    path_buf.push(OUTPUT_PATH);
+                    path_buf.push(&short_kind);
+                    path_buf.push(file_name);
+                    if let Ok(file) = File::create(&path_buf) {
+                        let ref mut writer = BufWriter::new(file);
 
-                                let mut encoder = png::Encoder::new(writer,
-                                                                    rle.width as u32,
-                                                                    rle.height as u32) ;
-                                encoder.set_color(png::ColorType::Rgba);
-                                encoder.set_depth(png::BitDepth::Eight);
-                                let mut writer = encoder.write_header().unwrap();
+                        let mut encoder = png::Encoder::new(writer,
+                                                            rle.width as u32,
+                                                            rle.height as u32);
+                        encoder.set_color(png::ColorType::Rgba);
+                        encoder.set_depth(png::BitDepth::Eight);
+                        let mut writer = encoder.write_header().unwrap();
 
-                                writer.write_image_data(&rle.image_raw).unwrap();
-                            }
-                        }
+                        writer.write_image_data(&rle.image_raw).unwrap();
+                    }
                 }
             }
         } // end resource iter
+
+        dbg!(matches);
 
         // write out descriptor file
         {
@@ -346,9 +354,6 @@ fn convert_rle_data() {
                 xml.flush().unwrap();
             }
         }
-
-        println!("resources.len()  == {:?}", &resources.len());
-        println!("matches          == {:?}", matches);
     } // end kind entry loop
 }
 
@@ -386,7 +391,7 @@ fn load_rle_data(path: &Path) -> Result<ResourceFile, Error> {
             let num: String = stem.matches(char::is_numeric).collect();
             file_num = num.parse().unwrap_or(0xFFFF);
             // we really only need a maximum of 5 digits...
-            file_num = file_num % 99_999;
+            file_num = file_num % 10_000;
         }
     }
 

@@ -21,10 +21,7 @@ pub fn parse_lst(data: &[u8], use_v2: bool) -> Result<List, Error> {
         let chr = cursor.read_u8()?;
         string.push(chr);
     }
-    {
-        let file_type: &str = from_utf8(&string)?;
-        // println!("{:?}", &file_type);
-    }
+    let file_type: &str = from_utf8(&string)?;
     // file version length prefixed string
     let version: &str;
     {
@@ -35,7 +32,6 @@ pub fn parse_lst(data: &[u8], use_v2: bool) -> Result<List, Error> {
             string.push(chr);
         }
         version = from_utf8(&string)?;
-        // println!("{:?}", &version);
     }
 
     if use_v2 {

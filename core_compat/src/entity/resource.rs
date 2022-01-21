@@ -2,8 +2,8 @@ use crate::utility::pixel::Pixel;
 
 #[derive(Debug)]
 pub struct Resource {
-    pub file_num: Option<u32>,
-    index: u32,
+    pub file_num: u32,
+    pub index: u32,
     pub offset: u32,
     pub len: u32,
     pub offset_x: i32,
@@ -21,7 +21,7 @@ pub struct Resource {
 impl Resource {
     pub fn new() -> Resource {
         Resource {
-            file_num: None,
+            file_num: 0,
             index: 0,
             offset: 0,
             len: 0,
@@ -35,13 +35,5 @@ impl Resource {
             unknown_4: 0,
             image_raw: Vec::new(),
         }
-    }
-
-    pub fn set_index(&mut self, val: u32) {
-        self.index = val;
-    }
-
-    pub fn index(&self) -> u32 {
-        self.index
     }
 }

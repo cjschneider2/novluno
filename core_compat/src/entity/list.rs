@@ -1,6 +1,7 @@
 
 use crate::entity::list_item::ListItem;
 
+#[derive(Debug)]
 pub struct List {
     pub items: Vec<ListItem>,
 }
