@@ -10,7 +10,7 @@ pub enum Error {
     Io(io::Error),
     MissingMapIdentifier,
     MissingRleIdentifier,
-    UnknownOffsetTypeAt(u64),
+    UnknownOffsetTypeAt(u64, u8),
     Utf8(Utf8Error),
 }
 

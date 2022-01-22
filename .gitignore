@@ -33,3 +33,4 @@ doc/server_comm_logs/
 .vscode
 */.vscode
 
+/client/lib/SDL2-2/

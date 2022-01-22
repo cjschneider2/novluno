@@ -143,8 +143,8 @@ mod tests {
     fn test_tle_00001() {
         let data = include_bytes!("../../../data/DATAs/Tle/tle00001.rmd");
         let rmd = parse_rmd(RmdType::Tile, data).unwrap();
-        // assert!(rmd.row_count() as usize == rmd.rows.len());
-        // assert!(rmd.animation_count() as usize == rmd.animations.len());
+        assert!(rmd.row_count() as usize == rmd.rows.len());
+        assert!(rmd.animation_count() as usize == rmd.animations.len());
     }
 
     #[test]

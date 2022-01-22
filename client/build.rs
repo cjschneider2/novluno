@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 fn main() {
     let target = std::env::var("TARGET").unwrap();
-    // println!("target: {}", target);
+    println!("target: {}", target);
     if target.contains("pc-windows") {
         let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
         let out_dir = std::env::var("OUT_DIR").unwrap();

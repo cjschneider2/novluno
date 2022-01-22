@@ -133,14 +133,29 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
                 0x02 => {
                     /* Move `x` pos */
                     let pixels = cursor.read_i32::<LE>()?;
-                    x += pixels / 2; // NOTE: the two is probaby a u16 jump?
+                    x += pixels / 2; // NOTE: the two is probably a u16 jump?
                 }
                 0x03 => {
                     /* Next line */
                     y += 1;
                 }
-                _ => {
-                    return Err(Error::UnknownOffsetTypeAt(cursor.position()));
+                val => {
+                    /*
+                    println!("{:?}: dumping rest of resource into image", Error::UnknownOffsetTypeAt(cursor.position(), val));
+                    if let Some(&next_offset) = resource_offsets.get(idx + 1) {
+                        let rest_bytes: usize = (next_offset as usize) - (cursor.position() as usize);
+                        for b_idx in 0..rest_bytes {
+                            let _idx = b_idx as usize;
+                            let data = cursor.read_u16::<LE>()?;
+                            let (r, g, b) = format_r5g6b5_norm(data);
+                            resource.image_raw[_idx] = r;
+                            resource.image_raw[_idx + 1] = g;
+                            resource.image_raw[_idx + 2] = b;
+                            resource.image_raw[_idx + 3] = 0xFF;
+                        }
+                    }
+                    */
+                    return Err(Error::UnknownOffsetTypeAt(cursor.position(), val));
                 }
             }
         }
