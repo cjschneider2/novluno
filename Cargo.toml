@@ -3,6 +3,7 @@ members = [
     "geometry",
     "core_compat",
     "client",
+    "client_new",
     "server",
     "data_converter",
     "cp949",

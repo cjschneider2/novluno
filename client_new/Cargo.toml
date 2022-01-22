@@ -1,0 +1,14 @@
+[package]
+name = "client_new"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+winit = "^0.26"
+glow = "^0.11"
+imgui = "^0.8"
+imgui-rs = "^1.47"
+imgui-glow-renderer = "^0.8"
+imgui-winit-support = "^0.8"
