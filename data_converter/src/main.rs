@@ -71,15 +71,54 @@ fn main() {
     }
 
     // parse the list file and insert them into the database
-    convert_rle_data(false);
+    // convert_rle_data(false);
 
     // convert the maps ...
+    export_map_images();
     // convert_rmm_data();
 
     // ... and rmd files
     // convert_rmd_data();
 
     println!("finished!");
+}
+
+fn export_map_images() {
+    // create the output directory if it doesn't exist yet
+    let mut map_out_dir = PathBuf::new();
+    map_out_dir.push(OUTPUT_PATH);
+    map_out_dir.push("map");
+    println!("Creating directory: {:?}", map_out_dir);
+    match std::fs::create_dir(map_out_dir) {
+        Ok(_) => (),
+        Err(e) => println!("{:?}", e),
+    }
+
+    // book-keeping of map data paths
+    let (kind, path) = RMM_ENTRY;
+    let map_path = Path::new(path);
+    let map_file_paths = read_dir(map_path).unwrap();
+
+    // parse the map files in the map directory
+    let mut map_list: Vec<Map> = Vec::new();
+    for entry in map_file_paths {
+        let entry = entry.unwrap();
+        let path = entry.path();
+        let map: Map = match load_rmm_data(&path) {
+            Ok(map) => map,
+            Err(e) => {
+                println!("{:?}", e);
+                println!("{:?}", path);
+                continue;
+            }
+        };
+        map_list.push(map);
+    }
+    println!("parsed {} map entries.", map_list.len());
+
+    for map in map_list.iter() {
+        println!("map: {}, name: {}", map.number, map.name);
+    }
 }
 
 fn convert_rmd_data() {

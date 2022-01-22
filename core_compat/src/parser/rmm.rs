@@ -63,11 +63,12 @@ pub fn parse_rmm(data: &[u8]) -> Result<Map, Error> {
     map.set_size_x(cursor.read_u32::<LE>()?);
     map.set_size_y(cursor.read_u32::<LE>()?);
 
-    // Map String (name?)
+    // Map name?
     map.set_id_count(cursor.read_u8()?);
     for idx in 0..(map.id_count()) {
         map.add_id_list_val(cursor.read_u8()?);
     }
+    map.name = cp949::cp949_to_utf8(&map.id_list);
 
     // the map number described by this file...
     map.set_map_number(cursor.read_u32::<LE>()?);
@@ -169,6 +170,13 @@ fn parse_v2(cursor: &mut Cursor<&[u8]>) -> Result<MapTile, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_map00000_rmm() {
+        let data = include_bytes!("../../../data/DATAs/Map/Map00000.rmm");
+        let map = parse_rmm(data).unwrap();
+        assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
+    }
 
     #[test]
     fn test_map00001_rmm() {

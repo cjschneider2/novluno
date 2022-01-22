@@ -181,7 +181,7 @@ impl Game {
                     }
 
                     // -- load animations
-                    for _ani in rmd.animations() {
+                    for _ani in rmd.animations.iter() {
                         // todo
                     }
                 } else {

@@ -78,19 +78,19 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     let string = parse_cp949(&mut cursor)?;
     // println!("str 1: `{:?}`", string);
 
-    rmd.set_animation_parts(cursor.read_i32::<LE>()?);
-    rmd.set_animation_entry_count(cursor.read_i32::<LE>()?);
+    rmd.animation_parts = cursor.read_i32::<LE>()?;
+    rmd.animation_entry_count = cursor.read_i32::<LE>()?;
 
     // let string = parse_u8_vec(&mut cursor)?;
     let string = parse_cp949(&mut cursor)?;
     // println!("str 2: `{:?}`", string);
 
-    rmd.set_entry_count(cursor.read_i32::<LE>()?);
+    rmd.entry_count = cursor.read_i32::<LE>()?;
 
     // println!("end header offset: `{}`", cursor.position());
 
     // read the Rmd rows
-    for _ in 0..rmd.entry_count() {
+    for _ in 0..rmd.entry_count {
         let mut entry = RmdEntry::new();
         entry.set_image_count(cursor.read_i32::<LE>()?);
         for _ in 0..entry.image_count() {
@@ -99,11 +99,11 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
             img.source_y1 = cursor.read_i32::<LE>()?;
             img.source_x2 = cursor.read_i32::<LE>()?;
             img.source_y2 = cursor.read_i32::<LE>()?;
-            img.empty_1   = cursor.read_i32::<LE>()?;
-            img.empty_2   = cursor.read_i32::<LE>()?;
-            img.dest_x    = cursor.read_i32::<LE>()?;
-            img.dest_y    = cursor.read_i32::<LE>()?;
-            img.render_z  = cursor.read_i32::<LE>()?;
+            img.empty_1 = cursor.read_i32::<LE>()?;
+            img.empty_2 = cursor.read_i32::<LE>()?;
+            img.dest_x = cursor.read_i32::<LE>()?;
+            img.dest_y = cursor.read_i32::<LE>()?;
+            img.render_z = cursor.read_i32::<LE>()?;
             img.draw_type = cursor.read_i32::<LE>()?;
             img.image_id_count = cursor.read_i32::<LE>()?;
             for _ in 0..img.image_id_count {
@@ -114,9 +114,9 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
         rmd.add_entry(entry);
     }
 
-    rmd.set_animation_count(cursor.read_i32::<LE>()?);
+    rmd.animation_count = cursor.read_i32::<LE>()?;
 
-    for _ in 0..rmd.animation_count() {
+    for _ in 0..rmd.animation_count {
         let mut ani = RmdAnimation::new(cursor.read_i32::<LE>()?);
         for _ in 0..ani.frame_count() {
             ani.add_frame(cursor.read_i16::<LE>()?);
@@ -134,8 +134,8 @@ mod tests {
 
     fn print_ani_info(rmd: &Rmd) {
         println!();
-        println!("rmd.animation_count: {:?}", &rmd.animation_count());
-        println!("rmd.image_count:     {:?}", &rmd.entry_count());
+        println!("rmd.animation_count: {:?}", &rmd.animation_count);
+        println!("rmd.image_count:     {:?}", &rmd.entry_count);
         assert!(false);
     }
 
@@ -143,8 +143,7 @@ mod tests {
     fn test_tle_00001() {
         let data = include_bytes!("../../../data/DATAs/Tle/tle00001.rmd");
         let rmd = parse_rmd(RmdType::Tile, data).unwrap();
-        assert!(rmd.row_count() as usize == rmd.rows.len());
-        assert!(rmd.animation_count() as usize == rmd.animations.len());
+        assert_eq!(rmd.animation_count as usize, rmd.animations.len());
     }
 
     #[test]
