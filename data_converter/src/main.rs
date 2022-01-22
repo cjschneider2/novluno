@@ -54,10 +54,10 @@ static RMM_ENTRY: (&'static str, &'static str) =
 
 static RMD_ENTRIES: [(&'static str, &'static str, &'static str, RmdType); 5] = [
     ("bullet", "bul", "./data/DATAs/Bul", RmdType::Bullet),
-    ("char",   "chr", "./data/DATAs/Chr", RmdType::Character),
-    ("icon",   "ico", "./data/DATAs/Ico", RmdType::Icon),
+    ("char", "chr", "./data/DATAs/Chr", RmdType::Character),
+    ("icon", "ico", "./data/DATAs/Ico", RmdType::Icon),
     ("object", "obj", "./data/DATAs/Obj", RmdType::Object),
-    ("tile",   "tle", "./data/DATAs/Tle", RmdType::Tile),
+    ("tile", "tle", "./data/DATAs/Tle", RmdType::Tile),
 ];
 
 fn main() {
@@ -71,7 +71,7 @@ fn main() {
     }
 
     // parse the list file and insert them into the database
-    convert_rle_data();
+    convert_rle_data(false);
 
     // convert the maps ...
     // convert_rmm_data();
@@ -133,7 +133,7 @@ fn convert_rmm_data() {
             Err(e) => {
                 println!("{:?}", e);
                 println!("{:?}", path);
-                continue
+                continue;
             }
         };
         map_list.push(map);
@@ -233,11 +233,11 @@ fn convert_rmm_data() {
     }
 }
 
-fn convert_rle_data() {
-    for &(kind, short_kind, folder, list, use_v2) in RLE_ENTRIES.iter() {
-        println!("file: {:?}", &kind);
+fn convert_rle_data(use_lst: bool) {
+    for &(kind, short_kind, folder, list_name, use_v2) in RLE_ENTRIES.iter() {
+        dbg!("file: {:?}", &kind);
 
-        // create a subfolder for the data if it doesn't exist
+        // create a sub-folder for the data if it doesn't exist
         let mut out_dir = PathBuf::new();
         out_dir.push(OUTPUT_PATH);
         out_dir.push(short_kind);
@@ -248,12 +248,13 @@ fn convert_rle_data() {
         }
         println!("Created: {:?}", out_dir.canonicalize().unwrap());
 
-
-        // load the data from the list file
-        let list_path = Path::new(list);
-        let list = load_list_data(&list_path, use_v2).unwrap();
-
-        dbg!(list.items.len());
+        let list_data = List { items: vec![] };
+        if use_lst {
+            // load the data from the list file
+            let list_path = Path::new(list_name);
+            let list_data = load_list_data(&list_path, use_v2).unwrap();
+            dbg!(list_data.items.len());
+        }
 
         // load the actual sprites into the database
         let rle_paths: Vec<std::fs::DirEntry> = read_dir(folder).unwrap().filter_map(|ent| ent.ok()).collect();
@@ -281,80 +282,84 @@ fn convert_rle_data() {
         let mut combi_entries: Vec<RleCombiEntry> = Vec::new();
         let mut matches = 0;
 
-        for rle in resources.iter() {
-            for item in &list.items {
-                if item.entry.file() == rle.file_num
-                    && item.entry.index() == rle.index
-                {
-                    matches += 1;
-                    let file_name = format!("{}_{}.png",
-                                            &short_kind,
-                                            item.id);
-                    let ent = RleCombiEntry {
-                        id: item.id,
-                        name: item.name.clone(),
-                        x_offset: rle.offset_x,
-                        y_offset: rle.offset_y,
-                        width: rle.width,
-                        height: rle.height,
-                        file_name: file_name.clone(),
-                    };
-                    combi_entries.push(ent);
+        if use_lst {
+            for rle in resources.iter() {
+                for item in &list_data.items {
+                    if item.entry.file() == rle.file_num
+                        && item.entry.index() == rle.index
+                    {
+                        matches += 1;
+                        let file_name = format!("{}_{}.png", &short_kind, item.id);
+                        combi_entries.push(RleCombiEntry {
+                            id: item.id,
+                            name: item.name.clone(),
+                            x_offset: rle.offset_x,
+                            y_offset: rle.offset_y,
+                            width: rle.width,
+                            height: rle.height,
+                            file_name: file_name.clone(),
+                        });
 
-                    // Generate the png files
-                    let mut path_buf = PathBuf::new();
-                    path_buf.push(OUTPUT_PATH);
-                    path_buf.push(&short_kind);
-                    path_buf.push(file_name);
-                    if let Ok(file) = File::create(&path_buf) {
-                        let ref mut writer = BufWriter::new(file);
-
-                        let mut encoder = png::Encoder::new(writer,
-                                                            rle.width as u32,
-                                                            rle.height as u32);
-                        encoder.set_color(png::ColorType::Rgba);
-                        encoder.set_depth(png::BitDepth::Eight);
-                        let mut writer = encoder.write_header().unwrap();
-
-                        writer.write_image_data(&rle.image_raw).unwrap();
+                        // Generate the png files
+                        write_png(short_kind, &file_name, rle);
                     }
                 }
             }
-        } // end resource iter
-
-        dbg!(matches);
-
-        // write out descriptor file
-        {
-            let file_name = format!("{}.xml", kind);
-            let mut path_buf = PathBuf::new();
-            path_buf.push(OUTPUT_PATH);
-            path_buf.push(file_name);
-
-            let file = File::create(&path_buf).unwrap();
-            let writer = BufWriter::new(file);
-
-            let kind_str = format!("{}", kind);
-            {
-                let mut xml = xml_writer::XmlWriter::new(writer);
-                xml.begin_elem(&kind_str).unwrap();
-                for entry in combi_entries {
-                    xml.begin_elem("entry").unwrap();
-                    xml.attr("id", &format!("{}", entry.id)).unwrap();
-                    xml.attr("name", &entry.name).unwrap();
-                    xml.attr("x_offset", &format!("{}", entry.x_offset)).unwrap();
-                    xml.attr("y_offset", &format!("{}", entry.y_offset)).unwrap();
-                    xml.attr("width", &format!("{}", entry.width)).unwrap();
-                    xml.attr("height", &format!("{}", entry.height)).unwrap();
-                    xml.attr("file_name", &entry.file_name).unwrap();
-                    xml.end_elem().unwrap();
-                }
-                xml.end_elem().unwrap();
-                xml.close().unwrap();
-                xml.flush().unwrap();
+            dbg!(matches);
+            // write out descriptor file
+            write_list_file(kind, combi_entries);
+        } else {
+            for rle in resources.iter() {
+                let file_name = format!("{}_{}-{}.png", &short_kind, rle.file_num, rle.index);
+                write_png(short_kind, &file_name, rle);
             }
         }
     } // end kind entry loop
+}
+
+fn write_png(subdir: &str, file_name: &str, rle: &Resource) {
+    let mut path_buf = PathBuf::new();
+    path_buf.push(OUTPUT_PATH);
+    path_buf.push(&subdir);
+    path_buf.push(file_name);
+    if let Ok(file) = File::create(&path_buf) {
+        let ref mut writer = BufWriter::new(file);
+        let mut encoder = png::Encoder::new(writer,
+                                            rle.width as u32,
+                                            rle.height as u32);
+        encoder.set_color(png::ColorType::Rgba);
+        encoder.set_depth(png::BitDepth::Eight);
+        let mut writer = encoder.write_header().unwrap();
+        writer.write_image_data(&rle.image_raw).unwrap();
+    }
+}
+
+fn write_list_file(kind: &str, combi_entries: Vec<RleCombiEntry>) {
+    let file_name = format!("{}.xml", kind);
+    let mut path_buf = PathBuf::new();
+    path_buf.push(OUTPUT_PATH);
+    path_buf.push(file_name);
+
+    let file = File::create(&path_buf).unwrap();
+    let writer = BufWriter::new(file);
+
+    let kind_str = format!("{}", kind);
+    let mut xml = xml_writer::XmlWriter::new(writer);
+    xml.begin_elem(&kind_str).unwrap();
+    for entry in combi_entries {
+        xml.begin_elem("entry").unwrap();
+        xml.attr("id", &format!("{}", entry.id)).unwrap();
+        xml.attr("name", &entry.name).unwrap();
+        xml.attr("x_offset", &format!("{}", entry.x_offset)).unwrap();
+        xml.attr("y_offset", &format!("{}", entry.y_offset)).unwrap();
+        xml.attr("width", &format!("{}", entry.width)).unwrap();
+        xml.attr("height", &format!("{}", entry.height)).unwrap();
+        xml.attr("file_name", &entry.file_name).unwrap();
+        xml.end_elem().unwrap();
+    }
+    xml.end_elem().unwrap();
+    xml.close().unwrap();
+    xml.flush().unwrap();
 }
 
 fn load_rmd_data(path: &Path, kind: RmdType) -> Result<Rmd, Error> {
