@@ -1,15 +1,14 @@
 [workspace]
 members = [
-    "geometry",
-    "core_compat",
     "client",
-    "server",
-    "data_converter",
+    "core_compat",
     "cp949",
-    # Experiments
-    #"experiments/client_amethyst",
+    "data_converter",
+    "geometry",
+    "experiments/server",
+    "wasm-client"
+    ## Experiments
     #"experiments/rm_viewer"
-    #"experiments/rm_viewer_v2"
 ]
 
 [profile.release]
