@@ -6,9 +6,6 @@ members = [
     "data_converter",
     "geometry",
     "experiments/server",
-    "wasm-client"
-    ## Experiments
-    #"experiments/rm_viewer"
 ]
 
 [profile.release]

@@ -7,7 +7,7 @@ authors = ["C. Jeremiah Schneider <csjchneider2@gmail.com>"]
 path = "../core_compat"
 
 [dependencies.rusqlite]
-version = "0.11"
+version = "0.29"
 features = ["bundled", "blob"]
 
 [dependencies]
