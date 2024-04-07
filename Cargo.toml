@@ -1,11 +1,11 @@
 [workspace]
+resolver = "2"
 members = [
     "client",
     "core_compat",
     "cp949",
     "data_converter",
     "geometry",
-    "experiments/server",
 ]
 
 [profile.release]
