@@ -1,6 +1,6 @@
-use crate::entity::rmd_type::RmdType;
 use crate::entity::rmd_animation::RmdAnimation;
 use crate::entity::rmd_entry::RmdEntry;
+use crate::entity::rmd_type::RmdType;
 
 #[derive(Debug)]
 pub struct Rmd {

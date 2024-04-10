@@ -4,7 +4,7 @@ pub struct Size<T> {
     pub height: T,
 }
 
-impl <T> Size<T> {
+impl<T> Size<T> {
     pub fn new(width: T, height: T) -> Size<T> {
         Size { width, height }
     }

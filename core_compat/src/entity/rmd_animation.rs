@@ -1,12 +1,10 @@
-
 #[derive(Debug)]
 pub struct RmdAnimation {
     frame_count: i32,
-    frames: Vec<i16> // Rmd row pointer
+    frames: Vec<i16>, // Rmd row pointer
 }
 
 impl RmdAnimation {
-
     pub fn new(frame_count: i32) -> RmdAnimation {
         RmdAnimation {
             frame_count,

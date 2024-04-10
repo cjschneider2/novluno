@@ -1,2 +1,2 @@
-pub mod pixel;
 pub mod parsing;
+pub mod pixel;

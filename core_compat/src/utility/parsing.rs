@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
-use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
+use byteorder::ReadBytesExt;
 
 use cp949::cp949_to_utf8;
 
@@ -11,6 +11,16 @@ pub fn parse_string(cursor: &mut Cursor<&[u8]>) -> Result<String, Error> {
     let string_length = cursor.read_u8()?;
     let mut str_vec = Vec::<u8>::new();
     for _ in 0..string_length {
+        let chr = cursor.read_u8()?;
+        str_vec.push(chr);
+    }
+    let string = String::from_utf8(str_vec)?;
+    Ok(string)
+}
+
+pub fn parse_fixed_len_string(cursor: &mut Cursor<&[u8]>, len: usize) -> Result<String, Error> {
+    let mut str_vec = Vec::<u8>::new();
+    for _ in 0..len {
         let chr = cursor.read_u8()?;
         str_vec.push(chr);
     }

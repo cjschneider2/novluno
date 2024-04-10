@@ -1,18 +1,18 @@
 //! This module has the methods for decoding the Redmoon Online RLE files and
 //! storing / exporting them into various formats.
 
-use std::str::from_utf8;
 use std::io::Cursor;
 use std::io::Seek;
 use std::io::SeekFrom;
+use std::str::from_utf8;
 
-use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
+use byteorder::ReadBytesExt;
 
-use crate::error::Error;
-use crate::utility::pixel::Pixel;
 use crate::entity::resource::Resource;
 use crate::entity::resource_file::ResourceFile;
+use crate::error::Error;
+use crate::utility::pixel::Pixel;
 
 pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
     let mut cursor = Cursor::new(data);
@@ -60,7 +60,7 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
                 // resource is important.
                 continue;
             }
-            offset => offset
+            offset => offset,
         };
 
         let mut resource = Resource::new();
@@ -83,14 +83,20 @@ pub fn parse_rle(file_number: u32, data: &[u8]) -> Result<ResourceFile, Error> {
         resource.unknown_4 = cursor.read_u32::<LE>()?;
 
         // Pre-fill the image buffer with 0's
-        if resource.width < 8000 && resource.width > 0
-            && resource.height < 8000 && resource.height > 0 {
+        if resource.width < 8000
+            && resource.width > 0
+            && resource.height < 8000
+            && resource.height > 0
+        {
             let total_px = resource.width * resource.height * 4 /* bytes / pixel */;
             for _ in 0..total_px {
                 resource.image_raw.push(0x0);
             }
         } else {
-            println!("wrongly sized resource: ({}, {})", resource.width, resource.height);
+            println!(
+                "wrongly sized resource: ({}, {})",
+                resource.width, resource.height
+            );
             // dbg!(&(resource.file_num, resource.index));
             // oversized resource
             resource.image_raw.push(0xFF); // R
@@ -177,32 +183,31 @@ fn format_r5g6b5_norm(d: u16) -> (u8, u8, u8) {
     (r as u8, g as u8, b as u8)
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_c0000000_rle() {
-        let data = include_bytes!("../../../data/RLEs/Chr/C00/c0000000.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Chr/C00/c0000000.rle");
         let rle = parse_rle(0, data).unwrap();
     }
 
     #[test]
     fn test_c0000042_rle() {
-        let data = include_bytes!("../../../data/RLEs/Chr/C00/c0000042.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Chr/C00/c0000042.rle");
         let rle = parse_rle(42, data).unwrap();
     }
 
     #[test]
     fn test_c0200188_rle() {
-        let data = include_bytes!("../../../data/RLEs/Chr/C02/c0200188.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Chr/C02/c0200188.rle");
         let rle = parse_rle(188, data).unwrap();
     }
 
     #[test]
     fn test_ico_00000_rle() {
-        let data = include_bytes!("../../../data/RLEs/Ico/ico00000.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Ico/ico00000.rle");
         let rle = parse_rle(0, data).unwrap();
     }
 }

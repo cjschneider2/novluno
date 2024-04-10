@@ -1,6 +1,6 @@
+use geometry::point::Point;
 use geometry::rectangle::Rectangle;
 use geometry::size::Size;
-use geometry::point::Point;
 
 #[derive(Debug)]
 pub struct RmdImage {
@@ -15,7 +15,7 @@ pub struct RmdImage {
     pub dest_y: i32,
     pub draw_type: i32, // enum { Shadow, skill, normal }
     pub image_id_count: i32,
-    pub image_id: Vec<i32>    // Lst row/entry pointer entries
+    pub image_id: Vec<i32>, // Lst row/entry pointer entries
 }
 
 impl RmdImage {
@@ -36,4 +36,3 @@ impl RmdImage {
         }
     }
 }
-

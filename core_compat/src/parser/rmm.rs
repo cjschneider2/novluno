@@ -26,20 +26,19 @@
 //!            No collision, full collision,
 //!            left top collision, right bottom collision)
 
-
-use std::str::from_utf8;
 use std::io::Cursor;
 use std::io::Seek;
 use std::io::SeekFrom;
+use std::str::from_utf8;
 
-use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
+use byteorder::ReadBytesExt;
 
-use crate::error::Error;
+use crate::entity::entry::Entry;
 use crate::entity::map::Map;
 use crate::entity::map_tile::MapTile;
-use crate::entity::event::Event;
-use crate::entity::entry::Entry;
+use crate::entity::map_event::MapEvent;
+use crate::error::Error;
 
 pub fn parse_rmm(data: &[u8]) -> Result<Map, Error> {
     let mut cursor = Cursor::new(data);
@@ -77,7 +76,7 @@ pub fn parse_rmm(data: &[u8]) -> Result<Map, Error> {
     // NOTE: This is an array of event rectangles for interactions with
     //       things like mailboxes and the like
     for _ in 0..map.event_count() {
-        let event = Event {
+        let event = MapEvent {
             number: cursor.read_u16::<LE>()?,
             left: cursor.read_u32::<LE>()?,
             top: cursor.read_u32::<LE>()?,
@@ -173,28 +172,28 @@ mod tests {
 
     #[test]
     fn test_map00000_rmm() {
-        let data = include_bytes!("../../../data/DATAs/Map/Map00000.rmm");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Map/Map00000.rmm");
         let map = parse_rmm(data).unwrap();
         assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }
 
     #[test]
     fn test_map00001_rmm() {
-        let data = include_bytes!("../../../data/DATAs/Map/Map00001.rmm");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Map/Map00001.rmm");
         let map = parse_rmm(data).unwrap();
         assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }
 
     #[test]
     fn test_map00005_rmm() {
-        let data = include_bytes!("../../../data/DATAs/Map/Map00005.rmm");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Map/Map00005.rmm");
         let map = parse_rmm(data).unwrap();
         assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }
 
     #[test]
     fn test_map00003_rmm() {
-        let data = include_bytes!("../../../data/DATAs/Map/Map00003.rmm");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Map/Map00003.rmm");
         let map = parse_rmm(data).unwrap();
         assert_eq!((map.size_x() * map.size_y()) as usize, map.tile_count());
     }

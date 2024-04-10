@@ -4,7 +4,7 @@ pub struct Point<T> {
     pub y: T,
 }
 
-impl <T> Point<T> {
+impl<T> Point<T> {
     pub fn new(x: T, y: T) -> Point<T> {
         Point { x, y }
     }

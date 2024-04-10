@@ -2,6 +2,7 @@
 name = "data_converter"
 version = "0.1.0"
 authors = ["cjschneider2 <cjschneider2@gmail.com>"]
+edition = "2024"
 
 [dependencies.core_compat]
 path = "../core_compat"

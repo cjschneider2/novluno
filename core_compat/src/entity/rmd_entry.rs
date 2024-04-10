@@ -35,4 +35,3 @@ impl RmdEntry {
         &self.images
     }
 }
-

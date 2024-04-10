@@ -1,14 +1,14 @@
 //! "RedMoon EventInfo File 1.0"
 
-use std::str::from_utf8;
 use std::io::Cursor;
+use std::str::from_utf8;
 
-use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
+use byteorder::ReadBytesExt;
 
 use crate::entity::rmi::Rmi;
 use crate::error::Error;
-use crate::utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
+use crate::utility::parsing::{parse_cp949, parse_string, parse_u8_vec};
 
 const ITEM_INFO_HDR: &str = "RedMoon ItemInfo File 1.0";
 const EVENT_INFO_HDR: &str = "RedMoon EventInfo File 1.0";
@@ -31,11 +31,7 @@ pub fn parse_rmi(data: &[u8]) -> Result<Rmi, Error> {
     Ok(rmi)
 }
 
-fn parse_event_entry(
-    cursor: &mut Cursor<&[u8]>,
-    idx: i32)
-    -> Result<(), Error>
-{
+fn parse_event_entry(cursor: &mut Cursor<&[u8]>, idx: i32) -> Result<(), Error> {
     println!("-- Entry {}", idx);
     println!("-- Cursor Start @ 0x{:x}", cursor.position());
 
@@ -75,9 +71,7 @@ fn parse_event_entry(
             let pos = cursor.position();
             let byte = cursor.read_u8()?;
             println!("    -- byte value 0x{:x} @ 0x{:x}", byte, pos);
-            if byte <= 1
-            || byte == 0x44
-            || byte == 0x60 {
+            if byte <= 1 || byte == 0x44 || byte == 0x60 {
                 cont = false;
             }
             cursor.set_position(pos);
@@ -95,7 +89,7 @@ mod tests {
 
     #[test]
     fn test_rmi_event00() {
-        let data = include_bytes!("../../../data/DATAs/Info/event00.rmi");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Info/event00.rmi");
         let rmi = parse_rmi(data);
         rmi.unwrap();
     }

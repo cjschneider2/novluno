@@ -4,53 +4,147 @@ extern crate core_compat;
 extern crate png;
 extern crate xml_writer;
 
-
+use std::fs::read_dir;
+use std::fs::File;
+use std::io::BufWriter;
+use std::io::Read;
 use std::path::Path;
 use std::path::PathBuf;
-use std::fs::File;
-use std::fs::read_dir;
-use std::io::Read;
-use std::io::BufWriter;
 
-use core_compat::entity::resource_file::ResourceFile;
+use core_compat::entity::list::List;
+use core_compat::entity::map::Map;
 use core_compat::entity::resource::Resource;
+use core_compat::entity::resource_file::ResourceFile;
 use core_compat::entity::rmd::Rmd;
 use core_compat::entity::rmd_type::RmdType;
-use core_compat::entity::map::Map;
-use core_compat::entity::list::List;
 use core_compat::error::Error;
+use core_compat::parser::lst::parse_lst;
 use core_compat::parser::rle::parse_rle;
 use core_compat::parser::rmd::parse_rmd;
 use core_compat::parser::rmm::parse_rmm;
-use core_compat::parser::lst::parse_lst;
 
 static OUTPUT_PATH: &'static str = "./temp/";
 
 // This is the list of data folder's and list files for them
 static RLE_ENTRIES: [(&'static str, &'static str, &'static str, &'static str, bool); 16] = [
     // type      |short| source path           | source list path          | type 2?
-    ("bullets",   "bul", "./data/RLEs/Bul",     "./data/RLEs/bul.lst",     false),
-    ("icons",     "ico", "./data/RLEs/Ico",     "./data/RLEs/ico.lst",     false),
-    ("objects",   "obj", "./data/RLEs/Obj",     "./data/RLEs/obj.lst",     true),
-    ("tiles",     "tle", "./data/RLEs/Tle",     "./data/RLEs/tle.lst",     false),
-    ("interface", "int", "./data/RLEs/Int",     "./data/RLEs/int.lst",     false),
-    ("philar",    "ch0", "./data/RLEs/Chr/C00", "./data/RLEs/Chr/c00.lst", false),
-    ("azlar",     "ch1", "./data/RLEs/Chr/C01", "./data/RLEs/Chr/c01.lst", false),
-    ("sadad",     "ch2", "./data/RLEs/Chr/C02", "./data/RLEs/Chr/c02.lst", false),
-    ("destino",   "ch3", "./data/RLEs/Chr/C03", "./data/RLEs/Chr/c03.lst", false),
-    ("jarexx",    "ch4", "./data/RLEs/Chr/C04", "./data/RLEs/Chr/c04.lst", false),
-    ("canon",     "ch5", "./data/RLEs/Chr/C05", "./data/RLEs/Chr/c05.lst", false),
-    ("kitara",    "ch6", "./data/RLEs/Chr/C06", "./data/RLEs/Chr/c06.lst", false),
-    ("lunarena",  "ch7", "./data/RLEs/Chr/C07", "./data/RLEs/Chr/c07.lst", false),
-    ("lavita",    "ch8", "./data/RLEs/Chr/C08", "./data/RLEs/Chr/c08.lst", false),
-    ("ch_9_gm",   "ch9", "./data/RLEs/Chr/C09", "./data/RLEs/Chr/c09.lst", false),
-    ("extra_chr", "etc", "./data/RLEs/Chr/Etc", "./data/RLEs/Chr/etc.lst", false),
+    (
+        "bullets",
+        "bul",
+        "./data/RLEs/Bul",
+        "./data/RLEs/bul.lst",
+        false,
+    ),
+    (
+        "icons",
+        "ico",
+        "./data/RLEs/Ico",
+        "./data/RLEs/ico.lst",
+        false,
+    ),
+    (
+        "objects",
+        "obj",
+        "./data/RLEs/Obj",
+        "./data/RLEs/obj.lst",
+        true,
+    ),
+    (
+        "tiles",
+        "tle",
+        "./data/RLEs/Tle",
+        "./data/RLEs/tle.lst",
+        false,
+    ),
+    (
+        "interface",
+        "int",
+        "./data/RLEs/Int",
+        "./data/RLEs/int.lst",
+        false,
+    ),
+    (
+        "philar",
+        "ch0",
+        "./data/RLEs/Chr/C00",
+        "./data/RLEs/Chr/c00.lst",
+        false,
+    ),
+    (
+        "azlar",
+        "ch1",
+        "./data/RLEs/Chr/C01",
+        "./data/RLEs/Chr/c01.lst",
+        false,
+    ),
+    (
+        "sadad",
+        "ch2",
+        "./data/RLEs/Chr/C02",
+        "./data/RLEs/Chr/c02.lst",
+        false,
+    ),
+    (
+        "destino",
+        "ch3",
+        "./data/RLEs/Chr/C03",
+        "./data/RLEs/Chr/c03.lst",
+        false,
+    ),
+    (
+        "jarexx",
+        "ch4",
+        "./data/RLEs/Chr/C04",
+        "./data/RLEs/Chr/c04.lst",
+        false,
+    ),
+    (
+        "canon",
+        "ch5",
+        "./data/RLEs/Chr/C05",
+        "./data/RLEs/Chr/c05.lst",
+        false,
+    ),
+    (
+        "kitara",
+        "ch6",
+        "./data/RLEs/Chr/C06",
+        "./data/RLEs/Chr/c06.lst",
+        false,
+    ),
+    (
+        "lunarena",
+        "ch7",
+        "./data/RLEs/Chr/C07",
+        "./data/RLEs/Chr/c07.lst",
+        false,
+    ),
+    (
+        "lavita",
+        "ch8",
+        "./data/RLEs/Chr/C08",
+        "./data/RLEs/Chr/c08.lst",
+        false,
+    ),
+    (
+        "ch_9_gm",
+        "ch9",
+        "./data/RLEs/Chr/C09",
+        "./data/RLEs/Chr/c09.lst",
+        false,
+    ),
+    (
+        "extra_chr",
+        "etc",
+        "./data/RLEs/Chr/Etc",
+        "./data/RLEs/Chr/etc.lst",
+        false,
+    ),
     // The sounds one is the only one which is a little different...
     // ("Sounds", "snd", "../data/RLEs/Snd", "../data/RLEs/snd.lst"),
 ];
 
-static RMM_ENTRY: (&'static str, &'static str) =
-    ("maps", "./data/DATAs/Map");
+static RMM_ENTRY: (&'static str, &'static str) = ("maps", "./data/DATAs/Map");
 
 static RMD_ENTRIES: [(&'static str, &'static str, &'static str, RmdType); 5] = [
     ("bullet", "bul", "./data/DATAs/Bul", RmdType::Bullet),
@@ -61,10 +155,16 @@ static RMD_ENTRIES: [(&'static str, &'static str, &'static str, RmdType); 5] = [
 ];
 
 fn main() {
-    println!("Starting from directory: {:?}", ::std::env::current_dir().unwrap());
+    println!(
+        "Starting from directory: {:?}",
+        ::std::env::current_dir().unwrap()
+    );
     // create directory - print errors...
     let root_out_dir = Path::new(OUTPUT_PATH);
-    println!("Creating directory: {:?}", root_out_dir.canonicalize().unwrap());
+    println!(
+        "Creating directory: {:?}",
+        root_out_dir.canonicalize().unwrap()
+    );
     match std::fs::create_dir(root_out_dir) {
         Ok(_) => (),
         Err(e) => println!("{:?}", e),
@@ -125,7 +225,7 @@ fn convert_rmd_data() {
     // create the output directory if it doesn't exist yet
     let mut data_out_dir = PathBuf::new();
     data_out_dir.push(OUTPUT_PATH);
-    data_out_dir.push("data");
+    data_out_dir.push("../../client/data");
     println!("Creating directory: {:?}", data_out_dir);
     match std::fs::create_dir(data_out_dir) {
         Ok(_) => (),
@@ -236,13 +336,17 @@ fn convert_rmm_data() {
             xml.end_elem().unwrap();
             // <object_ref> rm data reference
             xml.begin_elem("object_ref").unwrap();
-            xml.attr("file", &format!("{}", tile.obj_rmd_entry.file())).unwrap();
-            xml.attr("index", &format!("{}", tile.obj_rmd_entry.index())).unwrap();
+            xml.attr("file", &format!("{}", tile.obj_rmd_entry.file()))
+                .unwrap();
+            xml.attr("index", &format!("{}", tile.obj_rmd_entry.index()))
+                .unwrap();
             xml.end_elem().unwrap();
             // <tile_ref> rm data reference
             xml.begin_elem("tile_ref").unwrap();
-            xml.attr("file", &format!("{}", tile.tle_rmd_entry.file())).unwrap();
-            xml.attr("index", &format!("{}", tile.tle_rmd_entry.index())).unwrap();
+            xml.attr("file", &format!("{}", tile.tle_rmd_entry.file()))
+                .unwrap();
+            xml.attr("index", &format!("{}", tile.tle_rmd_entry.index()))
+                .unwrap();
             xml.end_elem().unwrap();
             // <warp>
             xml.begin_elem("warp").unwrap();
@@ -296,7 +400,10 @@ fn convert_rle_data(use_lst: bool) {
         }
 
         // load the actual sprites into the database
-        let rle_paths: Vec<std::fs::DirEntry> = read_dir(folder).unwrap().filter_map(|ent| ent.ok()).collect();
+        let rle_paths: Vec<std::fs::DirEntry> = read_dir(folder)
+            .unwrap()
+            .filter_map(|ent| ent.ok())
+            .collect();
         let mut resources = Vec::<Resource>::new();
 
         dbg!(rle_paths.len());
@@ -324,9 +431,7 @@ fn convert_rle_data(use_lst: bool) {
         if use_lst {
             for rle in resources.iter() {
                 for item in &list_data.items {
-                    if item.entry.file() == rle.file_num
-                        && item.entry.index() == rle.index
-                    {
+                    if item.entry.file() == rle.file_num && item.entry.index() == rle.index {
                         matches += 1;
                         let file_name = format!("{}_{}.png", &short_kind, item.id);
                         combi_entries.push(RleCombiEntry {
@@ -363,9 +468,7 @@ fn write_png(subdir: &str, file_name: &str, rle: &Resource) {
     path_buf.push(file_name);
     if let Ok(file) = File::create(&path_buf) {
         let ref mut writer = BufWriter::new(file);
-        let mut encoder = png::Encoder::new(writer,
-                                            rle.width as u32,
-                                            rle.height as u32);
+        let mut encoder = png::Encoder::new(writer, rle.width as u32, rle.height as u32);
         encoder.set_color(png::ColorType::Rgba);
         encoder.set_depth(png::BitDepth::Eight);
         let mut writer = encoder.write_header().unwrap();
@@ -389,8 +492,10 @@ fn write_list_file(kind: &str, combi_entries: Vec<RleCombiEntry>) {
         xml.begin_elem("entry").unwrap();
         xml.attr("id", &format!("{}", entry.id)).unwrap();
         xml.attr("name", &entry.name).unwrap();
-        xml.attr("x_offset", &format!("{}", entry.x_offset)).unwrap();
-        xml.attr("y_offset", &format!("{}", entry.y_offset)).unwrap();
+        xml.attr("x_offset", &format!("{}", entry.x_offset))
+            .unwrap();
+        xml.attr("y_offset", &format!("{}", entry.y_offset))
+            .unwrap();
         xml.attr("width", &format!("{}", entry.width)).unwrap();
         xml.attr("height", &format!("{}", entry.height)).unwrap();
         xml.attr("file_name", &entry.file_name).unwrap();

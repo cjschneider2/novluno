@@ -1,8 +1,7 @@
-
-use crate::entity::event::Event;
+use crate::entity::map_event::MapEvent;
 use crate::entity::map_tile::MapTile;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Map {
     pub size_x: u32,
     pub size_y: u32,
@@ -11,7 +10,7 @@ pub struct Map {
     pub name: String,
     pub number: u32,
     pub event_count: u32,
-    pub events: Vec<Event>,
+    pub events: Vec<MapEvent>,
     pub tiles: Vec<MapTile>,
 }
 
@@ -34,7 +33,7 @@ impl Map {
         self.tiles.push(tile);
     }
 
-    pub fn add_event(&mut self, event: Event) {
+    pub fn add_event(&mut self, event: MapEvent) {
         self.events.push(event);
     }
 

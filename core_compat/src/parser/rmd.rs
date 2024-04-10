@@ -40,21 +40,21 @@
 //! [RMD Animation - Frame]
 //! int RMDRowPointer (points to a row of the RMD)
 
-use std::str::from_utf8;
 use std::io::Cursor;
 use std::io::Seek;
 use std::io::SeekFrom;
+use std::str::from_utf8;
 
-use byteorder::ReadBytesExt;
 use byteorder::LittleEndian as LE;
+use byteorder::ReadBytesExt;
 
 use crate::entity::rmd::Rmd;
 use crate::entity::rmd_animation::RmdAnimation;
 use crate::entity::rmd_entry::RmdEntry;
-use crate::entity::rmd_type::RmdType;
 use crate::entity::rmd_image::RmdImage;
+use crate::entity::rmd_type::RmdType;
 use crate::error::Error;
-use crate::utility::parsing::{parse_string, parse_cp949, parse_u8_vec};
+use crate::utility::parsing::{parse_cp949, parse_string, parse_u8_vec};
 
 pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     let mut cursor = Cursor::new(data);
@@ -65,13 +65,17 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
     // println!("{:?}", string_1);
 
     let file_number = cursor.read_u32::<LE>()?; // 4
-    // println!("file_number: {}", file_number);
+                                                // println!("file_number: {}", file_number);
 
     // 8 empty bytes
     let padding = cursor.read_u32::<LE>()?; // 8
-    if padding != 0 { println!("p2: {}", padding); }
+    if padding != 0 {
+        println!("p2: {}", padding);
+    }
     let padding = cursor.read_u32::<LE>()?; // 12
-    if padding != 0 { println!("p3: {}", padding); }
+    if padding != 0 {
+        println!("p3: {}", padding);
+    }
 
     // let string = parse_string(&mut cursor)?;
     // let string = parse_u8_vec(&mut cursor)?;
@@ -100,10 +104,10 @@ pub fn parse_rmd(kind: RmdType, data: &[u8]) -> Result<Rmd, Error> {
             img.source_x2 = cursor.read_i32::<LE>()?;
             img.source_y2 = cursor.read_i32::<LE>()?;
             img.empty_1 = cursor.read_i32::<LE>()?;
-            img.empty_2 = cursor.read_i32::<LE>()?;
+            img.render_z = cursor.read_i32::<LE>()?; // zorder — JS field 6 (was wrongly read as empty_2)
             img.dest_x = cursor.read_i32::<LE>()?;
             img.dest_y = cursor.read_i32::<LE>()?;
-            img.render_z = cursor.read_i32::<LE>()?;
+            img.empty_2 = cursor.read_i32::<LE>()?;  // layer / blend-mode flag (JS field 9)
             img.draw_type = cursor.read_i32::<LE>()?;
             img.image_id_count = cursor.read_i32::<LE>()?;
             for _ in 0..img.image_id_count {
@@ -141,14 +145,14 @@ mod tests {
 
     #[test]
     fn test_tle_00001() {
-        let data = include_bytes!("../../../data/DATAs/Tle/tle00001.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Tle/tle00001.rmd");
         let rmd = parse_rmd(RmdType::Tile, data).unwrap();
         assert_eq!(rmd.animation_count as usize, rmd.animations.len());
     }
 
     #[test]
     fn test_obj_00001() {
-        let data = include_bytes!("../../../data/DATAs/Obj/obj00001.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Obj/obj00001.rmd");
         let rmd = parse_rmd(RmdType::Object, data).unwrap();
         // assert!(rmd.row_count as usize == rmd.rows.len());
         // assert!(rmd.animation_count as usize == rmd.animations.len());
@@ -156,7 +160,7 @@ mod tests {
 
     #[test]
     fn test_chr_00001() {
-        let data = include_bytes!("../../../data/DATAs/Chr/chr00001.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Chr/chr00001.rmd");
         let rmd = parse_rmd(RmdType::Character, data).unwrap();
         // print_ani_info(&rmd);
         // assert!(rmd.row_count as usize == rmd.rows.len());
@@ -165,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_chr_00042() {
-        let data = include_bytes!("../../../data/DATAs/Chr/chr00042.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Chr/chr00042.rmd");
         let rmd = parse_rmd(RmdType::Character, data).unwrap();
         // assert!(rmd.row_count as usize == rmd.rows.len());
         // assert!(rmd.animation_count as usize == rmd.animations.len());

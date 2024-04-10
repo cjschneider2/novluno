@@ -2,6 +2,7 @@
 name = "core_compat"
 version = "0.0.1"
 authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
+edition = "2024"
 
 [dependencies.geometry]
 path = "../geometry"
@@ -13,4 +14,4 @@ path = "../cp949"
 byteorder = "*"
 
 [dev-dependencies]
-png = "0.17.2"
+png = "0.18.0"

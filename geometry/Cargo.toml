@@ -2,5 +2,6 @@
 name = "geometry"
 version = "0.1.0"
 authors = ["C. Jeremiah Schneider <cjschneider2@gmail.com>"]
+edition = "2024"
 
 [dependencies]

@@ -3,8 +3,19 @@ name = "client"
 version = "0.1.0"
 edition = "2021"
 
+# NOTE: Workspace dependencies are referenced with the local path
+[dependencies.core_compat]
+path = "../core_compat"
+
+[dependencies.geometry]
+path = "../geometry"
+
 [dependencies]
-bevy = "0.13"
+bevy = { version = "0.18.1", features = ["bevy_asset"]}
+bevy_framepace = "0.21.0"
+thiserror = "2.0.18"
+ron = "*"
+bevy_egui = "0.39.1"
 
 [profile.dev]
 opt-level = 1

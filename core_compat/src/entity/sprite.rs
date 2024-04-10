@@ -1,6 +1,6 @@
-use crate::utility::pixel::Pixel;
 use crate::entity::entry::Entry;
 use crate::entity::sprite_type::SpriteType;
+use crate::utility::pixel::Pixel;
 
 #[derive(Debug)]
 pub struct Sprite {
@@ -13,4 +13,3 @@ pub struct Sprite {
     // pub image_raw: Vec<Pixel>,
     pub image_raw: Vec<u8>, // defined to be in RGB_565_norm format
 }
-

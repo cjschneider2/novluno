@@ -2,6 +2,7 @@
 name = "cp949"
 version = "0.1.0"
 authors = ["Charles J. Schneider <cjschneider2@gmail.com>"]
+edition = "2024"
 
 [dependencies]
 byteorder = "*"
