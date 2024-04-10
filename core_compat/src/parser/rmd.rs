@@ -141,14 +141,14 @@ mod tests {
 
     #[test]
     fn test_tle_00001() {
-        let data = include_bytes!("../../../data/DATAs/Tle/tle00001.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Tle/tle00001.rmd");
         let rmd = parse_rmd(RmdType::Tile, data).unwrap();
         assert_eq!(rmd.animation_count as usize, rmd.animations.len());
     }
 
     #[test]
     fn test_obj_00001() {
-        let data = include_bytes!("../../../data/DATAs/Obj/obj00001.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Obj/obj00001.rmd");
         let rmd = parse_rmd(RmdType::Object, data).unwrap();
         // assert!(rmd.row_count as usize == rmd.rows.len());
         // assert!(rmd.animation_count as usize == rmd.animations.len());
@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn test_chr_00001() {
-        let data = include_bytes!("../../../data/DATAs/Chr/chr00001.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Chr/chr00001.rmd");
         let rmd = parse_rmd(RmdType::Character, data).unwrap();
         // print_ani_info(&rmd);
         // assert!(rmd.row_count as usize == rmd.rows.len());
@@ -165,7 +165,7 @@ mod tests {
 
     #[test]
     fn test_chr_00042() {
-        let data = include_bytes!("../../../data/DATAs/Chr/chr00042.rmd");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Chr/chr00042.rmd");
         let rmd = parse_rmd(RmdType::Character, data).unwrap();
         // assert!(rmd.row_count as usize == rmd.rows.len());
         // assert!(rmd.animation_count as usize == rmd.animations.len());

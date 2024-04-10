@@ -114,25 +114,25 @@ mod tests {
 
     #[test]
     fn test_lst_bul() {
-        let data = include_bytes!("../../../data/RLEs/bul.lst");
+        let data = include_bytes!("../../../client/assets/data/RLEs/bul.lst");
         let list = parse_lst(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_ico() {
-        let data = include_bytes!("../../../data/RLEs/ico.lst");
+        let data = include_bytes!("../../../client/assets/data/RLEs/ico.lst");
         let list = parse_lst(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_int() {
-        let data = include_bytes!("../../../data/RLEs/int.lst");
+        let data = include_bytes!("../../../client/assets/data/RLEs/int.lst");
         let list = parse_lst(data, false).unwrap();
     }
 
     #[test]
     fn test_lst_tle() {
-        let data = include_bytes!("../../../data/RLEs/tle.lst");
+        let data = include_bytes!("../../../client/assets/data/RLEs/tle.lst");
         let list = parse_lst(data, false).unwrap();
     }
 
@@ -155,7 +155,7 @@ mod tests {
     #[test]
     // NOTE: This uses the version 1.2 of the lst file
     fn test_lst_obj() {
-        let data = include_bytes!("../../../data/RLEs/obj.lst");
+        let data = include_bytes!("../../../client/assets/data/RLEs/obj.lst");
         let list = parse_lst(data, false).unwrap();
     }
 }

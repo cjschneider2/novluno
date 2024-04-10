@@ -125,7 +125,7 @@ fn convert_rmd_data() {
     // create the output directory if it doesn't exist yet
     let mut data_out_dir = PathBuf::new();
     data_out_dir.push(OUTPUT_PATH);
-    data_out_dir.push("data");
+    data_out_dir.push("../../client/data");
     println!("Creating directory: {:?}", data_out_dir);
     match std::fs::create_dir(data_out_dir) {
         Ok(_) => (),

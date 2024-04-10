@@ -1,0 +1,20 @@
+#[derive(Copy, Clone, Hash, Eq, PartialEq)]
+pub enum ListType {
+    Bullet,
+    Icon,
+    Interface,
+    Sound,
+    Tile,
+    Object,
+    Chr0,
+    Chr1,
+    Chr2,
+    Chr3,
+    Chr4,
+    Chr5,
+    Chr6,
+    Chr7,
+    Chr8,
+    Chr9,
+    Etc,
+}

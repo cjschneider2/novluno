@@ -12,7 +12,7 @@ Cargo.lock
 **/*.rs.bk
 
 # The data directory
-/data/
+/client/assets/data/
 /data_*/
 
 # Other directories

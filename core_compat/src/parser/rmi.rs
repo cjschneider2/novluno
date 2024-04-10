@@ -95,7 +95,7 @@ mod tests {
 
     #[test]
     fn test_rmi_event00() {
-        let data = include_bytes!("../../../data/DATAs/Info/event00.rmi");
+        let data = include_bytes!("../../../client/assets/data/DATAs/Info/event00.rmi");
         let rmi = parse_rmi(data);
         rmi.unwrap();
     }

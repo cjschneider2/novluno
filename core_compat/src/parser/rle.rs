@@ -184,25 +184,25 @@ mod tests {
 
     #[test]
     fn test_c0000000_rle() {
-        let data = include_bytes!("../../../data/RLEs/Chr/C00/c0000000.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Chr/C00/c0000000.rle");
         let rle = parse_rle(0, data).unwrap();
     }
 
     #[test]
     fn test_c0000042_rle() {
-        let data = include_bytes!("../../../data/RLEs/Chr/C00/c0000042.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Chr/C00/c0000042.rle");
         let rle = parse_rle(42, data).unwrap();
     }
 
     #[test]
     fn test_c0200188_rle() {
-        let data = include_bytes!("../../../data/RLEs/Chr/C02/c0200188.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Chr/C02/c0200188.rle");
         let rle = parse_rle(188, data).unwrap();
     }
 
     #[test]
     fn test_ico_00000_rle() {
-        let data = include_bytes!("../../../data/RLEs/Ico/ico00000.rle");
+        let data = include_bytes!("../../../client/assets/data/RLEs/Ico/ico00000.rle");
         let rle = parse_rle(0, data).unwrap();
     }
 }

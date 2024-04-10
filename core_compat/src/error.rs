@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::io;
 use std::str::Utf8Error;
 use std::string::FromUtf16Error;
@@ -12,6 +13,34 @@ pub enum Error {
     MissingRleIdentifier,
     UnknownOffsetTypeAt(u64, u8),
     Utf8(Utf8Error),
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::FromUtf16(s) => write!(f, "{}", s),
+            Error::FromUtf8(s) => write!(f, "{}", s),
+            Error::Io(s) => write!(f, "{}", s),
+            Error::MissingMapIdentifier => write!(f, "{}", "missing map identifier"),
+            Error::MissingRleIdentifier => write!(f, "{}", "missing rle identifier"),
+            Error::UnknownOffsetTypeAt(offset, typ) => write!(f, "unknown type {} at offset {}", typ, offset),
+            Error::Utf8(s) => write!(f, "{}", s),
+        }
+    }
+}
+
+impl std::error::Error for Error {
+    fn description(&self) -> &str {
+        match self {
+            Error::FromUtf16(_) => "error parsing utf16",
+            Error::FromUtf8(_) => "error parsing utf8",
+            Error::Io(_) => "io error",
+            Error::MissingMapIdentifier => "missing map identifier",
+            Error::MissingRleIdentifier => "missing rle identifier",
+            Error::UnknownOffsetTypeAt(_, _) => "unknown type at offset",
+            Error::Utf8(_) => "utf8 error",
+        }
+    }
 }
 
 impl From<io::Error> for Error {
