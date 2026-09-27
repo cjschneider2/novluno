@@ -13,7 +13,7 @@ impl MapIndex {
         if let Some(map) = self.by_number.get(&number) {
             return map.clone();
         }
-        let name = format!("data/DATAs/Map/Map{:05}.rmm", number);
+        let name = format!("DATAs/Map/Map{:05}.rmm", number);
         let handle: Handle<MapAsset> = asset_server.load(&name);
         self.by_number.insert(number, handle.clone());
         handle

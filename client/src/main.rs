@@ -31,7 +31,10 @@ use crate::systems::player::{
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::srgb(1.0, 0.0, 1.0)))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            file_path: "".to_string(),
+            ..default()
+        }))
         .add_plugins(bevy_framepace::FramepacePlugin)
         .add_plugins(EguiPlugin::default())
         .init_asset::<ListAsset>()

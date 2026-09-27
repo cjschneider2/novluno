@@ -14,6 +14,7 @@ Cargo.lock
 # The data directory
 /client/assets/data/
 /data_*/
+/data/
 
 # Other directories
 /experiments/rmduo

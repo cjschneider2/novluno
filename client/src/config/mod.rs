@@ -14,8 +14,8 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Config {
-            data_dir: "../Data/DATAs".into(),
-            rle_dir: "../Data/RELs".into(),
+            data_dir: "DATAs".into(),
+            rle_dir: "RELs".into(),
             list_paths: vec![
                 ("bul.lst".into(), ListType::Bullet),
                 ("ico.lst".into(), ListType::Icon),

@@ -11,11 +11,11 @@ path = "../core_compat"
 path = "../geometry"
 
 [dependencies]
-bevy = { version = "0.18.1", features = ["bevy_asset"]}
-bevy_framepace = "0.21.0"
+bevy = { version = "0.19.1", features = ["bevy_asset"]}
+bevy_framepace = "0.22.0"
 thiserror = "2.0.18"
 ron = "*"
-bevy_egui = "0.39.1"
+bevy_egui = "0.42.0"
 
 [profile.dev]
 opt-level = 1

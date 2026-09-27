@@ -14,7 +14,7 @@ pub const STARTING_MAP: usize = 1;
 pub const RENDER_MARGIN_TILES: i32 = 1;
 
 // Player movement.
-pub const MOVE_COOLDOWN: f32 = 0.12;
+pub const MOVE_COOLDOWN: f32 = 0.1;
 
 // Animation frame rates.
 pub const TILE_ANIM_FPS: f32 = 30.0;

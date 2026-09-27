@@ -152,11 +152,11 @@ pub fn spawn_tiles(
         }
 
         for &n in &tle_rmd_file_nums {
-            let h = asset_server.load(format!("data/DATAs/Tle/tle{n:05}.rmd"));
+            let h = asset_server.load(format!("DATAs/Tle/tle{n:05}.rmd"));
             data_cache.insert(SpriteKind::Tile, n, h);
         }
         for &n in &obj_rmd_file_nums {
-            let h = asset_server.load(format!("data/DATAs/Obj/obj{n:05}.rmd"));
+            let h = asset_server.load(format!("DATAs/Obj/obj{n:05}.rmd"));
             data_cache.insert(SpriteKind::Object, n, h);
         }
 
@@ -203,10 +203,10 @@ pub fn spawn_tiles(
             obj_rle_file_nums.len(),
         );
         spawn_state.tle_rle_handles = tle_rle_file_nums.iter()
-            .map(|&n| asset_server.load(format!("data/RLEs/Tle/tle{n:05}.rle")))
+            .map(|&n| asset_server.load(format!("RLEs/Tle/tle{n:05}.rle")))
             .collect();
         spawn_state.obj_rle_handles = obj_rle_file_nums.iter()
-            .map(|&n| asset_server.load(format!("data/RLEs/Obj/obj{n:05}.rle")))
+            .map(|&n| asset_server.load(format!("RLEs/Obj/obj{n:05}.rle")))
             .collect();
 
         spawn_state.phase = Phase::WaitingForSprites;

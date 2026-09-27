@@ -83,6 +83,16 @@ pub struct Player {
     pub frame_idx: usize,
     /// Per-frame animation advance timer.
     pub timer: Timer,
+    /// Visual interpolation start position
+    pub move_from: Vec2,
+    /// Visual interpolation end position
+    pub move_to: Vec2,
+    /// Seconds elapsed in the current move state
+    pub move_elapsed: f32,
+    /// Seconds to complete move state
+    pub move_duration: f32,
+    /// True while the player is moving (interpolating to `move_to`).
+    pub is_interpolating: bool,
 }
 
 impl Default for Player {
@@ -96,6 +106,11 @@ impl Default for Player {
             action: CharAction::default(),
             frame_idx: 0,
             timer: Timer::new(Duration::from_secs_f32(1.0 / PLAYER_ANIM_FPS), TimerMode::Repeating),
+            move_from: Vec2::ZERO,
+            move_to: Vec2::ZERO,
+            move_elapsed: 0.0,
+            move_duration: MOVE_COOLDOWN,
+            is_interpolating: false,
         }
     }
 }
@@ -211,6 +226,25 @@ pub fn player_movement(
 ) {
     let Ok((mut player, mut transform)) = q.single_mut() else { return };
 
+    if player.is_interpolating {
+        player.move_elapsed += time.delta_secs();
+
+        let t = (player.move_elapsed / player.move_duration).clamp(0.0, 1.0);
+
+        let ease_t = t * t * (3.0 - 2.0 * t);
+
+        let world = player.move_from.lerp(player.move_to, ease_t);
+
+        transform.translation.x = world.x;
+        transform.translation.y = world.y;
+
+        if t >= 1.0 {
+            player.is_interpolating = false;
+            transform.translation.x = player.move_to.x;
+            transform.translation.y = player.move_to.y;
+        }
+    }
+
     // Determine map bounds for clamping (1-tile margin on each edge).
     let (map_w, map_h) = state
         .data
@@ -235,7 +269,9 @@ pub fn player_movement(
     if keys.pressed(KeyCode::KeyA) || keys.pressed(KeyCode::KeyH) { dx -= 1; }
     if keys.pressed(KeyCode::KeyD) || keys.pressed(KeyCode::KeyL) { dx += 1; }
 
-    if dx != 0 || dy != 0 {
+    let moving = dx != 0 || dy != 0;
+
+    if moving {
         let new_dir = direction_from_delta(dx, dy);
         let dir_changed = new_dir != player.direction;
         if dir_changed {
@@ -249,11 +285,19 @@ pub fn player_movement(
 
             if new_x != player.tile_x || new_y != player.tile_y {
                 if !collision_grid.is_blocked(new_x, new_y, player.tile_pos) {
+                    let old_world = tile_to_world(player.tile_x, player.tile_y, player.tile_pos);
+
                     player.tile_x = new_x;
                     player.tile_y = new_y;
-                    let world = tile_to_world(player.tile_x, player.tile_y, player.tile_pos);
-                    transform.translation.x = world.x;
-                    transform.translation.y = world.y;
+
+                    let new_world = tile_to_world(player.tile_x, player.tile_y, player.tile_pos);
+
+                    player.move_from = old_world;
+                    player.move_to = new_world;
+                    player.move_elapsed = 0.0;
+                    player.move_duration = MOVE_COOLDOWN;
+                    player.is_interpolating = true;
+
                     transform.translation.z = player_z(player.tile_y);
                 }
                 *move_timer = MOVE_COOLDOWN;
@@ -281,11 +325,11 @@ pub fn load_char_assets(
     let Ok(player) = player_q.single() else { return };
     let ce = player.char_enum;
     if !state.data.chr_rmds.contains_key(&ce) {
-        let rmd_handle = asset_server.load(format!("data/DATAs/Chr/chr{ce:05}.rmd"));
+        let rmd_handle = asset_server.load(format!("DATAs/Chr/chr{ce:05}.rmd"));
         state.data.chr_rmds.insert(ce, rmd_handle);
     }
     if !state.data.chr_lists.contains_key(&ce) {
-        let list_handle = asset_server.load(format!("data/RLEs/Chr/c{ce:02}.lst"));
+        let list_handle = asset_server.load(format!("RLEs/Chr/c{ce:02}.lst"));
         state.data.chr_lists.insert(ce, list_handle);
     }
 }
@@ -376,7 +420,7 @@ pub fn spawn_char_sprites(
         char_spawn_state.rle_handles = rle_file_nums
             .iter()
             .map(|&n| asset_server.load(
-                format!("data/RLEs/Chr/C{ce:02}/c{ce:02}{n:05}.rle"),
+                format!("RLEs/Chr/C{ce:02}/c{ce:02}{n:05}.rle"),
             ))
             .collect();
         char_spawn_state.loaded_char = ce;

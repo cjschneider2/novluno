@@ -83,12 +83,12 @@ pub fn sync_frame_limit(state: Res<State>, mut settings: ResMut<FramepaceSetting
 
 pub fn load_assets(mut state: ResMut<State>, asset_server: Res<AssetServer>, _config: Res<Config>) {
     use crate::constants::STARTING_MAP;
-    state.data.tile_list = asset_server.load("data/RLEs/tle.lst");
-    state.data.obj_list  = asset_server.load("data/RLEs/obj.lst");
-    state.data.maps.insert(STARTING_MAP, asset_server.load(format!("data/DATAs/Map/Map{STARTING_MAP:05}.rmm")));
+    state.data.tile_list = asset_server.load("RLEs/tle.lst");
+    state.data.obj_list  = asset_server.load("RLEs/obj.lst");
+    state.data.maps.insert(STARTING_MAP, asset_server.load(format!("DATAs/Map/Map{STARTING_MAP:05}.rmm")));
     state.current_map = STARTING_MAP;
     state.printed_dbg = false;
     // Preload character 0 (Philar) assets.
-    state.data.chr_lists.insert(0, asset_server.load("data/RLEs/Chr/c00.lst"));
-    state.data.chr_rmds.insert(0, asset_server.load("data/DATAs/Chr/chr00000.rmd"));
+    state.data.chr_lists.insert(0, asset_server.load("RLEs/Chr/c00.lst"));
+    state.data.chr_rmds.insert(0, asset_server.load("DATAs/Chr/chr00000.rmd"));
 }
