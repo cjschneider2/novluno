@@ -2,6 +2,7 @@ mod asset_loader;
 mod config;
 mod constants;
 mod resources;
+pub mod scenes;
 mod state;
 mod systems;
 
@@ -16,6 +17,10 @@ use crate::config::Config;
 use crate::resources::data_cache::DataCache;
 use crate::resources::map_index::MapIndex;
 use crate::resources::sprite_cache::{populate_sprite_cache, SpriteCache};
+use crate::scenes::{
+    AccountData, CharacterCreatePlugin, CharacterSelectPlugin, InGamePlugin, LoadingPlugin,
+    LoginPlugin, SceneState,
+};
 use crate::systems::camera::{camera_follow, spawn_camera, update_map_bounds, MapBounds};
 use crate::systems::fonts::setup_fonts;
 use crate::systems::debug_marker::spawn_debug_marker;
@@ -30,13 +35,22 @@ use crate::systems::player::{
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Color::srgb(1.0, 0.0, 1.0)))
+        .insert_resource(ClearColor(Color::srgb(0.05, 0.05, 0.08)))
         .add_plugins(DefaultPlugins.set(AssetPlugin {
             file_path: "".to_string(),
             ..default()
         }))
         .add_plugins(bevy_framepace::FramepacePlugin)
         .add_plugins(EguiPlugin::default())
+        .init_state::<SceneState>()
+        .init_resource::<AccountData>()
+        .add_plugins((
+            LoadingPlugin,
+            LoginPlugin,
+            CharacterSelectPlugin,
+            CharacterCreatePlugin,
+            InGamePlugin,
+        ))
         .init_asset::<ListAsset>()
         .init_asset::<MapAsset>()
         .init_asset::<RleAsset>()
@@ -61,21 +75,30 @@ fn main() {
         .add_systems(Startup, (state::load_assets, spawn_camera, spawn_player, spawn_debug_marker))
         .add_systems(Update, (
             sync_frame_limit,
-            load_char_assets,
-            map_cycle_input,
-            change_map.after(map_cycle_input),
             populate_sprite_cache,
-            spawn_tiles.after(populate_sprite_cache).after(change_map),
-            update_map_bounds.after(spawn_tiles),
-            animate_sprites,
-            player_movement,
-            advance_char_anim.after(player_movement),
-            spawn_char_sprites.after(advance_char_anim).after(populate_sprite_cache),
-            update_char_layer_debug.after(spawn_char_sprites),
-            camera_follow.after(player_movement).after(update_map_bounds),
-            draw_debug_gizmos,
-            draw_collision_overlay,
         ))
-        .add_systems(EguiPrimaryContextPass, (setup_fonts, debug_overlay).chain())
+        .add_systems(
+            Update,
+            (
+                load_char_assets,
+                map_cycle_input,
+                change_map.after(map_cycle_input),
+                spawn_tiles.after(change_map),
+                update_map_bounds.after(spawn_tiles),
+                animate_sprites,
+                player_movement,
+                advance_char_anim.after(player_movement),
+                spawn_char_sprites.after(advance_char_anim),
+                update_char_layer_debug.after(spawn_char_sprites),
+                camera_follow.after(player_movement).after(update_map_bounds),
+                draw_debug_gizmos,
+                draw_collision_overlay,
+            )
+                .run_if(in_state(SceneState::InGame)),
+        )
+        .add_systems(
+            EguiPrimaryContextPass,
+            (setup_fonts, debug_overlay.run_if(in_state(SceneState::InGame))).chain(),
+        )
         .run();
 }
